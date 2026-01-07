@@ -1,0 +1,77 @@
+# ============================================================================
+# Chameleon Vitae - Container Orchestration
+# ============================================================================
+# Compatible with both Docker Compose and Podman Compose
+# Usage: podman-compose up -d
+# ============================================================================
+
+name: chameleon-vitae
+
+services:
+  # ==========================================================================
+  # PostgreSQL Database
+  # ==========================================================================
+  # PostgreSQL 17 (LTS-like stability) - Using bookworm for production reliability
+  # Version 18 is available but 17 is recommended for production stability
+  # ==========================================================================
+  postgres:
+    image: docker.io/library/postgres:17-bookworm
+    container_name: chameleon-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-chameleon}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme_in_production}
+      POSTGRES_DB: ${POSTGRES_DB:-chameleon_vitae}
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./deploy/postgres/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-chameleon} -d ${POSTGRES_DB:-chameleon_vitae}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - chameleon-network
+
+  # ==========================================================================
+  # Gotenberg PDF Engine
+  # ==========================================================================
+  # Gotenberg 8 - Headless Chrome/Chromium for HTML to PDF conversion
+  # Documentation: https://gotenberg.dev/docs/getting-started/installation
+  # ==========================================================================
+  gotenberg:
+    image: docker.io/gotenberg/gotenberg:8
+    container_name: chameleon-gotenberg
+    restart: unless-stopped
+    command:
+      - "gotenberg"
+      - "--chromium-disable-javascript=true"
+      - "--chromium-allow-list=file:///tmp/.*"
+      - "--api-timeout=60s"
+    ports:
+      - "127.0.0.1:3000:3000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - chameleon-network
+
+# ============================================================================
+# Volumes
+# ============================================================================
+volumes:
+  postgres_data:
+    driver: local
+
+# ============================================================================
+# Networks
+# ============================================================================
+networks:
+  chameleon-network:
+    driver: bridge

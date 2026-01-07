@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 Discussions
+    url: https://github.com/SeltikHD/chameleon-vitae/discussions
+    about: Use discussions for questions, ideas, and general conversation.
+  - name: 📖 Documentation
+    url: https://github.com/SeltikHD/chameleon-vitae#readme
+    about: Check the documentation before opening an issue.

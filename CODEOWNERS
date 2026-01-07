@@ -1,0 +1,33 @@
+# ============================================================================
+# Chameleon Vitae - CODEOWNERS
+# ============================================================================
+# This file defines the code owners for this repository.
+# These users will be automatically requested for review when a pull request
+# modifies files that match the patterns below.
+#
+# For more information, see:
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+# ============================================================================
+
+# Global owners - will be requested for review on all PRs
+*                           @SeltikHD
+
+# Core Domain - requires careful review
+/internal/core/             @SeltikHD
+
+# Infrastructure and adapters
+/internal/adapters/         @SeltikHD
+
+# Frontend
+/frontend/                  @SeltikHD
+
+# Infrastructure configuration
+/deploy/                    @SeltikHD
+compose.yaml                @SeltikHD
+
+# GitHub configuration and workflows
+/.github/                   @SeltikHD
+
+# Documentation
+*.md                        @SeltikHD
+/docs/                      @SeltikHD
