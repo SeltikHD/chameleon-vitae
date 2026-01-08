@@ -19,6 +19,7 @@ CREATE EXTENSION IF NOT EXISTS pg_trgm;
 CREATE TABLE IF NOT EXISTS users (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     firebase_uid VARCHAR(128) UNIQUE NOT NULL,
+    picture_url VARCHAR(512),
     email VARCHAR(255),
     name VARCHAR(255),
     headline VARCHAR(255),
