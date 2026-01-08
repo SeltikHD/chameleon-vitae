@@ -39,10 +39,9 @@ If applicable, add screenshots to help explain your problem.
 
 ## 📝 Logs
 
-<details>
-<summary>Click to expand logs</summary>
+### Logs Output
 
-```
+```text
 Paste relevant logs here
 ```
 
