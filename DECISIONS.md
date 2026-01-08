@@ -355,6 +355,156 @@ internal/
 
 ---
 
+## ADR-013: Use Jina Reader API for Job Description Parsing
+
+**Date:** 2026-01-08  
+**Status:** Accepted
+
+### Context
+
+Chameleon Vitae needs to parse job descriptions from various job boards (LinkedIn, Gupy, Indeed, etc.) to feed our LLM for resume tailoring. This presents several challenges:
+
+1. **Modern Web Complexity:** Job posting pages are heavily JavaScript-rendered, making traditional scraping difficult.
+2. **Anti-Scraping Measures:** Major job boards employ sophisticated bot detection (CAPTCHAs, rate limiting, IP blocking).
+3. **Diverse Page Structures:** Each job board has different HTML structures, requiring custom parsers.
+4. **Maintenance Burden:** Job boards frequently update their UI, breaking scrapers.
+5. **Legal Concerns:** Direct scraping may violate terms of service.
+6. **LLM Input Requirements:** Raw HTML is noisy and token-inefficient for LLM processing.
+
+#### Alternatives Considered
+
+|Option|Pros|Cons|
+|--------|------|------|
+|**Custom Scraper (Playwright/Puppeteer)**|Full control, no dependencies|High maintenance, bot detection, expensive hosting|
+|**Browserless.io**|Managed headless browser|Expensive at scale ($0.01+ per page)|
+|**ScrapingBee/Bright Data**|Residential proxies, high success rate|Very expensive, complex pricing|
+|**Jina Reader API**|Free/cheap, LLM-optimized output, simple API|Third-party dependency, potential rate limits|
+|**Ask users to paste text**|Simple, no scraping|Poor UX, inconsistent formatting|
+
+### Decision
+
+We will use **Jina Reader API** (`r.jina.ai`) as our primary job description parsing solution.
+
+#### What is Jina Reader?
+
+Jina Reader is an open-source service by Jina AI that converts any URL to LLM-friendly Markdown. It:
+
+- Handles JavaScript rendering automatically
+- Strips away navigation, ads, and irrelevant content
+- Outputs clean Markdown optimized for LLM consumption
+- Supports PDFs and images (with optional VLM captioning)
+- Provides both free and paid tiers
+
+#### Usage Pattern
+
+```text
+# Simply prepend r.jina.ai to any URL
+GET https://r.jina.ai/https://linkedin.com/jobs/view/12345
+
+# Returns clean Markdown:
+## Senior Backend Engineer
+
+**Company:** Awesome Corp
+**Location:** Remote, USA
+
+### About the Role
+We are looking for an experienced backend engineer...
+
+### Requirements
+- 5+ years of experience with Go or similar languages
+- Strong understanding of distributed systems
+...
+```
+
+#### Integration Architecture
+
+```text
+┌─────────────┐      ┌─────────────┐      ┌─────────────┐
+│   Frontend  │────▶│   Backend   │────▶│ Jina Reader │
+│  (Job URL)  │      │   /parse    │      │  r.jina.ai  │
+└─────────────┘      └─────────────┘      └─────────────┘
+                            │
+                            ▼
+                     ┌─────────────┐
+                     │   Groq AI   │
+                     │  (Analysis) │
+                     └─────────────┘
+```
+
+### Consequences
+
+#### Positive
+
+1. **Zero Maintenance:** No need to maintain scrapers or handle anti-bot measures.
+2. **LLM-Optimized Output:** Markdown is token-efficient and preserves structure.
+3. **Cost-Effective:** Free tier sufficient for MVP; paid tier is affordable (~$0.001/page).
+4. **Simple Integration:** Single HTTP GET request with URL prefix.
+5. **Rapid Development:** Allows us to focus on core resume tailoring logic.
+6. **Scalable Infrastructure:** Jina maintains the infrastructure.
+
+#### Negative
+
+1. **Third-Party Dependency:** Service outage would affect job parsing functionality.
+2. **Rate Limits:** Free tier has rate limits (may need API key for production).
+3. **No Offline Mode:** Requires internet connectivity.
+4. **Data Privacy:** Job URLs are sent to Jina's servers.
+5. **Output Variability:** Markdown quality depends on page structure.
+
+#### Mitigations
+
+|Risk|Mitigation|
+|------|------------|
+|Service outage|Implement fallback: ask user to paste job description manually|
+|Rate limits|Obtain API key for production; implement request queuing|
+|Privacy concerns|Only public job URLs are parsed; no user data sent|
+|Output quality|Validate and sanitize Markdown before LLM processing|
+
+### Implementation Notes
+
+#### API Endpoint
+
+```go
+// POST /tools/parse-job
+type ParseJobRequest struct {
+    URL string `json:"url" validate:"required,url"`
+}
+
+type ParseJobResponse struct {
+    URL      string            `json:"url"`
+    Title    string            `json:"title"`
+    Markdown string            `json:"markdown"`
+    Metadata map[string]string `json:"metadata"`
+}
+```
+
+#### Headers for Production
+
+```http
+GET https://r.jina.ai/https://example.com/job
+Authorization: Bearer <jina_api_key>
+Accept: text/markdown
+X-With-Generated-Alt: false
+```
+
+#### Error Handling
+
+- **429 Too Many Requests:** Implement exponential backoff and retry.
+- **Timeout (>30s):** Return partial content or fallback message.
+- **Empty Content:** Prompt user to paste job description manually.
+
+### Related Decisions
+
+- [ADR-003: AI Strategy (LLM Provider)](./DECISIONS.md#adr-003-ai-strategy-llm-provider) - Jina output feeds into Groq/Llama
+- [ADR-012: Multilanguage Resume Generation](./DECISIONS.md#adr-012-multilanguage-resume-generation) - Parsed content may be in different languages
+
+### References
+
+- [Jina Reader GitHub Repository](https://github.com/jina-ai/reader)
+- [Jina AI Official Documentation](https://jina.ai/reader)
+- [Jina Reader API Rate Limits](https://jina.ai/reader#pricing)
+
+---
+
 ## Template for New ADRs
 
 ```markdown
@@ -377,4 +527,4 @@ internal/
 
 ---
 
-Last Updated: 2026-01-07
+Last Updated: 2026-01-08
