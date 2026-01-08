@@ -32,7 +32,7 @@ repos:
     hooks:
       - id: markdownlint
         args: ['--fix']
-        exclude: 'CHANGELOG\.md'
+        exclude: '(CHANGELOG\.md|CODEOWNERS)'
 
   # Secrets detection
   - repo: https://github.com/Yelp/detect-secrets
