@@ -1,4 +1,25 @@
 // Package main is the entrypoint for the Chameleon Vitae server.
+//
+//	@title			Chameleon Vitae API
+//	@version		1.0.0
+//	@description	AI-powered resume engineering using Hexagonal Architecture. Tailors resumes to specific job descriptions using LLM technology.
+//
+//	@contact.name	Chameleon Vitae Team
+//	@contact.url	https://github.com/SeltikHD/chameleon-vitae
+//
+//	@license.name	MIT
+//	@license.url	https://opensource.org/licenses/MIT
+//
+//	@host			localhost:8080
+//	@BasePath		/v1
+//
+//	@securityDefinitions.apikey	BearerAuth
+//	@in							header
+//	@name						Authorization
+//	@description				Firebase JWT token. Format: "Bearer {token}"
+//
+//	@externalDocs.description	OpenAPI
+//	@externalDocs.url			https://swagger.io/resources/open-api/
 package main
 
 import (
@@ -12,6 +33,9 @@ import (
 
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
+
+	// Import generated swagger docs
+	_ "github.com/SeltikHD/chameleon-vitae/docs"
 )
 
 func main() {

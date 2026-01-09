@@ -1,3 +1,4 @@
+basePath: /v1
 definitions:
   http.AnalyzeBulletRequest:
     properties:
@@ -664,8 +665,18 @@ definitions:
         example: https://johndoe.dev
         type: string
     type: object
+host: localhost:8080
 info:
-  contact: {}
+  contact:
+    name: Chameleon Vitae Team
+    url: https://github.com/SeltikHD/chameleon-vitae
+  description: AI-powered resume engineering using Hexagonal Architecture. Tailors
+    resumes to specific job descriptions using LLM technology.
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  title: Chameleon Vitae API
+  version: 1.0.0
 paths:
   /health:
     get:
@@ -1652,4 +1663,10 @@ paths:
       summary: Parse job URL
       tags:
       - tools
+securityDefinitions:
+  BearerAuth:
+    description: 'Firebase JWT token. Format: "Bearer {token}"'
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"
