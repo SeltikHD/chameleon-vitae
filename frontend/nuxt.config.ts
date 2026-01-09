@@ -15,11 +15,29 @@ export default defineNuxtConfig({
     '/': { prerender: true }
   },
 
+  runtimeConfig: {
+    public: {
+      apiBase: process.env.NUXT_PUBLIC_API_BASE || 'http://localhost:8080/api',
+      // Firebase client-side configuration (safe to expose).
+      firebaseApiKey: process.env.NUXT_PUBLIC_FIREBASE_API_KEY || '',
+      firebaseAuthDomain: process.env.NUXT_PUBLIC_FIREBASE_AUTH_DOMAIN || '',
+      firebaseProjectId: process.env.NUXT_PUBLIC_FIREBASE_PROJECT_ID || '',
+      firebaseStorageBucket: process.env.NUXT_PUBLIC_FIREBASE_STORAGE_BUCKET || '',
+      firebaseMessagingSenderId: process.env.NUXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || '',
+      firebaseAppId: process.env.NUXT_PUBLIC_FIREBASE_APP_ID || ''
+    }
+  },
+
   compatibilityDate: '2025-01-15',
 
+  // ESLint configuration using ESLint Stylistic (no Prettier needed).
+  // This provides formatting rules directly in ESLint for a simpler toolchain.
   eslint: {
     config: {
       stylistic: {
+        indent: 2,
+        semi: false,
+        quotes: 'single',
         commaDangle: 'never',
         braceStyle: '1tbs'
       }
