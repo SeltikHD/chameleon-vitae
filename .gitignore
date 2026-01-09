@@ -106,6 +106,27 @@ frontend/.output
 *.key
 
 # ============================================================================
+# Firebase Configuration (SECURITY CRITICAL)
+# ============================================================================
+
+# Firebase service account files (backend - NEVER commit!)
+firebase-service-account.json
+firebase-service-account*.json
+*-firebase-adminsdk*.json
+serviceAccountKey.json
+service-account.json
+
+# Firebase emulator data
+.firebase/
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+database-debug.log
+
+# Firebase cache
+.firebaserc
+
+# ============================================================================
 # IDE & Editor
 # ============================================================================
 
