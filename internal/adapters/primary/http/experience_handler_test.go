@@ -30,7 +30,7 @@ func TestExperienceHandlerList(t *testing.T) {
 					Email:       "test@example.com",
 				})
 			},
-			setupMocks:     func(expRepo *mocks.InMemoryExperienceRepository) {},
+			setupMocks:     func(expRepo *mocks.InMemoryExperienceRepository) { /* no experiences seeded */ },
 			expectedStatus: http.StatusOK,
 			checkResponse: func(t *testing.T, resp ListExperiencesResponse) {
 				assert.Empty(t, resp.Data)
@@ -62,7 +62,7 @@ func TestExperienceHandlerList(t *testing.T) {
 			setupAuth: func(ctx context.Context) context.Context {
 				return ctx
 			},
-			setupMocks:     func(expRepo *mocks.InMemoryExperienceRepository) {},
+			setupMocks:     func(expRepo *mocks.InMemoryExperienceRepository) { /* no experiences seeded */ },
 			expectedStatus: http.StatusUnauthorized,
 			expectedCode:   "UNAUTHORIZED",
 		},
@@ -146,7 +146,7 @@ func TestExperienceHandlerGet(t *testing.T) {
 					Email:       "test@example.com",
 				})
 			},
-			setupMocks:     func(expRepo *mocks.InMemoryExperienceRepository) {},
+			setupMocks:     func(expRepo *mocks.InMemoryExperienceRepository) { /* no experiences seeded */ },
 			expectedStatus: http.StatusNotFound,
 			expectedCode:   "EXPERIENCE_NOT_FOUND",
 		},
@@ -174,7 +174,7 @@ func TestExperienceHandlerGet(t *testing.T) {
 			setupAuth: func(ctx context.Context) context.Context {
 				return ctx
 			},
-			setupMocks:     func(expRepo *mocks.InMemoryExperienceRepository) {},
+			setupMocks:     func(expRepo *mocks.InMemoryExperienceRepository) { /* no experiences seeded */ },
 			expectedStatus: http.StatusUnauthorized,
 			expectedCode:   "UNAUTHORIZED",
 		},

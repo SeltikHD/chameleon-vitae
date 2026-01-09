@@ -52,7 +52,7 @@ func TestUserHandlerGetMe(t *testing.T) {
 			setupAuth: func(ctx context.Context) context.Context {
 				return ctx // No auth user in context
 			},
-			setupMocks:     func(userRepo *mocks.InMemoryUserRepository) {},
+			setupMocks:     func(userRepo *mocks.InMemoryUserRepository) { /* no user seeded */ },
 			expectedStatus: http.StatusUnauthorized,
 			expectedCode:   "UNAUTHORIZED",
 		},
@@ -65,7 +65,7 @@ func TestUserHandlerGetMe(t *testing.T) {
 					Email:       "test@example.com",
 				})
 			},
-			setupMocks:     func(userRepo *mocks.InMemoryUserRepository) {},
+			setupMocks:     func(userRepo *mocks.InMemoryUserRepository) { /* no user seeded */ },
 			expectedStatus: http.StatusNotFound,
 			expectedCode:   "USER_NOT_FOUND",
 		},
@@ -176,7 +176,7 @@ func TestUserHandlerUpdateMe(t *testing.T) {
 			setupAuth: func(ctx context.Context) context.Context {
 				return ctx
 			},
-			setupMocks: func(userRepo *mocks.InMemoryUserRepository) {},
+			setupMocks: func(userRepo *mocks.InMemoryUserRepository) { /* no user seeded */ },
 			requestBody: UpdateUserRequest{
 				Name: strPtr("New Name"),
 			},
@@ -192,7 +192,7 @@ func TestUserHandlerUpdateMe(t *testing.T) {
 					Email:       "test@example.com",
 				})
 			},
-			setupMocks: func(userRepo *mocks.InMemoryUserRepository) {},
+			setupMocks: func(userRepo *mocks.InMemoryUserRepository) { /* no user seeded */ },
 			requestBody: UpdateUserRequest{
 				Name: strPtr("New Name"),
 			},
