@@ -5,6 +5,7 @@ package http
 
 import (
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/go-chi/chi/v5"
@@ -143,8 +144,12 @@ func (r *Router) setupRoutes() {
 
 	// Swagger documentation (if enabled)
 	if r.config.EnableSwagger {
+		swaggerHost := r.config.BaseURL
+		if strings.Contains(swaggerHost, "0.0.0.0") {
+			swaggerHost = strings.ReplaceAll(swaggerHost, "0.0.0.0", "localhost")
+		}
 		r.mux.Get("/swagger/*", httpSwagger.Handler(
-			httpSwagger.URL(r.config.BaseURL+"/swagger/doc.json"),
+			httpSwagger.URL(swaggerHost+"/swagger/doc.json"),
 			httpSwagger.DeepLinking(true),
 			httpSwagger.DocExpansion("list"),
 			httpSwagger.DomID("swagger-ui"),
