@@ -29,9 +29,10 @@ var (
 	ErrInvalidProficiencyLevel = errors.New("proficiency level must be between 0 and 100")
 
 	// Language errors.
-	ErrLanguageNotFound      = errors.New("spoken language not found")
-	ErrLanguageAlreadyExists = errors.New("language already exists for this user")
-	ErrInvalidProficiency    = errors.New("invalid language proficiency level")
+	ErrLanguageNotFound       = errors.New("spoken language not found")
+	ErrSpokenLanguageNotFound = errors.New("spoken language not found")
+	ErrLanguageAlreadyExists  = errors.New("language already exists for this user")
+	ErrInvalidProficiency     = errors.New("invalid language proficiency level")
 
 	// Resume errors.
 	ErrResumeNotFound          = errors.New("resume not found")
@@ -40,6 +41,8 @@ var (
 	ErrEmptyJobDescription     = errors.New("job description cannot be empty")
 	ErrResumeNotGenerated      = errors.New("resume must be generated before PDF export")
 	ErrInvalidStatusTransition = errors.New("invalid status transition")
+	ErrNoBulletsAvailable      = errors.New("no bullets available for resume generation")
+	ErrResumeNotReady          = errors.New("resume is not ready for PDF generation")
 
 	// Validation errors.
 	ErrValidation          = errors.New("validation error")
@@ -139,4 +142,28 @@ func (v *ValidationErrors) ToError() error {
 		return nil
 	}
 	return v
+}
+
+// DatabaseError represents a database operation error.
+type DatabaseError struct {
+	Operation string
+	Err       error
+}
+
+// Error returns the error message.
+func (e *DatabaseError) Error() string {
+	return "database error in " + e.Operation + ": " + e.Err.Error()
+}
+
+// Unwrap returns the underlying error.
+func (e *DatabaseError) Unwrap() error {
+	return e.Err
+}
+
+// NewDatabaseError creates a new database error with operation context.
+func NewDatabaseError(operation string, err error) *DatabaseError {
+	return &DatabaseError{
+		Operation: operation,
+		Err:       err,
+	}
 }
