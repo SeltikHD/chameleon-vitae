@@ -56,6 +56,15 @@ func (t ExperienceType) String() string {
 	return string(t)
 }
 
+// ParseExperienceType parses a string into an ExperienceType.
+func ParseExperienceType(s string) (ExperienceType, error) {
+	t := ExperienceType(s)
+	if !t.IsValid() {
+		return "", ErrInvalidExperienceType
+	}
+	return t, nil
+}
+
 // LanguageProficiency represents proficiency level in a spoken language.
 type LanguageProficiency string
 
@@ -87,6 +96,15 @@ func (p LanguageProficiency) IsValid() bool {
 		}
 	}
 	return false
+}
+
+// ParseLanguageProficiency parses a string into a LanguageProficiency.
+func ParseLanguageProficiency(s string) (LanguageProficiency, error) {
+	p := LanguageProficiency(s)
+	if !p.IsValid() {
+		return "", ErrInvalidProficiency
+	}
+	return p, nil
 }
 
 // ResumeStatus represents the lifecycle status of a generated resume.
@@ -124,6 +142,15 @@ func (s ResumeStatus) IsValid() bool {
 		}
 	}
 	return false
+}
+
+// ParseResumeStatus parses a string into a ResumeStatus.
+func ParseResumeStatus(s string) (ResumeStatus, error) {
+	status := ResumeStatus(s)
+	if !status.IsValid() {
+		return "", ErrInvalidResumeStatus
+	}
+	return status, nil
 }
 
 // ImpactScore represents a bullet's impact score (0-100).
