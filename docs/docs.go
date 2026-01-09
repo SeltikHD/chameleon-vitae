@@ -36,7 +36,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/http.HealthResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.HealthResponse"
                         }
                     }
                 }
@@ -69,7 +69,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/http.SyncUserRequest"
+                            "$ref": "#/definitions/internal_adapters_primary_http.SyncUserRequest"
                         }
                     }
                 ],
@@ -77,25 +77,25 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/http.SyncUserResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.SyncUserResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid request body",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Invalid or expired token",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     }
                 }
@@ -133,7 +133,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/http.UpdateBulletRequest"
+                            "$ref": "#/definitions/internal_adapters_primary_http.UpdateBulletRequest"
                         }
                     }
                 ],
@@ -141,37 +141,37 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/http.BulletResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.BulletResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid request body",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Bullet not found",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     },
                     "422": {
                         "description": "Validation failed",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     }
                 }
@@ -203,19 +203,19 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Bullet not found",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     }
                 }
@@ -253,7 +253,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/http.AnalyzeBulletRequest"
+                            "$ref": "#/definitions/internal_adapters_primary_http.AnalyzeBulletRequest"
                         }
                     }
                 ],
@@ -261,31 +261,31 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/http.ScoreBulletResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ScoreBulletResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid request body",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Bullet not found",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     }
                 }
@@ -332,19 +332,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/http.ListExperiencesResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ListExperiencesResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     }
                 }
@@ -373,7 +373,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/http.CreateExperienceRequest"
+                            "$ref": "#/definitions/internal_adapters_primary_http.CreateExperienceRequest"
                         }
                     }
                 ],
@@ -381,31 +381,31 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/http.ExperienceResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ExperienceResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid request body",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     },
                     "422": {
                         "description": "Validation failed",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     }
                 }
@@ -439,25 +439,25 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/http.ExperienceResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ExperienceResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Experience not found",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     }
                 }
@@ -493,7 +493,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/http.UpdateExperienceRequest"
+                            "$ref": "#/definitions/internal_adapters_primary_http.UpdateExperienceRequest"
                         }
                     }
                 ],
@@ -501,37 +501,37 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/http.ExperienceResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ExperienceResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid request body",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Experience not found",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     },
                     "422": {
                         "description": "Validation failed",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     }
                 }
@@ -563,19 +563,19 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Experience not found",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     }
                 }
@@ -613,7 +613,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/http.CreateBulletRequest"
+                            "$ref": "#/definitions/internal_adapters_primary_http.CreateBulletRequest"
                         }
                     }
                 ],
@@ -621,37 +621,37 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/http.BulletResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.BulletResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid request body",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Experience not found",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     },
                     "422": {
                         "description": "Validation failed",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     }
                 }
@@ -676,19 +676,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/http.ListSpokenLanguagesResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ListSpokenLanguagesResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     }
                 }
@@ -717,7 +717,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/http.CreateSpokenLanguageRequest"
+                            "$ref": "#/definitions/internal_adapters_primary_http.CreateSpokenLanguageRequest"
                         }
                     }
                 ],
@@ -725,37 +725,37 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/http.SpokenLanguageResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.SpokenLanguageResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid request body",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     },
                     "409": {
                         "description": "Language already exists",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     },
                     "422": {
                         "description": "Validation failed",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     }
                 }
@@ -789,19 +789,19 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Language not found",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     }
                 }
@@ -826,19 +826,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/http.UserResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.UserResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     }
                 }
@@ -867,7 +867,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/http.UpdateUserRequest"
+                            "$ref": "#/definitions/internal_adapters_primary_http.UpdateUserRequest"
                         }
                     }
                 ],
@@ -875,31 +875,31 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/http.UserResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.UserResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid request body",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     },
                     "422": {
                         "description": "Validation failed",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     }
                 }
@@ -946,19 +946,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/http.ListResumesResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ListResumesResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     }
                 }
@@ -987,7 +987,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/http.CreateResumeRequest"
+                            "$ref": "#/definitions/internal_adapters_primary_http.CreateResumeRequest"
                         }
                     }
                 ],
@@ -995,31 +995,31 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/http.ResumeResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ResumeResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid request body",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     },
                     "422": {
                         "description": "Validation failed",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     }
                 }
@@ -1053,25 +1053,25 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/http.ResumeResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ResumeResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Resume not found",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     }
                 }
@@ -1103,19 +1103,19 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Resume not found",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     }
                 }
@@ -1153,7 +1153,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/http.UpdateResumeContentRequest"
+                            "$ref": "#/definitions/internal_adapters_primary_http.UpdateResumeContentRequest"
                         }
                     }
                 ],
@@ -1161,37 +1161,37 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/http.ResumeResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ResumeResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid request body",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Resume not found",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     },
                     "422": {
                         "description": "Validation failed",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     }
                 }
@@ -1232,31 +1232,31 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/http.ResumeResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ResumeResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Resume not found",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     },
                     "422": {
                         "description": "Resume not ready for PDF",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     }
                 }
@@ -1293,7 +1293,7 @@ const docTemplate = `{
                         "name": "request",
                         "in": "body",
                         "schema": {
-                            "$ref": "#/definitions/http.TailorResumeRequest"
+                            "$ref": "#/definitions/internal_adapters_primary_http.TailorResumeRequest"
                         }
                     }
                 ],
@@ -1301,37 +1301,37 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/http.ResumeResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ResumeResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid request body",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Resume not found",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     },
                     "422": {
                         "description": "Validation failed",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     }
                 }
@@ -1364,19 +1364,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/http.ListSkillsResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ListSkillsResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     }
                 }
@@ -1407,7 +1407,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/http.BatchUpsertSkillsRequest"
+                            "$ref": "#/definitions/internal_adapters_primary_http.BatchUpsertSkillsRequest"
                         }
                     }
                 ],
@@ -1415,31 +1415,31 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/http.BatchUpsertSkillsResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.BatchUpsertSkillsResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid request body",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     },
                     "422": {
                         "description": "Validation failed",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     }
                 }
@@ -1473,19 +1473,19 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Skill not found",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     }
                 }
@@ -1516,7 +1516,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/http.ParseJobURLRequest"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ParseJobURLRequest"
                         }
                     }
                 ],
@@ -1524,31 +1524,31 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/http.ParseJobURLResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ParseJobURLResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid request body",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     },
                     "422": {
                         "description": "Failed to parse job posting",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/http.ErrorResponse"
+                            "$ref": "#/definitions/internal_adapters_primary_http.ErrorResponse"
                         }
                     }
                 }
@@ -1556,7 +1556,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "http.AnalyzeBulletRequest": {
+        "internal_adapters_primary_http.AnalyzeBulletRequest": {
             "type": "object",
             "properties": {
                 "job_description": {
@@ -1565,18 +1565,18 @@ const docTemplate = `{
                 }
             }
         },
-        "http.BatchUpsertSkillsRequest": {
+        "internal_adapters_primary_http.BatchUpsertSkillsRequest": {
             "type": "object",
             "properties": {
                 "skills": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/http.SkillInput"
+                        "$ref": "#/definitions/internal_adapters_primary_http.SkillInput"
                     }
                 }
             }
         },
-        "http.BatchUpsertSkillsResponse": {
+        "internal_adapters_primary_http.BatchUpsertSkillsResponse": {
             "type": "object",
             "properties": {
                 "created": {
@@ -1586,7 +1586,7 @@ const docTemplate = `{
                 "data": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/http.SkillResponse"
+                        "$ref": "#/definitions/internal_adapters_primary_http.SkillResponse"
                     }
                 },
                 "updated": {
@@ -1595,7 +1595,7 @@ const docTemplate = `{
                 }
             }
         },
-        "http.BulletResponse": {
+        "internal_adapters_primary_http.BulletResponse": {
             "type": "object",
             "properties": {
                 "content": {
@@ -1642,7 +1642,7 @@ const docTemplate = `{
                 }
             }
         },
-        "http.CreateBulletRequest": {
+        "internal_adapters_primary_http.CreateBulletRequest": {
             "type": "object",
             "properties": {
                 "content": {
@@ -1665,7 +1665,7 @@ const docTemplate = `{
                 }
             }
         },
-        "http.CreateExperienceRequest": {
+        "internal_adapters_primary_http.CreateExperienceRequest": {
             "type": "object",
             "properties": {
                 "description": {
@@ -1710,7 +1710,7 @@ const docTemplate = `{
                 }
             }
         },
-        "http.CreateResumeRequest": {
+        "internal_adapters_primary_http.CreateResumeRequest": {
             "type": "object",
             "properties": {
                 "company_name": {
@@ -1735,7 +1735,7 @@ const docTemplate = `{
                 }
             }
         },
-        "http.CreateSpokenLanguageRequest": {
+        "internal_adapters_primary_http.CreateSpokenLanguageRequest": {
             "type": "object",
             "properties": {
                 "display_order": {
@@ -1752,7 +1752,7 @@ const docTemplate = `{
                 }
             }
         },
-        "http.ErrorBody": {
+        "internal_adapters_primary_http.ErrorBody": {
             "type": "object",
             "properties": {
                 "code": {
@@ -1762,7 +1762,7 @@ const docTemplate = `{
                 "details": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/http.ErrorDetail"
+                        "$ref": "#/definitions/internal_adapters_primary_http.ErrorDetail"
                     }
                 },
                 "message": {
@@ -1771,7 +1771,7 @@ const docTemplate = `{
                 }
             }
         },
-        "http.ErrorDetail": {
+        "internal_adapters_primary_http.ErrorDetail": {
             "type": "object",
             "properties": {
                 "field": {
@@ -1784,21 +1784,21 @@ const docTemplate = `{
                 }
             }
         },
-        "http.ErrorResponse": {
+        "internal_adapters_primary_http.ErrorResponse": {
             "type": "object",
             "properties": {
                 "error": {
-                    "$ref": "#/definitions/http.ErrorBody"
+                    "$ref": "#/definitions/internal_adapters_primary_http.ErrorBody"
                 }
             }
         },
-        "http.ExperienceResponse": {
+        "internal_adapters_primary_http.ExperienceResponse": {
             "type": "object",
             "properties": {
                 "bullets": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/http.BulletResponse"
+                        "$ref": "#/definitions/internal_adapters_primary_http.BulletResponse"
                     }
                 },
                 "created_at": {
@@ -1859,7 +1859,7 @@ const docTemplate = `{
                 }
             }
         },
-        "http.HealthResponse": {
+        "internal_adapters_primary_http.HealthResponse": {
             "type": "object",
             "properties": {
                 "service": {
@@ -1872,13 +1872,13 @@ const docTemplate = `{
                 }
             }
         },
-        "http.ListExperiencesResponse": {
+        "internal_adapters_primary_http.ListExperiencesResponse": {
             "type": "object",
             "properties": {
                 "data": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/http.ExperienceResponse"
+                        "$ref": "#/definitions/internal_adapters_primary_http.ExperienceResponse"
                     }
                 },
                 "limit": {
@@ -1895,13 +1895,13 @@ const docTemplate = `{
                 }
             }
         },
-        "http.ListResumesResponse": {
+        "internal_adapters_primary_http.ListResumesResponse": {
             "type": "object",
             "properties": {
                 "data": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/http.ResumeResponse"
+                        "$ref": "#/definitions/internal_adapters_primary_http.ResumeResponse"
                     }
                 },
                 "limit": {
@@ -1918,13 +1918,13 @@ const docTemplate = `{
                 }
             }
         },
-        "http.ListSkillsResponse": {
+        "internal_adapters_primary_http.ListSkillsResponse": {
             "type": "object",
             "properties": {
                 "data": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/http.SkillResponse"
+                        "$ref": "#/definitions/internal_adapters_primary_http.SkillResponse"
                     }
                 },
                 "total": {
@@ -1933,18 +1933,18 @@ const docTemplate = `{
                 }
             }
         },
-        "http.ListSpokenLanguagesResponse": {
+        "internal_adapters_primary_http.ListSpokenLanguagesResponse": {
             "type": "object",
             "properties": {
                 "data": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/http.SpokenLanguageResponse"
+                        "$ref": "#/definitions/internal_adapters_primary_http.SpokenLanguageResponse"
                     }
                 }
             }
         },
-        "http.ParseJobMetadata": {
+        "internal_adapters_primary_http.ParseJobMetadata": {
             "type": "object",
             "properties": {
                 "fetched_at": {
@@ -1957,7 +1957,7 @@ const docTemplate = `{
                 }
             }
         },
-        "http.ParseJobURLRequest": {
+        "internal_adapters_primary_http.ParseJobURLRequest": {
             "type": "object",
             "properties": {
                 "url": {
@@ -1966,7 +1966,7 @@ const docTemplate = `{
                 }
             }
         },
-        "http.ParseJobURLResponse": {
+        "internal_adapters_primary_http.ParseJobURLResponse": {
             "type": "object",
             "properties": {
                 "markdown": {
@@ -1974,7 +1974,7 @@ const docTemplate = `{
                     "example": "## Senior Backend Engineer..."
                 },
                 "metadata": {
-                    "$ref": "#/definitions/http.ParseJobMetadata"
+                    "$ref": "#/definitions/internal_adapters_primary_http.ParseJobMetadata"
                 },
                 "title": {
                     "type": "string",
@@ -1986,7 +1986,7 @@ const docTemplate = `{
                 }
             }
         },
-        "http.ResumeAnalysisDTO": {
+        "internal_adapters_primary_http.ResumeAnalysisDTO": {
             "type": "object",
             "properties": {
                 "matched_keywords": {
@@ -2009,16 +2009,16 @@ const docTemplate = `{
                 }
             }
         },
-        "http.ResumeContentDTO": {
+        "internal_adapters_primary_http.ResumeContentDTO": {
             "type": "object",
             "properties": {
                 "analysis": {
-                    "$ref": "#/definitions/http.ResumeAnalysisDTO"
+                    "$ref": "#/definitions/internal_adapters_primary_http.ResumeAnalysisDTO"
                 },
                 "experiences": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/http.TailoredExperienceDTO"
+                        "$ref": "#/definitions/internal_adapters_primary_http.TailoredExperienceDTO"
                     }
                 },
                 "skills": {
@@ -2032,7 +2032,7 @@ const docTemplate = `{
                 }
             }
         },
-        "http.ResumeResponse": {
+        "internal_adapters_primary_http.ResumeResponse": {
             "type": "object",
             "properties": {
                 "company_name": {
@@ -2044,7 +2044,7 @@ const docTemplate = `{
                     "example": "2026-01-09T10:00:00Z"
                 },
                 "generated_content": {
-                    "$ref": "#/definitions/http.ResumeContentDTO"
+                    "$ref": "#/definitions/internal_adapters_primary_http.ResumeContentDTO"
                 },
                 "id": {
                     "type": "string",
@@ -2092,7 +2092,7 @@ const docTemplate = `{
                 }
             }
         },
-        "http.ScoreBulletResponse": {
+        "internal_adapters_primary_http.ScoreBulletResponse": {
             "type": "object",
             "properties": {
                 "content": {
@@ -2113,7 +2113,7 @@ const docTemplate = `{
                 }
             }
         },
-        "http.SkillInput": {
+        "internal_adapters_primary_http.SkillInput": {
             "type": "object",
             "properties": {
                 "category": {
@@ -2138,7 +2138,7 @@ const docTemplate = `{
                 }
             }
         },
-        "http.SkillResponse": {
+        "internal_adapters_primary_http.SkillResponse": {
             "type": "object",
             "properties": {
                 "category": {
@@ -2175,7 +2175,7 @@ const docTemplate = `{
                 }
             }
         },
-        "http.SpokenLanguageResponse": {
+        "internal_adapters_primary_http.SpokenLanguageResponse": {
             "type": "object",
             "properties": {
                 "created_at": {
@@ -2200,7 +2200,7 @@ const docTemplate = `{
                 }
             }
         },
-        "http.SyncUserRequest": {
+        "internal_adapters_primary_http.SyncUserRequest": {
             "type": "object",
             "properties": {
                 "email": {
@@ -2221,7 +2221,7 @@ const docTemplate = `{
                 }
             }
         },
-        "http.SyncUserResponse": {
+        "internal_adapters_primary_http.SyncUserResponse": {
             "type": "object",
             "properties": {
                 "created_at": {
@@ -2246,7 +2246,7 @@ const docTemplate = `{
                 }
             }
         },
-        "http.TailorResumeRequest": {
+        "internal_adapters_primary_http.TailorResumeRequest": {
             "type": "object",
             "properties": {
                 "max_bullets_per_job": {
@@ -2255,7 +2255,7 @@ const docTemplate = `{
                 }
             }
         },
-        "http.TailoredBulletDTO": {
+        "internal_adapters_primary_http.TailoredBulletDTO": {
             "type": "object",
             "properties": {
                 "bullet_id": {
@@ -2269,13 +2269,13 @@ const docTemplate = `{
                 }
             }
         },
-        "http.TailoredExperienceDTO": {
+        "internal_adapters_primary_http.TailoredExperienceDTO": {
             "type": "object",
             "properties": {
                 "bullets": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/http.TailoredBulletDTO"
+                        "$ref": "#/definitions/internal_adapters_primary_http.TailoredBulletDTO"
                     }
                 },
                 "end_date": {
@@ -2298,7 +2298,7 @@ const docTemplate = `{
                 }
             }
         },
-        "http.UpdateBulletRequest": {
+        "internal_adapters_primary_http.UpdateBulletRequest": {
             "type": "object",
             "properties": {
                 "content": {
@@ -2321,7 +2321,7 @@ const docTemplate = `{
                 }
             }
         },
-        "http.UpdateExperienceRequest": {
+        "internal_adapters_primary_http.UpdateExperienceRequest": {
             "type": "object",
             "properties": {
                 "description": {
@@ -2370,7 +2370,7 @@ const docTemplate = `{
                 }
             }
         },
-        "http.UpdateResumeContentRequest": {
+        "internal_adapters_primary_http.UpdateResumeContentRequest": {
             "type": "object",
             "properties": {
                 "notes": {
@@ -2383,7 +2383,7 @@ const docTemplate = `{
                 }
             }
         },
-        "http.UpdateUserRequest": {
+        "internal_adapters_primary_http.UpdateUserRequest": {
             "type": "object",
             "properties": {
                 "github_url": {
@@ -2428,7 +2428,7 @@ const docTemplate = `{
                 }
             }
         },
-        "http.UserResponse": {
+        "internal_adapters_primary_http.UserResponse": {
             "type": "object",
             "properties": {
                 "created_at": {

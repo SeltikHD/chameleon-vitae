@@ -1,32 +1,32 @@
 basePath: /v1
 definitions:
-  http.AnalyzeBulletRequest:
+  internal_adapters_primary_http.AnalyzeBulletRequest:
     properties:
       job_description:
         example: We are looking for a Senior Backend Engineer...
         type: string
     type: object
-  http.BatchUpsertSkillsRequest:
+  internal_adapters_primary_http.BatchUpsertSkillsRequest:
     properties:
       skills:
         items:
-          $ref: '#/definitions/http.SkillInput'
+          $ref: '#/definitions/internal_adapters_primary_http.SkillInput'
         type: array
     type: object
-  http.BatchUpsertSkillsResponse:
+  internal_adapters_primary_http.BatchUpsertSkillsResponse:
     properties:
       created:
         example: 1
         type: integer
       data:
         items:
-          $ref: '#/definitions/http.SkillResponse'
+          $ref: '#/definitions/internal_adapters_primary_http.SkillResponse'
         type: array
       updated:
         example: 2
         type: integer
     type: object
-  http.BulletResponse:
+  internal_adapters_primary_http.BulletResponse:
     properties:
       content:
         example: Reduced API latency by 40%
@@ -60,7 +60,7 @@ definitions:
         example: "2026-01-09T10:00:00Z"
         type: string
     type: object
-  http.CreateBulletRequest:
+  internal_adapters_primary_http.CreateBulletRequest:
     properties:
       content:
         example: Reduced API latency by 40%
@@ -76,7 +76,7 @@ definitions:
           type: string
         type: array
     type: object
-  http.CreateExperienceRequest:
+  internal_adapters_primary_http.CreateExperienceRequest:
     properties:
       description:
         example: Led backend development...
@@ -109,7 +109,7 @@ definitions:
         example: https://techcompany.com
         type: string
     type: object
-  http.CreateResumeRequest:
+  internal_adapters_primary_http.CreateResumeRequest:
     properties:
       company_name:
         example: Awesome Corp
@@ -127,7 +127,7 @@ definitions:
         example: en
         type: string
     type: object
-  http.CreateSpokenLanguageRequest:
+  internal_adapters_primary_http.CreateSpokenLanguageRequest:
     properties:
       display_order:
         example: 0
@@ -139,20 +139,20 @@ definitions:
         example: native
         type: string
     type: object
-  http.ErrorBody:
+  internal_adapters_primary_http.ErrorBody:
     properties:
       code:
         example: VALIDATION_ERROR
         type: string
       details:
         items:
-          $ref: '#/definitions/http.ErrorDetail'
+          $ref: '#/definitions/internal_adapters_primary_http.ErrorDetail'
         type: array
       message:
         example: Validation failed
         type: string
     type: object
-  http.ErrorDetail:
+  internal_adapters_primary_http.ErrorDetail:
     properties:
       field:
         example: email
@@ -161,16 +161,16 @@ definitions:
         example: Invalid email format
         type: string
     type: object
-  http.ErrorResponse:
+  internal_adapters_primary_http.ErrorResponse:
     properties:
       error:
-        $ref: '#/definitions/http.ErrorBody'
+        $ref: '#/definitions/internal_adapters_primary_http.ErrorBody'
     type: object
-  http.ExperienceResponse:
+  internal_adapters_primary_http.ExperienceResponse:
     properties:
       bullets:
         items:
-          $ref: '#/definitions/http.BulletResponse'
+          $ref: '#/definitions/internal_adapters_primary_http.BulletResponse'
         type: array
       created_at:
         example: "2026-01-09T10:00:00Z"
@@ -215,7 +215,7 @@ definitions:
         example: https://techcompany.com
         type: string
     type: object
-  http.HealthResponse:
+  internal_adapters_primary_http.HealthResponse:
     properties:
       service:
         example: chameleon-vitae
@@ -224,11 +224,11 @@ definitions:
         example: healthy
         type: string
     type: object
-  http.ListExperiencesResponse:
+  internal_adapters_primary_http.ListExperiencesResponse:
     properties:
       data:
         items:
-          $ref: '#/definitions/http.ExperienceResponse'
+          $ref: '#/definitions/internal_adapters_primary_http.ExperienceResponse'
         type: array
       limit:
         example: 50
@@ -240,11 +240,11 @@ definitions:
         example: 15
         type: integer
     type: object
-  http.ListResumesResponse:
+  internal_adapters_primary_http.ListResumesResponse:
     properties:
       data:
         items:
-          $ref: '#/definitions/http.ResumeResponse'
+          $ref: '#/definitions/internal_adapters_primary_http.ResumeResponse'
         type: array
       limit:
         example: 20
@@ -256,24 +256,24 @@ definitions:
         example: 10
         type: integer
     type: object
-  http.ListSkillsResponse:
+  internal_adapters_primary_http.ListSkillsResponse:
     properties:
       data:
         items:
-          $ref: '#/definitions/http.SkillResponse'
+          $ref: '#/definitions/internal_adapters_primary_http.SkillResponse'
         type: array
       total:
         example: 25
         type: integer
     type: object
-  http.ListSpokenLanguagesResponse:
+  internal_adapters_primary_http.ListSpokenLanguagesResponse:
     properties:
       data:
         items:
-          $ref: '#/definitions/http.SpokenLanguageResponse'
+          $ref: '#/definitions/internal_adapters_primary_http.SpokenLanguageResponse'
         type: array
     type: object
-  http.ParseJobMetadata:
+  internal_adapters_primary_http.ParseJobMetadata:
     properties:
       fetched_at:
         example: "2026-01-09T10:00:00Z"
@@ -282,19 +282,19 @@ definitions:
         example: linkedin.com
         type: string
     type: object
-  http.ParseJobURLRequest:
+  internal_adapters_primary_http.ParseJobURLRequest:
     properties:
       url:
         example: https://linkedin.com/jobs/view/12345
         type: string
     type: object
-  http.ParseJobURLResponse:
+  internal_adapters_primary_http.ParseJobURLResponse:
     properties:
       markdown:
         example: '## Senior Backend Engineer...'
         type: string
       metadata:
-        $ref: '#/definitions/http.ParseJobMetadata'
+        $ref: '#/definitions/internal_adapters_primary_http.ParseJobMetadata'
       title:
         example: Senior Backend Engineer at Awesome Corp
         type: string
@@ -302,7 +302,7 @@ definitions:
         example: https://linkedin.com/jobs/view/12345
         type: string
     type: object
-  http.ResumeAnalysisDTO:
+  internal_adapters_primary_http.ResumeAnalysisDTO:
     properties:
       matched_keywords:
         items:
@@ -317,13 +317,13 @@ definitions:
           type: string
         type: array
     type: object
-  http.ResumeContentDTO:
+  internal_adapters_primary_http.ResumeContentDTO:
     properties:
       analysis:
-        $ref: '#/definitions/http.ResumeAnalysisDTO'
+        $ref: '#/definitions/internal_adapters_primary_http.ResumeAnalysisDTO'
       experiences:
         items:
-          $ref: '#/definitions/http.TailoredExperienceDTO'
+          $ref: '#/definitions/internal_adapters_primary_http.TailoredExperienceDTO'
         type: array
       skills:
         items:
@@ -332,7 +332,7 @@ definitions:
       summary:
         type: string
     type: object
-  http.ResumeResponse:
+  internal_adapters_primary_http.ResumeResponse:
     properties:
       company_name:
         example: Awesome Corp
@@ -341,7 +341,7 @@ definitions:
         example: "2026-01-09T10:00:00Z"
         type: string
       generated_content:
-        $ref: '#/definitions/http.ResumeContentDTO'
+        $ref: '#/definitions/internal_adapters_primary_http.ResumeContentDTO'
       id:
         example: 550e8400-e29b-41d4-a716-446655440000
         type: string
@@ -375,7 +375,7 @@ definitions:
         example: "2026-01-09T10:00:00Z"
         type: string
     type: object
-  http.ScoreBulletResponse:
+  internal_adapters_primary_http.ScoreBulletResponse:
     properties:
       content:
         example: Reduced API latency by 40%
@@ -390,7 +390,7 @@ definitions:
         example: Contains quantifiable metrics...
         type: string
     type: object
-  http.SkillInput:
+  internal_adapters_primary_http.SkillInput:
     properties:
       category:
         example: Programming Languages
@@ -408,7 +408,7 @@ definitions:
         example: 3.5
         type: number
     type: object
-  http.SkillResponse:
+  internal_adapters_primary_http.SkillResponse:
     properties:
       category:
         example: Programming Languages
@@ -435,7 +435,7 @@ definitions:
         example: 3.5
         type: number
     type: object
-  http.SpokenLanguageResponse:
+  internal_adapters_primary_http.SpokenLanguageResponse:
     properties:
       created_at:
         example: "2026-01-09T10:00:00Z"
@@ -453,7 +453,7 @@ definitions:
         example: native
         type: string
     type: object
-  http.SyncUserRequest:
+  internal_adapters_primary_http.SyncUserRequest:
     properties:
       email:
         example: user@example.com
@@ -468,7 +468,7 @@ definitions:
         example: https://example.com/photo.jpg
         type: string
     type: object
-  http.SyncUserResponse:
+  internal_adapters_primary_http.SyncUserResponse:
     properties:
       created_at:
         example: "2026-01-09T10:00:00Z"
@@ -486,13 +486,13 @@ definitions:
         example: John Doe
         type: string
     type: object
-  http.TailorResumeRequest:
+  internal_adapters_primary_http.TailorResumeRequest:
     properties:
       max_bullets_per_job:
         example: 15
         type: integer
     type: object
-  http.TailoredBulletDTO:
+  internal_adapters_primary_http.TailoredBulletDTO:
     properties:
       bullet_id:
         type: string
@@ -501,11 +501,11 @@ definitions:
       tailored_content:
         type: string
     type: object
-  http.TailoredExperienceDTO:
+  internal_adapters_primary_http.TailoredExperienceDTO:
     properties:
       bullets:
         items:
-          $ref: '#/definitions/http.TailoredBulletDTO'
+          $ref: '#/definitions/internal_adapters_primary_http.TailoredBulletDTO'
         type: array
       end_date:
         type: string
@@ -520,7 +520,7 @@ definitions:
       title:
         type: string
     type: object
-  http.UpdateBulletRequest:
+  internal_adapters_primary_http.UpdateBulletRequest:
     properties:
       content:
         example: Updated bullet content
@@ -536,7 +536,7 @@ definitions:
           type: string
         type: array
     type: object
-  http.UpdateExperienceRequest:
+  internal_adapters_primary_http.UpdateExperienceRequest:
     properties:
       description:
         example: Led backend development...
@@ -572,7 +572,7 @@ definitions:
         example: https://techcompany.com
         type: string
     type: object
-  http.UpdateResumeContentRequest:
+  internal_adapters_primary_http.UpdateResumeContentRequest:
     properties:
       notes:
         example: Made adjustments to summary
@@ -581,7 +581,7 @@ definitions:
         example: reviewed
         type: string
     type: object
-  http.UpdateUserRequest:
+  internal_adapters_primary_http.UpdateUserRequest:
     properties:
       github_url:
         example: https://github.com/johndoe
@@ -614,7 +614,7 @@ definitions:
         example: https://johndoe.dev
         type: string
     type: object
-  http.UserResponse:
+  internal_adapters_primary_http.UserResponse:
     properties:
       created_at:
         example: "2026-01-09T10:00:00Z"
@@ -687,7 +687,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/http.HealthResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.HealthResponse'
       summary: Health check
       tags:
       - health
@@ -708,26 +708,26 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/http.SyncUserRequest'
+          $ref: '#/definitions/internal_adapters_primary_http.SyncUserRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/http.SyncUserResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.SyncUserResponse'
         "400":
           description: Invalid request body
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
         "401":
           description: Invalid or expired token
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
       summary: Sync user from Firebase
       tags:
       - auth
@@ -746,15 +746,15 @@ paths:
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
         "404":
           description: Bullet not found
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Delete bullet
@@ -775,34 +775,34 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/http.UpdateBulletRequest'
+          $ref: '#/definitions/internal_adapters_primary_http.UpdateBulletRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/http.BulletResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.BulletResponse'
         "400":
           description: Invalid request body
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
         "404":
           description: Bullet not found
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
         "422":
           description: Validation failed
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Update bullet
@@ -825,30 +825,30 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/http.AnalyzeBulletRequest'
+          $ref: '#/definitions/internal_adapters_primary_http.AnalyzeBulletRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/http.ScoreBulletResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ScoreBulletResponse'
         "400":
           description: Invalid request body
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
         "404":
           description: Bullet not found
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Recalculate bullet score
@@ -878,15 +878,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/http.ListExperiencesResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ListExperiencesResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
       security:
       - BearerAuth: []
       summary: List experiences
@@ -902,30 +902,30 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/http.CreateExperienceRequest'
+          $ref: '#/definitions/internal_adapters_primary_http.CreateExperienceRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/http.ExperienceResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ExperienceResponse'
         "400":
           description: Invalid request body
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
         "422":
           description: Validation failed
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Create experience
@@ -946,15 +946,15 @@ paths:
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
         "404":
           description: Experience not found
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Delete experience
@@ -974,19 +974,19 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/http.ExperienceResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ExperienceResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
         "404":
           description: Experience not found
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Get experience
@@ -1007,34 +1007,34 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/http.UpdateExperienceRequest'
+          $ref: '#/definitions/internal_adapters_primary_http.UpdateExperienceRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/http.ExperienceResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ExperienceResponse'
         "400":
           description: Invalid request body
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
         "404":
           description: Experience not found
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
         "422":
           description: Validation failed
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Update experience
@@ -1056,34 +1056,34 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/http.CreateBulletRequest'
+          $ref: '#/definitions/internal_adapters_primary_http.CreateBulletRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/http.BulletResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.BulletResponse'
         "400":
           description: Invalid request body
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
         "404":
           description: Experience not found
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
         "422":
           description: Validation failed
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Create bullet
@@ -1098,15 +1098,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/http.ListSpokenLanguagesResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ListSpokenLanguagesResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
       security:
       - BearerAuth: []
       summary: List spoken languages
@@ -1122,34 +1122,34 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/http.CreateSpokenLanguageRequest'
+          $ref: '#/definitions/internal_adapters_primary_http.CreateSpokenLanguageRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/http.SpokenLanguageResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.SpokenLanguageResponse'
         "400":
           description: Invalid request body
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
         "409":
           description: Language already exists
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
         "422":
           description: Validation failed
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Create spoken language
@@ -1170,15 +1170,15 @@ paths:
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
         "404":
           description: Language not found
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Delete spoken language
@@ -1193,15 +1193,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/http.UserResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.UserResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Get current user profile
@@ -1217,30 +1217,30 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/http.UpdateUserRequest'
+          $ref: '#/definitions/internal_adapters_primary_http.UpdateUserRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/http.UserResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.UserResponse'
         "400":
           description: Invalid request body
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
         "422":
           description: Validation failed
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Update current user profile
@@ -1270,15 +1270,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/http.ListResumesResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ListResumesResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
       security:
       - BearerAuth: []
       summary: List resumes
@@ -1294,30 +1294,30 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/http.CreateResumeRequest'
+          $ref: '#/definitions/internal_adapters_primary_http.CreateResumeRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/http.ResumeResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ResumeResponse'
         "400":
           description: Invalid request body
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
         "422":
           description: Validation failed
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Create resume
@@ -1338,15 +1338,15 @@ paths:
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
         "404":
           description: Resume not found
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Delete resume
@@ -1366,19 +1366,19 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/http.ResumeResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ResumeResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
         "404":
           description: Resume not found
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Get resume
@@ -1400,34 +1400,34 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/http.UpdateResumeContentRequest'
+          $ref: '#/definitions/internal_adapters_primary_http.UpdateResumeContentRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/http.ResumeResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ResumeResponse'
         "400":
           description: Invalid request body
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
         "404":
           description: Resume not found
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
         "422":
           description: Validation failed
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Update resume status/content
@@ -1453,23 +1453,23 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/http.ResumeResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ResumeResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
         "404":
           description: Resume not found
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
         "422":
           description: Resume not ready for PDF
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Generate PDF
@@ -1490,34 +1490,34 @@ paths:
         in: body
         name: request
         schema:
-          $ref: '#/definitions/http.TailorResumeRequest'
+          $ref: '#/definitions/internal_adapters_primary_http.TailorResumeRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/http.ResumeResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ResumeResponse'
         "400":
           description: Invalid request body
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
         "404":
           description: Resume not found
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
         "422":
           description: Validation failed
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Tailor resume
@@ -1538,15 +1538,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/http.ListSkillsResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ListSkillsResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
       security:
       - BearerAuth: []
       summary: List skills
@@ -1567,15 +1567,15 @@ paths:
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
         "404":
           description: Skill not found
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Delete skill
@@ -1593,30 +1593,30 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/http.BatchUpsertSkillsRequest'
+          $ref: '#/definitions/internal_adapters_primary_http.BatchUpsertSkillsRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/http.BatchUpsertSkillsResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.BatchUpsertSkillsResponse'
         "400":
           description: Invalid request body
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
         "422":
           description: Validation failed
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Batch upsert skills
@@ -1634,30 +1634,30 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/http.ParseJobURLRequest'
+          $ref: '#/definitions/internal_adapters_primary_http.ParseJobURLRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/http.ParseJobURLResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ParseJobURLResponse'
         "400":
           description: Invalid request body
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
         "422":
           description: Failed to parse job posting
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Parse job URL
