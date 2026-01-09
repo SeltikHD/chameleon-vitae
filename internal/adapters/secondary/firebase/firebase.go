@@ -1,36 +1,17 @@
-// Package firebase provides a Firebase Authentication adapter.
+// Package firebase provides a Firebase Authentication adapter using the official SDK.
 package firebase
 
 import (
 	"context"
-	"crypto/rsa"
-	"encoding/base64"
-	"encoding/json"
 	"errors"
 	"fmt"
-	"math/big"
-	"net/http"
-	"strings"
-	"sync"
-	"time"
+
+	firebase "firebase.google.com/go/v4"
+	"firebase.google.com/go/v4/auth"
+	"github.com/rs/zerolog/log"
+	"google.golang.org/api/option"
 
 	"github.com/SeltikHD/chameleon-vitae/internal/core/ports"
-	"github.com/golang-jwt/jwt/v5"
-	"github.com/rs/zerolog/log"
-)
-
-const (
-	// googleCertsURL is the URL for Firebase/Google public keys.
-	googleCertsURL = "https://www.googleapis.com/robot/v1/metadata/x509/securetoken@system.gserviceaccount.com"
-
-	// googleJWKsURL is the alternative JWKs endpoint.
-	googleJWKsURL = "https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com"
-
-	// tokenIssuerPrefix is the expected issuer prefix for Firebase tokens.
-	tokenIssuerPrefix = "https://securetoken.google.com/"
-
-	// keyRefreshInterval is how often to refresh the public keys.
-	keyRefreshInterval = 1 * time.Hour
 )
 
 var (
@@ -40,257 +21,137 @@ var (
 	// ErrTokenExpired is returned when the token has expired.
 	ErrTokenExpired = errors.New("token expired")
 
-	// ErrInvalidIssuer is returned when the token issuer doesn't match.
-	ErrInvalidIssuer = errors.New("invalid token issuer")
-
-	// ErrInvalidAudience is returned when the token audience doesn't match.
-	ErrInvalidAudience = errors.New("invalid token audience")
-
-	// ErrKeyNotFound is returned when the signing key is not found.
-	ErrKeyNotFound = errors.New("signing key not found")
+	// ErrMissingProjectID is returned when the project ID is not provided.
+	ErrMissingProjectID = errors.New("firebase project ID is required")
 )
-
-// JWK represents a JSON Web Key.
-type JWK struct {
-	Kty string `json:"kty"`
-	Use string `json:"use"`
-	Kid string `json:"kid"`
-	N   string `json:"n"`
-	E   string `json:"e"`
-}
-
-// JWKSet represents a set of JSON Web Keys.
-type JWKSet struct {
-	Keys []JWK `json:"keys"`
-}
 
 // Config holds the configuration for the Firebase auth adapter.
 type Config struct {
 	// ProjectID is the Firebase project ID (required).
 	ProjectID string
 
-	// HTTPClient is an optional HTTP client for fetching public keys.
-	// If nil, http.DefaultClient is used.
-	HTTPClient *http.Client
+	// CredentialsFile is the path to the service account JSON file.
+	// If empty, the SDK will try to use Application Default Credentials.
+	CredentialsFile string
+
+	// CredentialsJSON is the service account JSON as a byte array.
+	// If provided, takes precedence over CredentialsFile.
+	CredentialsJSON []byte
 }
 
-// Adapter implements the ports.AuthProvider interface for Firebase Authentication.
+// Adapter implements the ports.AuthProvider interface using Firebase Admin SDK.
 type Adapter struct {
-	projectID  string
-	httpClient *http.Client
-
-	mu        sync.RWMutex
-	keys      map[string]*rsa.PublicKey
-	lastFetch time.Time
+	app    *firebase.App
+	client *auth.Client
 }
 
-// New creates a new Firebase authentication adapter.
-func New(cfg Config) (*Adapter, error) {
+// New creates a new Firebase authentication adapter using the official SDK.
+func New(ctx context.Context, cfg Config) (*Adapter, error) {
 	if cfg.ProjectID == "" {
-		return nil, errors.New("firebase: project ID is required")
+		return nil, ErrMissingProjectID
 	}
 
-	client := cfg.HTTPClient
-	if client == nil {
-		client = &http.Client{Timeout: 10 * time.Second}
+	var opts []option.ClientOption
+
+	// Configure credentials.
+	switch {
+	case len(cfg.CredentialsJSON) > 0:
+		opts = append(opts, option.WithCredentialsJSON(cfg.CredentialsJSON))
+	case cfg.CredentialsFile != "":
+		opts = append(opts, option.WithCredentialsFile(cfg.CredentialsFile))
+	// If neither is provided, the SDK will attempt to use Application Default Credentials.
+	default:
+		log.Info().Msg("firebase: using Application Default Credentials")
 	}
 
-	adapter := &Adapter{
-		projectID:  cfg.ProjectID,
-		httpClient: client,
-		keys:       make(map[string]*rsa.PublicKey),
+	// Create Firebase app configuration.
+	config := &firebase.Config{
+		ProjectID: cfg.ProjectID,
 	}
 
-	// Fetch keys on initialization.
-	if err := adapter.refreshKeys(context.Background()); err != nil {
-		log.Warn().Err(err).Msg("firebase: failed to fetch initial keys, will retry on first verification")
+	// Initialize Firebase app.
+	app, err := firebase.NewApp(ctx, config, opts...)
+	if err != nil {
+		return nil, fmt.Errorf("failed to initialize firebase app: %w", err)
 	}
 
-	return adapter, nil
+	// Get auth client.
+	client, err := app.Auth(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get firebase auth client: %w", err)
+	}
+
+	log.Info().
+		Str("project_id", cfg.ProjectID).
+		Msg("firebase: adapter initialized successfully")
+
+	return &Adapter{
+		app:    app,
+		client: client,
+	}, nil
 }
 
 // VerifyToken validates a Firebase ID token and returns the claims.
 func (a *Adapter) VerifyToken(ctx context.Context, idToken string) (*ports.AuthClaims, error) {
-	// Ensure we have fresh keys.
-	if err := a.ensureFreshKeys(ctx); err != nil {
-		return nil, fmt.Errorf("failed to fetch signing keys: %w", err)
+	if idToken == "" {
+		return nil, ErrInvalidToken
 	}
 
-	// Parse the token without validation first to get the key ID.
-	token, _, err := new(jwt.Parser).ParseUnverified(idToken, jwt.MapClaims{})
+	// Verify the ID token.
+	token, err := a.client.VerifyIDToken(ctx, idToken)
 	if err != nil {
-		return nil, fmt.Errorf("%w: %v", ErrInvalidToken, err)
-	}
-
-	// Get the key ID from the header.
-	kid, ok := token.Header["kid"].(string)
-	if !ok || kid == "" {
-		return nil, fmt.Errorf("%w: missing kid header", ErrInvalidToken)
-	}
-
-	// Get the public key for this kid.
-	a.mu.RLock()
-	pubKey, exists := a.keys[kid]
-	a.mu.RUnlock()
-
-	if !exists {
-		// Try refreshing keys in case a new key was added.
-		if err := a.refreshKeys(ctx); err != nil {
-			return nil, fmt.Errorf("failed to refresh signing keys: %w", err)
-		}
-
-		a.mu.RLock()
-		pubKey, exists = a.keys[kid]
-		a.mu.RUnlock()
-
-		if !exists {
-			return nil, ErrKeyNotFound
-		}
-	}
-
-	// Now parse and validate the token.
-	expectedIssuer := tokenIssuerPrefix + a.projectID
-
-	claims := jwt.MapClaims{}
-	parsedToken, err := jwt.ParseWithClaims(idToken, claims, func(t *jwt.Token) (interface{}, error) {
-		if t.Method.Alg() != "RS256" {
-			return nil, fmt.Errorf("unexpected signing method: %v", t.Header["alg"])
-		}
-		return pubKey, nil
-	}, jwt.WithIssuer(expectedIssuer), jwt.WithAudience(a.projectID))
-
-	if err != nil {
-		if errors.Is(err, jwt.ErrTokenExpired) {
+		if auth.IsIDTokenExpired(err) {
 			return nil, ErrTokenExpired
 		}
 		return nil, fmt.Errorf("%w: %v", ErrInvalidToken, err)
 	}
 
-	if !parsedToken.Valid {
-		return nil, ErrInvalidToken
-	}
-
 	// Extract claims.
-	authClaims := &ports.AuthClaims{}
-
-	if sub, ok := claims["sub"].(string); ok {
-		authClaims.UserID = sub
-	}
-	if email, ok := claims["email"].(string); ok {
-		authClaims.Email = email
-	}
-	if emailVerified, ok := claims["email_verified"].(bool); ok {
-		authClaims.EmailVerified = emailVerified
-	}
-	if name, ok := claims["name"].(string); ok {
-		authClaims.Name = name
-	}
-	if picture, ok := claims["picture"].(string); ok {
-		authClaims.Picture = picture
+	claims := &ports.AuthClaims{
+		UserID:    token.UID,
+		IssuedAt:  token.IssuedAt,
+		ExpiresAt: token.Expires,
 	}
 
-	// Extract provider from firebase claims.
-	if firebase, ok := claims["firebase"].(map[string]interface{}); ok {
-		if signInProvider, ok := firebase["sign_in_provider"].(string); ok {
-			authClaims.Provider = signInProvider
+	// Extract email if present.
+	if email, ok := token.Claims["email"].(string); ok {
+		claims.Email = email
+	}
+
+	// Extract email verified status.
+	if emailVerified, ok := token.Claims["email_verified"].(bool); ok {
+		claims.EmailVerified = emailVerified
+	}
+
+	// Extract name if present.
+	if name, ok := token.Claims["name"].(string); ok {
+		claims.Name = name
+	}
+
+	// Extract picture URL if present.
+	if picture, ok := token.Claims["picture"].(string); ok {
+		claims.Picture = picture
+	}
+
+	// Extract provider from sign_in_provider claim.
+	if firebase, ok := token.Claims["firebase"].(map[string]any); ok {
+		if provider, ok := firebase["sign_in_provider"].(string); ok {
+			claims.Provider = provider
 		}
 	}
 
-	if iat, ok := claims["iat"].(float64); ok {
-		authClaims.IssuedAt = int64(iat)
-	}
-	if exp, ok := claims["exp"].(float64); ok {
-		authClaims.ExpiresAt = int64(exp)
-	}
+	return claims, nil
+}
 
-	return authClaims, nil
+// GetUser retrieves a user by their Firebase UID.
+func (a *Adapter) GetUser(ctx context.Context, uid string) (*auth.UserRecord, error) {
+	return a.client.GetUser(ctx, uid)
 }
 
 // Close releases resources held by the adapter.
 func (a *Adapter) Close() error {
+	// The Firebase Admin SDK doesn't require explicit cleanup.
 	return nil
-}
-
-// ensureFreshKeys checks if keys need to be refreshed and fetches them if necessary.
-func (a *Adapter) ensureFreshKeys(ctx context.Context) error {
-	a.mu.RLock()
-	needsRefresh := time.Since(a.lastFetch) > keyRefreshInterval || len(a.keys) == 0
-	a.mu.RUnlock()
-
-	if needsRefresh {
-		return a.refreshKeys(ctx)
-	}
-	return nil
-}
-
-// refreshKeys fetches the latest public keys from Google.
-func (a *Adapter) refreshKeys(ctx context.Context) error {
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, googleJWKsURL, nil)
-	if err != nil {
-		return fmt.Errorf("failed to create request: %w", err)
-	}
-
-	resp, err := a.httpClient.Do(req)
-	if err != nil {
-		return fmt.Errorf("failed to fetch keys: %w", err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("failed to fetch keys: status %d", resp.StatusCode)
-	}
-
-	var jwkSet JWKSet
-	if err := json.NewDecoder(resp.Body).Decode(&jwkSet); err != nil {
-		return fmt.Errorf("failed to decode JWK set: %w", err)
-	}
-
-	newKeys := make(map[string]*rsa.PublicKey)
-	for _, jwk := range jwkSet.Keys {
-		if jwk.Kty != "RSA" {
-			continue
-		}
-
-		pubKey, err := jwkToRSAPublicKey(jwk)
-		if err != nil {
-			log.Warn().Err(err).Str("kid", jwk.Kid).Msg("firebase: failed to parse JWK")
-			continue
-		}
-		newKeys[jwk.Kid] = pubKey
-	}
-
-	a.mu.Lock()
-	a.keys = newKeys
-	a.lastFetch = time.Now()
-	a.mu.Unlock()
-
-	log.Debug().Int("key_count", len(newKeys)).Msg("firebase: refreshed public keys")
-
-	return nil
-}
-
-// jwkToRSAPublicKey converts a JWK to an RSA public key.
-func jwkToRSAPublicKey(jwk JWK) (*rsa.PublicKey, error) {
-	// Decode the modulus.
-	nBytes, err := base64.RawURLEncoding.DecodeString(strings.TrimRight(jwk.N, "="))
-	if err != nil {
-		return nil, fmt.Errorf("failed to decode modulus: %w", err)
-	}
-	n := new(big.Int).SetBytes(nBytes)
-
-	// Decode the exponent.
-	eBytes, err := base64.RawURLEncoding.DecodeString(strings.TrimRight(jwk.E, "="))
-	if err != nil {
-		return nil, fmt.Errorf("failed to decode exponent: %w", err)
-	}
-
-	// Convert exponent bytes to int.
-	var e int
-	for _, b := range eBytes {
-		e = e<<8 + int(b)
-	}
-
-	return &rsa.PublicKey{N: n, E: e}, nil
 }
 
 // Compile-time check that Adapter implements ports.AuthProvider.
