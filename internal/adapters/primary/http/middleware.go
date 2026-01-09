@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/httprate"
 	"github.com/rs/zerolog/log"
 
 	"github.com/SeltikHD/chameleon-vitae/internal/core/ports"
@@ -65,7 +66,7 @@ func (r *Router) SetAuthMiddleware(authProvider ports.AuthProvider, userRepo por
 }
 
 // authMiddleware instance stored in router.
-type authMiddlewareInstance struct {
+type _authMiddlewareInstance struct {
 	authProvider ports.AuthProvider
 	userRepo     ports.UserRepository
 }
@@ -209,15 +210,8 @@ func CORS(allowedOrigins []string) func(http.Handler) http.Handler {
 	}
 }
 
-// RateLimiter creates a rate limiting middleware.
-// Note: This is a placeholder. For production, use a proper rate limiter
-// like github.com/go-chi/httprate or implement with Redis.
+// RateLimiter creates a rate limiting middleware using httprate.
+// It limits requests per IP address to the specified rate per minute.
 func RateLimiter(requestsPerMinute int) func(http.Handler) http.Handler {
-	return func(next http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			// TODO: Implement rate limiting with Redis or in-memory store
-			// For now, just pass through
-			next.ServeHTTP(w, r)
-		})
-	}
+	return httprate.LimitByIP(requestsPerMinute, time.Minute)
 }
