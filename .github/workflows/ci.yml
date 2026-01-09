@@ -9,6 +9,10 @@ on:
 permissions:
   contents: read
 
+env:
+  # Firebase configuration for tests (use dummy values for CI)
+  FIREBASE_PROJECT_ID: test-project-id
+
 jobs:
   # ===========================================================================
   # Backend (Go)
@@ -44,6 +48,8 @@ jobs:
 
       - name: Run tests
         run: go test -v -race -coverprofile=coverage.out -covermode=atomic ./...
+        env:
+          FIREBASE_PROJECT_ID: ${{ env.FIREBASE_PROJECT_ID }}
 
       - name: Upload coverage
         uses: codecov/codecov-action@v4
