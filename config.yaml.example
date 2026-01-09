@@ -1,0 +1,54 @@
+# ============================================================================
+# Chameleon Vitae - Configuration
+# ============================================================================
+
+app:
+  name: "chameleon-vitae"
+  version: "1.0.0"
+  environment: "development"
+  debug: true
+
+server:
+  port: 8080
+  host: "0.0.0.0"
+  readTimeout: "15s"
+  writeTimeout: "30s"
+  idleTimeout: "60s"
+  allowedOrigins:
+    - "*"
+
+database:
+  host: "localhost"
+  port: 5432
+  user: "chameleon"
+  password: "change_this_password" # pragma: allowlist secret
+  database: "chameleon_vitae"
+  sslMode: "disable"
+  maxOpenConns: 25
+  maxIdleConns: 5
+
+firebase:
+  projectId: "1234567890"
+  credentialsJson: |
+    {
+      "type": "service_account",
+      "project_id": "example-project",
+    }
+
+groq:
+  apiKey: "api_key_here" # pragma: allowlist secret
+  defaultModel: "llama-3.3-70b-versatile"
+  analysisModel: "llama-4-scout-17b-16e-instruct"
+  baseUrl: "https://api.groq.com/openai/v1"
+
+jina:
+  apiKey: "api_key_here" # pragma: allowlist secret
+  baseUrl: "https://r.jina.ai"
+
+pdf:
+  baseUrl: "http://localhost:3000"
+  timeout: "60s"
+
+storage:
+  type: "local"
+  localPath: "./storage"
