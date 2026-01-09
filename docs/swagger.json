@@ -1,0 +1,2483 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "contact": {}
+    },
+    "paths": {
+        "/health": {
+            "get": {
+                "description": "Returns the health status of the service",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "health"
+                ],
+                "summary": "Health check",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/http.HealthResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/auth/sync": {
+            "post": {
+                "description": "Synchronizes a Firebase authenticated user with the local PostgreSQL database. Creates a new user if not exists, updates if exists (upsert behavior).",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Sync user from Firebase",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer token from Firebase",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "User sync request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/http.SyncUserRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/http.SyncUserResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request body",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid or expired token",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/bullets/{bulletID}": {
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Updates an existing bullet",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "bullets"
+                ],
+                "summary": "Update bullet",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bullet ID",
+                        "name": "bulletID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Bullet data",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/http.UpdateBulletRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/http.BulletResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request body",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Bullet not found",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    },
+                    "422": {
+                        "description": "Validation failed",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Deletes a bullet",
+                "tags": [
+                    "bullets"
+                ],
+                "summary": "Delete bullet",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bullet ID",
+                        "name": "bulletID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No content"
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Bullet not found",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/bullets/{bulletID}/score": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Triggers AI recalculation of the bullet's impact score against a job description",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "bullets"
+                ],
+                "summary": "Recalculate bullet score",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bullet ID",
+                        "name": "bulletID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Job description for analysis",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/http.AnalyzeBulletRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/http.ScoreBulletResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request body",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Bullet not found",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/experiences": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns a paginated list of experiences for the authenticated user",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "experiences"
+                ],
+                "summary": "List experiences",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Filter by experience type",
+                        "name": "type",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 50,
+                        "description": "Pagination limit",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "Pagination offset",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/http.ListExperiencesResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Creates a new experience for the authenticated user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "experiences"
+                ],
+                "summary": "Create experience",
+                "parameters": [
+                    {
+                        "description": "Experience data",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/http.CreateExperienceRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/http.ExperienceResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request body",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    },
+                    "422": {
+                        "description": "Validation failed",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/experiences/{experienceID}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns a specific experience with all its bullets",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "experiences"
+                ],
+                "summary": "Get experience",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Experience ID",
+                        "name": "experienceID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/http.ExperienceResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Experience not found",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Updates an existing experience",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "experiences"
+                ],
+                "summary": "Update experience",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Experience ID",
+                        "name": "experienceID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Experience data",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/http.UpdateExperienceRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/http.ExperienceResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request body",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Experience not found",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    },
+                    "422": {
+                        "description": "Validation failed",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Deletes an experience and all its bullets",
+                "tags": [
+                    "experiences"
+                ],
+                "summary": "Delete experience",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Experience ID",
+                        "name": "experienceID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No content"
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Experience not found",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/experiences/{experienceID}/bullets": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Creates a new bullet point under an experience",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "bullets"
+                ],
+                "summary": "Create bullet",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Experience ID",
+                        "name": "experienceID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Bullet data",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/http.CreateBulletRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/http.BulletResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request body",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Experience not found",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    },
+                    "422": {
+                        "description": "Validation failed",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/languages": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns all spoken languages for the authenticated user",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "languages"
+                ],
+                "summary": "List spoken languages",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/http.ListSpokenLanguagesResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Creates a new spoken language for the authenticated user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "languages"
+                ],
+                "summary": "Create spoken language",
+                "parameters": [
+                    {
+                        "description": "Spoken language data",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/http.CreateSpokenLanguageRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/http.SpokenLanguageResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request body",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "Language already exists",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    },
+                    "422": {
+                        "description": "Validation failed",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/languages/{languageID}": {
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Deletes a spoken language",
+                "tags": [
+                    "languages"
+                ],
+                "summary": "Delete spoken language",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Spoken language ID",
+                        "name": "languageID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No content"
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Language not found",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/me": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns the authenticated user's complete profile",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Get current user profile",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/http.UserResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Updates the authenticated user's profile fields",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Update current user profile",
+                "parameters": [
+                    {
+                        "description": "Update data",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/http.UpdateUserRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/http.UserResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request body",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    },
+                    "422": {
+                        "description": "Validation failed",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/resumes": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns a paginated list of resumes for the authenticated user",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "resumes"
+                ],
+                "summary": "List resumes",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Filter by status",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 20,
+                        "description": "Pagination limit",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "Pagination offset",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/http.ListResumesResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Creates a new resume draft from a job description",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "resumes"
+                ],
+                "summary": "Create resume",
+                "parameters": [
+                    {
+                        "description": "Resume data",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/http.CreateResumeRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/http.ResumeResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request body",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    },
+                    "422": {
+                        "description": "Validation failed",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/resumes/{resumeID}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns a specific resume with full content",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "resumes"
+                ],
+                "summary": "Get resume",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Resume ID",
+                        "name": "resumeID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/http.ResumeResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Resume not found",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Deletes a resume",
+                "tags": [
+                    "resumes"
+                ],
+                "summary": "Delete resume",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Resume ID",
+                        "name": "resumeID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No content"
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Resume not found",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/resumes/{resumeID}/content": {
+            "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Updates the status or content of a resume for manual adjustments",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "resumes"
+                ],
+                "summary": "Update resume status/content",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Resume ID",
+                        "name": "resumeID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Resume update",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/http.UpdateResumeContentRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/http.ResumeResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request body",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Resume not found",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    },
+                    "422": {
+                        "description": "Validation failed",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/resumes/{resumeID}/pdf": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Generates a PDF file of the resume using the selected template",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "resumes"
+                ],
+                "summary": "Generate PDF",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Resume ID",
+                        "name": "resumeID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "modern",
+                        "description": "Template name",
+                        "name": "template",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/http.ResumeResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Resume not found",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    },
+                    "422": {
+                        "description": "Resume not ready for PDF",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/resumes/{resumeID}/tailor": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Uses AI to select and rewrite bullets for a specific job description",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "resumes"
+                ],
+                "summary": "Tailor resume",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Resume ID",
+                        "name": "resumeID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Tailoring parameters",
+                        "name": "request",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/http.TailorResumeRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/http.ResumeResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request body",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Resume not found",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    },
+                    "422": {
+                        "description": "Validation failed",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/skills": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns all skills for the authenticated user, optionally filtered by category",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "skills"
+                ],
+                "summary": "List skills",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Filter by category",
+                        "name": "category",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/http.ListSkillsResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/skills/batch": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Creates or updates multiple skills. Skills are matched by name - existing skills are updated, new ones are created.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "skills"
+                ],
+                "summary": "Batch upsert skills",
+                "parameters": [
+                    {
+                        "description": "Skills data",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/http.BatchUpsertSkillsRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/http.BatchUpsertSkillsResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request body",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    },
+                    "422": {
+                        "description": "Validation failed",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/skills/{skillID}": {
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Deletes a skill",
+                "tags": [
+                    "skills"
+                ],
+                "summary": "Delete skill",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Skill ID",
+                        "name": "skillID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No content"
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Skill not found",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/tools/parse-job": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Fetches a job posting URL and extracts structured data using Jina Reader",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tools"
+                ],
+                "summary": "Parse job URL",
+                "parameters": [
+                    {
+                        "description": "Job URL to parse",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/http.ParseJobURLRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/http.ParseJobURLResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request body",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    },
+                    "422": {
+                        "description": "Failed to parse job posting",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/http.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "http.AnalyzeBulletRequest": {
+            "type": "object",
+            "properties": {
+                "job_description": {
+                    "type": "string",
+                    "example": "We are looking for a Senior Backend Engineer..."
+                }
+            }
+        },
+        "http.BatchUpsertSkillsRequest": {
+            "type": "object",
+            "properties": {
+                "skills": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/http.SkillInput"
+                    }
+                }
+            }
+        },
+        "http.BatchUpsertSkillsResponse": {
+            "type": "object",
+            "properties": {
+                "created": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/http.SkillResponse"
+                    }
+                },
+                "updated": {
+                    "type": "integer",
+                    "example": 2
+                }
+            }
+        },
+        "http.BulletResponse": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "type": "string",
+                    "example": "Reduced API latency by 40%"
+                },
+                "created_at": {
+                    "type": "string",
+                    "example": "2026-01-09T10:00:00Z"
+                },
+                "display_order": {
+                    "type": "integer",
+                    "example": 0
+                },
+                "experience_id": {
+                    "type": "string",
+                    "example": "550e8400-e29b-41d4-a716-446655440001"
+                },
+                "id": {
+                    "type": "string",
+                    "example": "550e8400-e29b-41d4-a716-446655440000"
+                },
+                "impact_score": {
+                    "type": "integer",
+                    "example": 75
+                },
+                "keywords": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "performance",
+                        "optimization"
+                    ]
+                },
+                "metadata": {
+                    "type": "object",
+                    "additionalProperties": {}
+                },
+                "updated_at": {
+                    "type": "string",
+                    "example": "2026-01-09T10:00:00Z"
+                }
+            }
+        },
+        "http.CreateBulletRequest": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "type": "string",
+                    "example": "Reduced API latency by 40%"
+                },
+                "display_order": {
+                    "type": "integer",
+                    "example": 0
+                },
+                "keywords": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "performance",
+                        "optimization"
+                    ]
+                }
+            }
+        },
+        "http.CreateExperienceRequest": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string",
+                    "example": "Led backend development..."
+                },
+                "end_date": {
+                    "type": "string",
+                    "example": "2024-06-30"
+                },
+                "is_current": {
+                    "type": "boolean",
+                    "example": false
+                },
+                "location": {
+                    "type": "string",
+                    "example": "Remote"
+                },
+                "metadata": {
+                    "type": "object",
+                    "additionalProperties": {}
+                },
+                "organization": {
+                    "type": "string",
+                    "example": "Tech Company Inc."
+                },
+                "start_date": {
+                    "type": "string",
+                    "example": "2022-01-15"
+                },
+                "title": {
+                    "type": "string",
+                    "example": "Senior Software Engineer"
+                },
+                "type": {
+                    "type": "string",
+                    "example": "work"
+                },
+                "url": {
+                    "type": "string",
+                    "example": "https://techcompany.com"
+                }
+            }
+        },
+        "http.CreateResumeRequest": {
+            "type": "object",
+            "properties": {
+                "company_name": {
+                    "type": "string",
+                    "example": "Awesome Corp"
+                },
+                "job_description": {
+                    "type": "string",
+                    "example": "## Senior Backend Engineer..."
+                },
+                "job_title": {
+                    "type": "string",
+                    "example": "Senior Backend Engineer"
+                },
+                "job_url": {
+                    "type": "string",
+                    "example": "https://linkedin.com/jobs/12345"
+                },
+                "target_language": {
+                    "type": "string",
+                    "example": "en"
+                }
+            }
+        },
+        "http.CreateSpokenLanguageRequest": {
+            "type": "object",
+            "properties": {
+                "display_order": {
+                    "type": "integer",
+                    "example": 0
+                },
+                "language": {
+                    "type": "string",
+                    "example": "Portuguese"
+                },
+                "proficiency": {
+                    "type": "string",
+                    "example": "native"
+                }
+            }
+        },
+        "http.ErrorBody": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string",
+                    "example": "VALIDATION_ERROR"
+                },
+                "details": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/http.ErrorDetail"
+                    }
+                },
+                "message": {
+                    "type": "string",
+                    "example": "Validation failed"
+                }
+            }
+        },
+        "http.ErrorDetail": {
+            "type": "object",
+            "properties": {
+                "field": {
+                    "type": "string",
+                    "example": "email"
+                },
+                "message": {
+                    "type": "string",
+                    "example": "Invalid email format"
+                }
+            }
+        },
+        "http.ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "$ref": "#/definitions/http.ErrorBody"
+                }
+            }
+        },
+        "http.ExperienceResponse": {
+            "type": "object",
+            "properties": {
+                "bullets": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/http.BulletResponse"
+                    }
+                },
+                "created_at": {
+                    "type": "string",
+                    "example": "2026-01-09T10:00:00Z"
+                },
+                "description": {
+                    "type": "string",
+                    "example": "Led backend development..."
+                },
+                "display_order": {
+                    "type": "integer",
+                    "example": 0
+                },
+                "end_date": {
+                    "type": "string",
+                    "example": "2024-06-30"
+                },
+                "id": {
+                    "type": "string",
+                    "example": "550e8400-e29b-41d4-a716-446655440000"
+                },
+                "is_current": {
+                    "type": "boolean",
+                    "example": false
+                },
+                "location": {
+                    "type": "string",
+                    "example": "Remote"
+                },
+                "metadata": {
+                    "type": "object",
+                    "additionalProperties": {}
+                },
+                "organization": {
+                    "type": "string",
+                    "example": "Tech Company Inc."
+                },
+                "start_date": {
+                    "type": "string",
+                    "example": "2022-01-15"
+                },
+                "title": {
+                    "type": "string",
+                    "example": "Senior Software Engineer"
+                },
+                "type": {
+                    "type": "string",
+                    "example": "work"
+                },
+                "updated_at": {
+                    "type": "string",
+                    "example": "2026-01-09T10:00:00Z"
+                },
+                "url": {
+                    "type": "string",
+                    "example": "https://techcompany.com"
+                }
+            }
+        },
+        "http.HealthResponse": {
+            "type": "object",
+            "properties": {
+                "service": {
+                    "type": "string",
+                    "example": "chameleon-vitae"
+                },
+                "status": {
+                    "type": "string",
+                    "example": "healthy"
+                }
+            }
+        },
+        "http.ListExperiencesResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/http.ExperienceResponse"
+                    }
+                },
+                "limit": {
+                    "type": "integer",
+                    "example": 50
+                },
+                "offset": {
+                    "type": "integer",
+                    "example": 0
+                },
+                "total": {
+                    "type": "integer",
+                    "example": 15
+                }
+            }
+        },
+        "http.ListResumesResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/http.ResumeResponse"
+                    }
+                },
+                "limit": {
+                    "type": "integer",
+                    "example": 20
+                },
+                "offset": {
+                    "type": "integer",
+                    "example": 0
+                },
+                "total": {
+                    "type": "integer",
+                    "example": 10
+                }
+            }
+        },
+        "http.ListSkillsResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/http.SkillResponse"
+                    }
+                },
+                "total": {
+                    "type": "integer",
+                    "example": 25
+                }
+            }
+        },
+        "http.ListSpokenLanguagesResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/http.SpokenLanguageResponse"
+                    }
+                }
+            }
+        },
+        "http.ParseJobMetadata": {
+            "type": "object",
+            "properties": {
+                "fetched_at": {
+                    "type": "string",
+                    "example": "2026-01-09T10:00:00Z"
+                },
+                "source": {
+                    "type": "string",
+                    "example": "linkedin.com"
+                }
+            }
+        },
+        "http.ParseJobURLRequest": {
+            "type": "object",
+            "properties": {
+                "url": {
+                    "type": "string",
+                    "example": "https://linkedin.com/jobs/view/12345"
+                }
+            }
+        },
+        "http.ParseJobURLResponse": {
+            "type": "object",
+            "properties": {
+                "markdown": {
+                    "type": "string",
+                    "example": "## Senior Backend Engineer..."
+                },
+                "metadata": {
+                    "$ref": "#/definitions/http.ParseJobMetadata"
+                },
+                "title": {
+                    "type": "string",
+                    "example": "Senior Backend Engineer at Awesome Corp"
+                },
+                "url": {
+                    "type": "string",
+                    "example": "https://linkedin.com/jobs/view/12345"
+                }
+            }
+        },
+        "http.ResumeAnalysisDTO": {
+            "type": "object",
+            "properties": {
+                "matched_keywords": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "missing_keywords": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "recommendations": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "http.ResumeContentDTO": {
+            "type": "object",
+            "properties": {
+                "analysis": {
+                    "$ref": "#/definitions/http.ResumeAnalysisDTO"
+                },
+                "experiences": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/http.TailoredExperienceDTO"
+                    }
+                },
+                "skills": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "summary": {
+                    "type": "string"
+                }
+            }
+        },
+        "http.ResumeResponse": {
+            "type": "object",
+            "properties": {
+                "company_name": {
+                    "type": "string",
+                    "example": "Awesome Corp"
+                },
+                "created_at": {
+                    "type": "string",
+                    "example": "2026-01-09T10:00:00Z"
+                },
+                "generated_content": {
+                    "$ref": "#/definitions/http.ResumeContentDTO"
+                },
+                "id": {
+                    "type": "string",
+                    "example": "550e8400-e29b-41d4-a716-446655440000"
+                },
+                "job_description": {
+                    "type": "string"
+                },
+                "job_title": {
+                    "type": "string",
+                    "example": "Senior Backend Engineer"
+                },
+                "job_url": {
+                    "type": "string",
+                    "example": "https://linkedin.com/jobs/..."
+                },
+                "notes": {
+                    "type": "string"
+                },
+                "pdf_url": {
+                    "type": "string",
+                    "example": "https://storage.../resume.pdf"
+                },
+                "score": {
+                    "type": "integer",
+                    "example": 85
+                },
+                "selected_bullets": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "status": {
+                    "type": "string",
+                    "example": "draft"
+                },
+                "target_language": {
+                    "type": "string",
+                    "example": "en"
+                },
+                "updated_at": {
+                    "type": "string",
+                    "example": "2026-01-09T10:00:00Z"
+                }
+            }
+        },
+        "http.ScoreBulletResponse": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "type": "string",
+                    "example": "Reduced API latency by 40%"
+                },
+                "id": {
+                    "type": "string",
+                    "example": "550e8400-e29b-41d4-a716-446655440000"
+                },
+                "impact_score": {
+                    "type": "integer",
+                    "example": 85
+                },
+                "score_reasoning": {
+                    "type": "string",
+                    "example": "Contains quantifiable metrics..."
+                }
+            }
+        },
+        "http.SkillInput": {
+            "type": "object",
+            "properties": {
+                "category": {
+                    "type": "string",
+                    "example": "Programming Languages"
+                },
+                "is_highlighted": {
+                    "type": "boolean",
+                    "example": true
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Go"
+                },
+                "proficiency_level": {
+                    "type": "integer",
+                    "example": 85
+                },
+                "years_of_experience": {
+                    "type": "number",
+                    "example": 3.5
+                }
+            }
+        },
+        "http.SkillResponse": {
+            "type": "object",
+            "properties": {
+                "category": {
+                    "type": "string",
+                    "example": "Programming Languages"
+                },
+                "created_at": {
+                    "type": "string",
+                    "example": "2026-01-09T10:00:00Z"
+                },
+                "display_order": {
+                    "type": "integer",
+                    "example": 0
+                },
+                "id": {
+                    "type": "string",
+                    "example": "550e8400-e29b-41d4-a716-446655440000"
+                },
+                "is_highlighted": {
+                    "type": "boolean",
+                    "example": true
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Go"
+                },
+                "proficiency_level": {
+                    "type": "integer",
+                    "example": 85
+                },
+                "years_of_experience": {
+                    "type": "number",
+                    "example": 3.5
+                }
+            }
+        },
+        "http.SpokenLanguageResponse": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string",
+                    "example": "2026-01-09T10:00:00Z"
+                },
+                "display_order": {
+                    "type": "integer",
+                    "example": 0
+                },
+                "id": {
+                    "type": "string",
+                    "example": "550e8400-e29b-41d4-a716-446655440000"
+                },
+                "language": {
+                    "type": "string",
+                    "example": "English"
+                },
+                "proficiency": {
+                    "type": "string",
+                    "example": "native"
+                }
+            }
+        },
+        "http.SyncUserRequest": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string",
+                    "example": "user@example.com"
+                },
+                "firebase_uid": {
+                    "type": "string",
+                    "example": "abc123xyz"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "John Doe"
+                },
+                "picture": {
+                    "type": "string",
+                    "example": "https://example.com/photo.jpg"
+                }
+            }
+        },
+        "http.SyncUserResponse": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string",
+                    "example": "2026-01-09T10:00:00Z"
+                },
+                "email": {
+                    "type": "string",
+                    "example": "user@example.com"
+                },
+                "firebase_uid": {
+                    "type": "string",
+                    "example": "abc123xyz"
+                },
+                "id": {
+                    "type": "string",
+                    "example": "550e8400-e29b-41d4-a716-446655440000"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "John Doe"
+                }
+            }
+        },
+        "http.TailorResumeRequest": {
+            "type": "object",
+            "properties": {
+                "max_bullets_per_job": {
+                    "type": "integer",
+                    "example": 15
+                }
+            }
+        },
+        "http.TailoredBulletDTO": {
+            "type": "object",
+            "properties": {
+                "bullet_id": {
+                    "type": "string"
+                },
+                "original_content": {
+                    "type": "string"
+                },
+                "tailored_content": {
+                    "type": "string"
+                }
+            }
+        },
+        "http.TailoredExperienceDTO": {
+            "type": "object",
+            "properties": {
+                "bullets": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/http.TailoredBulletDTO"
+                    }
+                },
+                "end_date": {
+                    "type": "string"
+                },
+                "experience_id": {
+                    "type": "string"
+                },
+                "is_current": {
+                    "type": "boolean"
+                },
+                "organization": {
+                    "type": "string"
+                },
+                "start_date": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "http.UpdateBulletRequest": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "type": "string",
+                    "example": "Updated bullet content"
+                },
+                "display_order": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "keywords": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "new",
+                        "keywords"
+                    ]
+                }
+            }
+        },
+        "http.UpdateExperienceRequest": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string",
+                    "example": "Led backend development..."
+                },
+                "display_order": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "end_date": {
+                    "type": "string",
+                    "example": "2024-06-30"
+                },
+                "is_current": {
+                    "type": "boolean",
+                    "example": false
+                },
+                "location": {
+                    "type": "string",
+                    "example": "Remote"
+                },
+                "metadata": {
+                    "type": "object",
+                    "additionalProperties": {}
+                },
+                "organization": {
+                    "type": "string",
+                    "example": "Tech Company Inc."
+                },
+                "start_date": {
+                    "type": "string",
+                    "example": "2022-01-15"
+                },
+                "title": {
+                    "type": "string",
+                    "example": "Senior Software Engineer"
+                },
+                "type": {
+                    "type": "string",
+                    "example": "work"
+                },
+                "url": {
+                    "type": "string",
+                    "example": "https://techcompany.com"
+                }
+            }
+        },
+        "http.UpdateResumeContentRequest": {
+            "type": "object",
+            "properties": {
+                "notes": {
+                    "type": "string",
+                    "example": "Made adjustments to summary"
+                },
+                "status": {
+                    "type": "string",
+                    "example": "reviewed"
+                }
+            }
+        },
+        "http.UpdateUserRequest": {
+            "type": "object",
+            "properties": {
+                "github_url": {
+                    "type": "string",
+                    "example": "https://github.com/johndoe"
+                },
+                "headline": {
+                    "type": "string",
+                    "example": "Senior Software Engineer"
+                },
+                "linkedin_url": {
+                    "type": "string",
+                    "example": "https://linkedin.com/in/johndoe"
+                },
+                "location": {
+                    "type": "string",
+                    "example": "San Francisco, CA"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "John Doe"
+                },
+                "phone": {
+                    "type": "string",
+                    "example": "+1-555-123-4567"
+                },
+                "portfolio_url": {
+                    "type": "string",
+                    "example": "https://portfolio.johndoe.dev"
+                },
+                "preferred_language": {
+                    "type": "string",
+                    "example": "en"
+                },
+                "summary": {
+                    "type": "string",
+                    "example": "Experienced developer..."
+                },
+                "website": {
+                    "type": "string",
+                    "example": "https://johndoe.dev"
+                }
+            }
+        },
+        "http.UserResponse": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string",
+                    "example": "2026-01-09T10:00:00Z"
+                },
+                "email": {
+                    "type": "string",
+                    "example": "user@example.com"
+                },
+                "firebase_uid": {
+                    "type": "string",
+                    "example": "abc123xyz"
+                },
+                "github_url": {
+                    "type": "string",
+                    "example": "https://github.com/johndoe"
+                },
+                "headline": {
+                    "type": "string",
+                    "example": "Senior Software Engineer"
+                },
+                "id": {
+                    "type": "string",
+                    "example": "550e8400-e29b-41d4-a716-446655440000"
+                },
+                "linkedin_url": {
+                    "type": "string",
+                    "example": "https://linkedin.com/in/johndoe"
+                },
+                "location": {
+                    "type": "string",
+                    "example": "San Francisco, CA"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "John Doe"
+                },
+                "phone": {
+                    "type": "string",
+                    "example": "+1-555-123-4567"
+                },
+                "picture_url": {
+                    "type": "string",
+                    "example": "https://example.com/photo.jpg"
+                },
+                "portfolio_url": {
+                    "type": "string",
+                    "example": "https://portfolio.johndoe.dev"
+                },
+                "preferred_language": {
+                    "type": "string",
+                    "example": "en"
+                },
+                "summary": {
+                    "type": "string",
+                    "example": "Experienced developer..."
+                },
+                "updated_at": {
+                    "type": "string",
+                    "example": "2026-01-09T10:00:00Z"
+                },
+                "website": {
+                    "type": "string",
+                    "example": "https://johndoe.dev"
+                }
+            }
+        }
+    }
+}

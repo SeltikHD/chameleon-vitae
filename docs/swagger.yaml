@@ -1,0 +1,1655 @@
+definitions:
+  http.AnalyzeBulletRequest:
+    properties:
+      job_description:
+        example: We are looking for a Senior Backend Engineer...
+        type: string
+    type: object
+  http.BatchUpsertSkillsRequest:
+    properties:
+      skills:
+        items:
+          $ref: '#/definitions/http.SkillInput'
+        type: array
+    type: object
+  http.BatchUpsertSkillsResponse:
+    properties:
+      created:
+        example: 1
+        type: integer
+      data:
+        items:
+          $ref: '#/definitions/http.SkillResponse'
+        type: array
+      updated:
+        example: 2
+        type: integer
+    type: object
+  http.BulletResponse:
+    properties:
+      content:
+        example: Reduced API latency by 40%
+        type: string
+      created_at:
+        example: "2026-01-09T10:00:00Z"
+        type: string
+      display_order:
+        example: 0
+        type: integer
+      experience_id:
+        example: 550e8400-e29b-41d4-a716-446655440001
+        type: string
+      id:
+        example: 550e8400-e29b-41d4-a716-446655440000
+        type: string
+      impact_score:
+        example: 75
+        type: integer
+      keywords:
+        example:
+        - performance
+        - optimization
+        items:
+          type: string
+        type: array
+      metadata:
+        additionalProperties: {}
+        type: object
+      updated_at:
+        example: "2026-01-09T10:00:00Z"
+        type: string
+    type: object
+  http.CreateBulletRequest:
+    properties:
+      content:
+        example: Reduced API latency by 40%
+        type: string
+      display_order:
+        example: 0
+        type: integer
+      keywords:
+        example:
+        - performance
+        - optimization
+        items:
+          type: string
+        type: array
+    type: object
+  http.CreateExperienceRequest:
+    properties:
+      description:
+        example: Led backend development...
+        type: string
+      end_date:
+        example: "2024-06-30"
+        type: string
+      is_current:
+        example: false
+        type: boolean
+      location:
+        example: Remote
+        type: string
+      metadata:
+        additionalProperties: {}
+        type: object
+      organization:
+        example: Tech Company Inc.
+        type: string
+      start_date:
+        example: "2022-01-15"
+        type: string
+      title:
+        example: Senior Software Engineer
+        type: string
+      type:
+        example: work
+        type: string
+      url:
+        example: https://techcompany.com
+        type: string
+    type: object
+  http.CreateResumeRequest:
+    properties:
+      company_name:
+        example: Awesome Corp
+        type: string
+      job_description:
+        example: '## Senior Backend Engineer...'
+        type: string
+      job_title:
+        example: Senior Backend Engineer
+        type: string
+      job_url:
+        example: https://linkedin.com/jobs/12345
+        type: string
+      target_language:
+        example: en
+        type: string
+    type: object
+  http.CreateSpokenLanguageRequest:
+    properties:
+      display_order:
+        example: 0
+        type: integer
+      language:
+        example: Portuguese
+        type: string
+      proficiency:
+        example: native
+        type: string
+    type: object
+  http.ErrorBody:
+    properties:
+      code:
+        example: VALIDATION_ERROR
+        type: string
+      details:
+        items:
+          $ref: '#/definitions/http.ErrorDetail'
+        type: array
+      message:
+        example: Validation failed
+        type: string
+    type: object
+  http.ErrorDetail:
+    properties:
+      field:
+        example: email
+        type: string
+      message:
+        example: Invalid email format
+        type: string
+    type: object
+  http.ErrorResponse:
+    properties:
+      error:
+        $ref: '#/definitions/http.ErrorBody'
+    type: object
+  http.ExperienceResponse:
+    properties:
+      bullets:
+        items:
+          $ref: '#/definitions/http.BulletResponse'
+        type: array
+      created_at:
+        example: "2026-01-09T10:00:00Z"
+        type: string
+      description:
+        example: Led backend development...
+        type: string
+      display_order:
+        example: 0
+        type: integer
+      end_date:
+        example: "2024-06-30"
+        type: string
+      id:
+        example: 550e8400-e29b-41d4-a716-446655440000
+        type: string
+      is_current:
+        example: false
+        type: boolean
+      location:
+        example: Remote
+        type: string
+      metadata:
+        additionalProperties: {}
+        type: object
+      organization:
+        example: Tech Company Inc.
+        type: string
+      start_date:
+        example: "2022-01-15"
+        type: string
+      title:
+        example: Senior Software Engineer
+        type: string
+      type:
+        example: work
+        type: string
+      updated_at:
+        example: "2026-01-09T10:00:00Z"
+        type: string
+      url:
+        example: https://techcompany.com
+        type: string
+    type: object
+  http.HealthResponse:
+    properties:
+      service:
+        example: chameleon-vitae
+        type: string
+      status:
+        example: healthy
+        type: string
+    type: object
+  http.ListExperiencesResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/http.ExperienceResponse'
+        type: array
+      limit:
+        example: 50
+        type: integer
+      offset:
+        example: 0
+        type: integer
+      total:
+        example: 15
+        type: integer
+    type: object
+  http.ListResumesResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/http.ResumeResponse'
+        type: array
+      limit:
+        example: 20
+        type: integer
+      offset:
+        example: 0
+        type: integer
+      total:
+        example: 10
+        type: integer
+    type: object
+  http.ListSkillsResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/http.SkillResponse'
+        type: array
+      total:
+        example: 25
+        type: integer
+    type: object
+  http.ListSpokenLanguagesResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/http.SpokenLanguageResponse'
+        type: array
+    type: object
+  http.ParseJobMetadata:
+    properties:
+      fetched_at:
+        example: "2026-01-09T10:00:00Z"
+        type: string
+      source:
+        example: linkedin.com
+        type: string
+    type: object
+  http.ParseJobURLRequest:
+    properties:
+      url:
+        example: https://linkedin.com/jobs/view/12345
+        type: string
+    type: object
+  http.ParseJobURLResponse:
+    properties:
+      markdown:
+        example: '## Senior Backend Engineer...'
+        type: string
+      metadata:
+        $ref: '#/definitions/http.ParseJobMetadata'
+      title:
+        example: Senior Backend Engineer at Awesome Corp
+        type: string
+      url:
+        example: https://linkedin.com/jobs/view/12345
+        type: string
+    type: object
+  http.ResumeAnalysisDTO:
+    properties:
+      matched_keywords:
+        items:
+          type: string
+        type: array
+      missing_keywords:
+        items:
+          type: string
+        type: array
+      recommendations:
+        items:
+          type: string
+        type: array
+    type: object
+  http.ResumeContentDTO:
+    properties:
+      analysis:
+        $ref: '#/definitions/http.ResumeAnalysisDTO'
+      experiences:
+        items:
+          $ref: '#/definitions/http.TailoredExperienceDTO'
+        type: array
+      skills:
+        items:
+          type: string
+        type: array
+      summary:
+        type: string
+    type: object
+  http.ResumeResponse:
+    properties:
+      company_name:
+        example: Awesome Corp
+        type: string
+      created_at:
+        example: "2026-01-09T10:00:00Z"
+        type: string
+      generated_content:
+        $ref: '#/definitions/http.ResumeContentDTO'
+      id:
+        example: 550e8400-e29b-41d4-a716-446655440000
+        type: string
+      job_description:
+        type: string
+      job_title:
+        example: Senior Backend Engineer
+        type: string
+      job_url:
+        example: https://linkedin.com/jobs/...
+        type: string
+      notes:
+        type: string
+      pdf_url:
+        example: https://storage.../resume.pdf
+        type: string
+      score:
+        example: 85
+        type: integer
+      selected_bullets:
+        items:
+          type: string
+        type: array
+      status:
+        example: draft
+        type: string
+      target_language:
+        example: en
+        type: string
+      updated_at:
+        example: "2026-01-09T10:00:00Z"
+        type: string
+    type: object
+  http.ScoreBulletResponse:
+    properties:
+      content:
+        example: Reduced API latency by 40%
+        type: string
+      id:
+        example: 550e8400-e29b-41d4-a716-446655440000
+        type: string
+      impact_score:
+        example: 85
+        type: integer
+      score_reasoning:
+        example: Contains quantifiable metrics...
+        type: string
+    type: object
+  http.SkillInput:
+    properties:
+      category:
+        example: Programming Languages
+        type: string
+      is_highlighted:
+        example: true
+        type: boolean
+      name:
+        example: Go
+        type: string
+      proficiency_level:
+        example: 85
+        type: integer
+      years_of_experience:
+        example: 3.5
+        type: number
+    type: object
+  http.SkillResponse:
+    properties:
+      category:
+        example: Programming Languages
+        type: string
+      created_at:
+        example: "2026-01-09T10:00:00Z"
+        type: string
+      display_order:
+        example: 0
+        type: integer
+      id:
+        example: 550e8400-e29b-41d4-a716-446655440000
+        type: string
+      is_highlighted:
+        example: true
+        type: boolean
+      name:
+        example: Go
+        type: string
+      proficiency_level:
+        example: 85
+        type: integer
+      years_of_experience:
+        example: 3.5
+        type: number
+    type: object
+  http.SpokenLanguageResponse:
+    properties:
+      created_at:
+        example: "2026-01-09T10:00:00Z"
+        type: string
+      display_order:
+        example: 0
+        type: integer
+      id:
+        example: 550e8400-e29b-41d4-a716-446655440000
+        type: string
+      language:
+        example: English
+        type: string
+      proficiency:
+        example: native
+        type: string
+    type: object
+  http.SyncUserRequest:
+    properties:
+      email:
+        example: user@example.com
+        type: string
+      firebase_uid:
+        example: abc123xyz
+        type: string
+      name:
+        example: John Doe
+        type: string
+      picture:
+        example: https://example.com/photo.jpg
+        type: string
+    type: object
+  http.SyncUserResponse:
+    properties:
+      created_at:
+        example: "2026-01-09T10:00:00Z"
+        type: string
+      email:
+        example: user@example.com
+        type: string
+      firebase_uid:
+        example: abc123xyz
+        type: string
+      id:
+        example: 550e8400-e29b-41d4-a716-446655440000
+        type: string
+      name:
+        example: John Doe
+        type: string
+    type: object
+  http.TailorResumeRequest:
+    properties:
+      max_bullets_per_job:
+        example: 15
+        type: integer
+    type: object
+  http.TailoredBulletDTO:
+    properties:
+      bullet_id:
+        type: string
+      original_content:
+        type: string
+      tailored_content:
+        type: string
+    type: object
+  http.TailoredExperienceDTO:
+    properties:
+      bullets:
+        items:
+          $ref: '#/definitions/http.TailoredBulletDTO'
+        type: array
+      end_date:
+        type: string
+      experience_id:
+        type: string
+      is_current:
+        type: boolean
+      organization:
+        type: string
+      start_date:
+        type: string
+      title:
+        type: string
+    type: object
+  http.UpdateBulletRequest:
+    properties:
+      content:
+        example: Updated bullet content
+        type: string
+      display_order:
+        example: 1
+        type: integer
+      keywords:
+        example:
+        - new
+        - keywords
+        items:
+          type: string
+        type: array
+    type: object
+  http.UpdateExperienceRequest:
+    properties:
+      description:
+        example: Led backend development...
+        type: string
+      display_order:
+        example: 1
+        type: integer
+      end_date:
+        example: "2024-06-30"
+        type: string
+      is_current:
+        example: false
+        type: boolean
+      location:
+        example: Remote
+        type: string
+      metadata:
+        additionalProperties: {}
+        type: object
+      organization:
+        example: Tech Company Inc.
+        type: string
+      start_date:
+        example: "2022-01-15"
+        type: string
+      title:
+        example: Senior Software Engineer
+        type: string
+      type:
+        example: work
+        type: string
+      url:
+        example: https://techcompany.com
+        type: string
+    type: object
+  http.UpdateResumeContentRequest:
+    properties:
+      notes:
+        example: Made adjustments to summary
+        type: string
+      status:
+        example: reviewed
+        type: string
+    type: object
+  http.UpdateUserRequest:
+    properties:
+      github_url:
+        example: https://github.com/johndoe
+        type: string
+      headline:
+        example: Senior Software Engineer
+        type: string
+      linkedin_url:
+        example: https://linkedin.com/in/johndoe
+        type: string
+      location:
+        example: San Francisco, CA
+        type: string
+      name:
+        example: John Doe
+        type: string
+      phone:
+        example: +1-555-123-4567
+        type: string
+      portfolio_url:
+        example: https://portfolio.johndoe.dev
+        type: string
+      preferred_language:
+        example: en
+        type: string
+      summary:
+        example: Experienced developer...
+        type: string
+      website:
+        example: https://johndoe.dev
+        type: string
+    type: object
+  http.UserResponse:
+    properties:
+      created_at:
+        example: "2026-01-09T10:00:00Z"
+        type: string
+      email:
+        example: user@example.com
+        type: string
+      firebase_uid:
+        example: abc123xyz
+        type: string
+      github_url:
+        example: https://github.com/johndoe
+        type: string
+      headline:
+        example: Senior Software Engineer
+        type: string
+      id:
+        example: 550e8400-e29b-41d4-a716-446655440000
+        type: string
+      linkedin_url:
+        example: https://linkedin.com/in/johndoe
+        type: string
+      location:
+        example: San Francisco, CA
+        type: string
+      name:
+        example: John Doe
+        type: string
+      phone:
+        example: +1-555-123-4567
+        type: string
+      picture_url:
+        example: https://example.com/photo.jpg
+        type: string
+      portfolio_url:
+        example: https://portfolio.johndoe.dev
+        type: string
+      preferred_language:
+        example: en
+        type: string
+      summary:
+        example: Experienced developer...
+        type: string
+      updated_at:
+        example: "2026-01-09T10:00:00Z"
+        type: string
+      website:
+        example: https://johndoe.dev
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /health:
+    get:
+      description: Returns the health status of the service
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/http.HealthResponse'
+      summary: Health check
+      tags:
+      - health
+  /v1/auth/sync:
+    post:
+      consumes:
+      - application/json
+      description: Synchronizes a Firebase authenticated user with the local PostgreSQL
+        database. Creates a new user if not exists, updates if exists (upsert behavior).
+      parameters:
+      - description: Bearer token from Firebase
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: User sync request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/http.SyncUserRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/http.SyncUserResponse'
+        "400":
+          description: Invalid request body
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "401":
+          description: Invalid or expired token
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      summary: Sync user from Firebase
+      tags:
+      - auth
+  /v1/bullets/{bulletID}:
+    delete:
+      description: Deletes a bullet
+      parameters:
+      - description: Bullet ID
+        in: path
+        name: bulletID
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No content
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "404":
+          description: Bullet not found
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete bullet
+      tags:
+      - bullets
+    put:
+      consumes:
+      - application/json
+      description: Updates an existing bullet
+      parameters:
+      - description: Bullet ID
+        in: path
+        name: bulletID
+        required: true
+        type: string
+      - description: Bullet data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/http.UpdateBulletRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/http.BulletResponse'
+        "400":
+          description: Invalid request body
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "404":
+          description: Bullet not found
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "422":
+          description: Validation failed
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update bullet
+      tags:
+      - bullets
+  /v1/bullets/{bulletID}/score:
+    post:
+      consumes:
+      - application/json
+      description: Triggers AI recalculation of the bullet's impact score against
+        a job description
+      parameters:
+      - description: Bullet ID
+        in: path
+        name: bulletID
+        required: true
+        type: string
+      - description: Job description for analysis
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/http.AnalyzeBulletRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/http.ScoreBulletResponse'
+        "400":
+          description: Invalid request body
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "404":
+          description: Bullet not found
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Recalculate bullet score
+      tags:
+      - bullets
+  /v1/experiences:
+    get:
+      description: Returns a paginated list of experiences for the authenticated user
+      parameters:
+      - description: Filter by experience type
+        in: query
+        name: type
+        type: string
+      - default: 50
+        description: Pagination limit
+        in: query
+        name: limit
+        type: integer
+      - default: 0
+        description: Pagination offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/http.ListExperiencesResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: List experiences
+      tags:
+      - experiences
+    post:
+      consumes:
+      - application/json
+      description: Creates a new experience for the authenticated user
+      parameters:
+      - description: Experience data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/http.CreateExperienceRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/http.ExperienceResponse'
+        "400":
+          description: Invalid request body
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "422":
+          description: Validation failed
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create experience
+      tags:
+      - experiences
+  /v1/experiences/{experienceID}:
+    delete:
+      description: Deletes an experience and all its bullets
+      parameters:
+      - description: Experience ID
+        in: path
+        name: experienceID
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No content
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "404":
+          description: Experience not found
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete experience
+      tags:
+      - experiences
+    get:
+      description: Returns a specific experience with all its bullets
+      parameters:
+      - description: Experience ID
+        in: path
+        name: experienceID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/http.ExperienceResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "404":
+          description: Experience not found
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get experience
+      tags:
+      - experiences
+    put:
+      consumes:
+      - application/json
+      description: Updates an existing experience
+      parameters:
+      - description: Experience ID
+        in: path
+        name: experienceID
+        required: true
+        type: string
+      - description: Experience data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/http.UpdateExperienceRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/http.ExperienceResponse'
+        "400":
+          description: Invalid request body
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "404":
+          description: Experience not found
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "422":
+          description: Validation failed
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update experience
+      tags:
+      - experiences
+  /v1/experiences/{experienceID}/bullets:
+    post:
+      consumes:
+      - application/json
+      description: Creates a new bullet point under an experience
+      parameters:
+      - description: Experience ID
+        in: path
+        name: experienceID
+        required: true
+        type: string
+      - description: Bullet data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/http.CreateBulletRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/http.BulletResponse'
+        "400":
+          description: Invalid request body
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "404":
+          description: Experience not found
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "422":
+          description: Validation failed
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create bullet
+      tags:
+      - bullets
+  /v1/languages:
+    get:
+      description: Returns all spoken languages for the authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/http.ListSpokenLanguagesResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: List spoken languages
+      tags:
+      - languages
+    post:
+      consumes:
+      - application/json
+      description: Creates a new spoken language for the authenticated user
+      parameters:
+      - description: Spoken language data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/http.CreateSpokenLanguageRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/http.SpokenLanguageResponse'
+        "400":
+          description: Invalid request body
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "409":
+          description: Language already exists
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "422":
+          description: Validation failed
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create spoken language
+      tags:
+      - languages
+  /v1/languages/{languageID}:
+    delete:
+      description: Deletes a spoken language
+      parameters:
+      - description: Spoken language ID
+        in: path
+        name: languageID
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No content
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "404":
+          description: Language not found
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete spoken language
+      tags:
+      - languages
+  /v1/me:
+    get:
+      description: Returns the authenticated user's complete profile
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/http.UserResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get current user profile
+      tags:
+      - user
+    patch:
+      consumes:
+      - application/json
+      description: Updates the authenticated user's profile fields
+      parameters:
+      - description: Update data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/http.UpdateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/http.UserResponse'
+        "400":
+          description: Invalid request body
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "422":
+          description: Validation failed
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update current user profile
+      tags:
+      - user
+  /v1/resumes:
+    get:
+      description: Returns a paginated list of resumes for the authenticated user
+      parameters:
+      - description: Filter by status
+        in: query
+        name: status
+        type: string
+      - default: 20
+        description: Pagination limit
+        in: query
+        name: limit
+        type: integer
+      - default: 0
+        description: Pagination offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/http.ListResumesResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: List resumes
+      tags:
+      - resumes
+    post:
+      consumes:
+      - application/json
+      description: Creates a new resume draft from a job description
+      parameters:
+      - description: Resume data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/http.CreateResumeRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/http.ResumeResponse'
+        "400":
+          description: Invalid request body
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "422":
+          description: Validation failed
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create resume
+      tags:
+      - resumes
+  /v1/resumes/{resumeID}:
+    delete:
+      description: Deletes a resume
+      parameters:
+      - description: Resume ID
+        in: path
+        name: resumeID
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No content
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "404":
+          description: Resume not found
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete resume
+      tags:
+      - resumes
+    get:
+      description: Returns a specific resume with full content
+      parameters:
+      - description: Resume ID
+        in: path
+        name: resumeID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/http.ResumeResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "404":
+          description: Resume not found
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get resume
+      tags:
+      - resumes
+  /v1/resumes/{resumeID}/content:
+    patch:
+      consumes:
+      - application/json
+      description: Updates the status or content of a resume for manual adjustments
+      parameters:
+      - description: Resume ID
+        in: path
+        name: resumeID
+        required: true
+        type: string
+      - description: Resume update
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/http.UpdateResumeContentRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/http.ResumeResponse'
+        "400":
+          description: Invalid request body
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "404":
+          description: Resume not found
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "422":
+          description: Validation failed
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update resume status/content
+      tags:
+      - resumes
+  /v1/resumes/{resumeID}/pdf:
+    get:
+      description: Generates a PDF file of the resume using the selected template
+      parameters:
+      - description: Resume ID
+        in: path
+        name: resumeID
+        required: true
+        type: string
+      - default: modern
+        description: Template name
+        in: query
+        name: template
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/http.ResumeResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "404":
+          description: Resume not found
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "422":
+          description: Resume not ready for PDF
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Generate PDF
+      tags:
+      - resumes
+  /v1/resumes/{resumeID}/tailor:
+    post:
+      consumes:
+      - application/json
+      description: Uses AI to select and rewrite bullets for a specific job description
+      parameters:
+      - description: Resume ID
+        in: path
+        name: resumeID
+        required: true
+        type: string
+      - description: Tailoring parameters
+        in: body
+        name: request
+        schema:
+          $ref: '#/definitions/http.TailorResumeRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/http.ResumeResponse'
+        "400":
+          description: Invalid request body
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "404":
+          description: Resume not found
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "422":
+          description: Validation failed
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Tailor resume
+      tags:
+      - resumes
+  /v1/skills:
+    get:
+      description: Returns all skills for the authenticated user, optionally filtered
+        by category
+      parameters:
+      - description: Filter by category
+        in: query
+        name: category
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/http.ListSkillsResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: List skills
+      tags:
+      - skills
+  /v1/skills/{skillID}:
+    delete:
+      description: Deletes a skill
+      parameters:
+      - description: Skill ID
+        in: path
+        name: skillID
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No content
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "404":
+          description: Skill not found
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete skill
+      tags:
+      - skills
+  /v1/skills/batch:
+    post:
+      consumes:
+      - application/json
+      description: Creates or updates multiple skills. Skills are matched by name
+        - existing skills are updated, new ones are created.
+      parameters:
+      - description: Skills data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/http.BatchUpsertSkillsRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/http.BatchUpsertSkillsResponse'
+        "400":
+          description: Invalid request body
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "422":
+          description: Validation failed
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Batch upsert skills
+      tags:
+      - skills
+  /v1/tools/parse-job:
+    post:
+      consumes:
+      - application/json
+      description: Fetches a job posting URL and extracts structured data using Jina
+        Reader
+      parameters:
+      - description: Job URL to parse
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/http.ParseJobURLRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/http.ParseJobURLResponse'
+        "400":
+          description: Invalid request body
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "422":
+          description: Failed to parse job posting
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Parse job URL
+      tags:
+      - tools
+swagger: "2.0"
