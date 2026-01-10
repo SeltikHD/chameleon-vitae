@@ -46,7 +46,7 @@
 
       <form
         class="space-y-4"
-        @submit.prevent="nextStep"
+        @submit.prevent="analyzeJob"
       >
         <UFormField
           label="Job URL (optional)"
@@ -56,6 +56,7 @@
             v-model="form.jobUrl"
             placeholder="https://careers.example.com/job/123"
             icon="i-lucide-link"
+            :disabled="isAnalyzing"
           />
         </UFormField>
 
@@ -74,6 +75,7 @@
             v-model="form.description"
             :rows="12"
             placeholder="Paste the full job description here..."
+            :disabled="isAnalyzing"
           />
         </UFormField>
 
@@ -81,10 +83,12 @@
           <UButton
             type="submit"
             color="primary"
-            :disabled="!form.description"
+            :disabled="!form.description || isAnalyzing"
+            :loading="isAnalyzing"
           >
-            Analyze Job
+            {{ isAnalyzing ? 'Analyzing...' : 'Analyze Job' }}
             <UIcon
+              v-if="!isAnalyzing"
               name="i-lucide-arrow-right"
               class="ml-2 h-4 w-4"
             />
@@ -99,29 +103,8 @@
         <h2 class="font-semibold text-zinc-100">AI Analysis</h2>
       </template>
 
-      <!-- Loading State -->
-      <div
-        v-if="isAnalyzing"
-        class="flex flex-col items-center py-12"
-      >
-        <div class="relative">
-          <div
-            class="h-16 w-16 animate-spin rounded-full border-4 border-zinc-700 border-t-emerald-500"
-          />
-          <UIcon
-            name="i-lucide-brain"
-            class="absolute left-1/2 top-1/2 h-6 w-6 -translate-x-1/2 -translate-y-1/2 text-emerald-400"
-          />
-        </div>
-        <p class="mt-4 text-zinc-400">Analyzing job requirements...</p>
-        <p class="text-sm text-zinc-500">This may take a few seconds</p>
-      </div>
-
       <!-- Analysis Results -->
-      <div
-        v-else
-        class="space-y-6"
-      >
+      <div class="space-y-6">
         <div>
           <h3 class="mb-3 text-sm font-medium text-zinc-400">Detected Company & Role</h3>
           <div class="flex items-center gap-4">
@@ -132,14 +115,21 @@
               />
             </div>
             <div>
-              <p class="font-semibold text-zinc-100">{{ analysis.company }}</p>
-              <p class="text-sm text-zinc-400">{{ analysis.position }}</p>
+              <UInput
+                v-model="analysis.company"
+                placeholder="Company name"
+                class="mb-1"
+              />
+              <UInput
+                v-model="analysis.position"
+                placeholder="Position title"
+              />
             </div>
           </div>
         </div>
 
         <div>
-          <h3 class="mb-3 text-sm font-medium text-zinc-400">Required Skills</h3>
+          <h3 class="mb-3 text-sm font-medium text-zinc-400">Detected Requirements</h3>
           <div class="flex flex-wrap gap-2">
             <UBadge
               v-for="skill in analysis.requiredSkills"
@@ -149,31 +139,25 @@
             >
               {{ skill }}
             </UBadge>
-          </div>
-        </div>
-
-        <div>
-          <h3 class="mb-3 text-sm font-medium text-zinc-400">Nice to Have</h3>
-          <div class="flex flex-wrap gap-2">
             <UBadge
-              v-for="skill in analysis.niceToHave"
-              :key="skill"
+              v-if="analysis.requiredSkills.length === 0"
               color="neutral"
               variant="subtle"
             >
-              {{ skill }}
+              No specific skills detected
             </UBadge>
           </div>
         </div>
 
         <div>
-          <h3 class="mb-3 text-sm font-medium text-zinc-400">Experience Level</h3>
-          <UBadge
-            color="secondary"
-            variant="subtle"
-          >
-            {{ analysis.experienceLevel }}
-          </UBadge>
+          <h3 class="mb-3 text-sm font-medium text-zinc-400">Template Selection</h3>
+          <USelectMenu
+            v-model="selectedTemplateId"
+            :items="templateOptions"
+            value-key="value"
+            placeholder="Select a template"
+            class="w-full"
+          />
         </div>
 
         <div class="flex justify-between pt-4">
@@ -190,10 +174,13 @@
           </UButton>
           <UButton
             color="primary"
-            @click="nextStep"
+            :disabled="!selectedTemplateId || isGenerating"
+            :loading="isGenerating"
+            @click="generateResume"
           >
-            Generate Resume
+            {{ isGenerating ? 'Generating...' : 'Generate Resume' }}
             <UIcon
+              v-if="!isGenerating"
               name="i-lucide-sparkles"
               class="ml-2 h-4 w-4"
             />
@@ -215,7 +202,7 @@
           </div>
         </div>
         <h3 class="mt-6 text-lg font-semibold text-zinc-100">Generating Your Resume</h3>
-        <p class="mt-2 text-zinc-400">Selecting and tailoring your best experience bullets...</p>
+        <p class="mt-2 text-zinc-400">{{ generationStatusText }}</p>
 
         <div class="mt-6 w-full max-w-xs">
           <div class="flex justify-between text-sm text-zinc-400">
@@ -229,19 +216,49 @@
             />
           </div>
         </div>
+
+        <!-- Error State -->
+        <div
+          v-if="generationError"
+          class="mt-6 text-center"
+        >
+          <UAlert
+            color="error"
+            variant="subtle"
+            icon="i-heroicons-exclamation-triangle"
+            :title="generationError"
+          />
+          <UButton
+            color="primary"
+            class="mt-4"
+            @click="generateResume"
+          >
+            Retry Generation
+          </UButton>
+        </div>
       </div>
     </UCard>
   </div>
 </template>
 
 <script setup lang="ts">
+import { apiFetch } from '~/composables/useApiFetch'
+import type { ResumeResponse, AnalyzeJobRequest, AnalyzeJobResponse } from '~/types/api'
+
 definePageMeta({
   layout: 'dashboard'
 })
 
+const router = useRouter()
+const toast = useToast()
+
 const currentStep = ref(0)
 const isAnalyzing = ref(false)
+const isGenerating = ref(false)
 const generationProgress = ref(0)
+const generationError = ref<string | null>(null)
+const selectedTemplateId = ref('')
+const createdResumeId = ref<string | null>(null)
 
 const steps = [
   { id: 'description', label: 'Job Description' },
@@ -254,13 +271,27 @@ const form = reactive({
   description: ''
 })
 
-// Mock analysis result.
 const analysis = reactive({
-  company: 'Acme Corp',
-  position: 'Senior Frontend Engineer',
-  requiredSkills: ['React', 'TypeScript', 'Next.js', 'Tailwind CSS', 'GraphQL'],
-  niceToHave: ['Vue.js', 'Testing', 'CI/CD', 'AWS'],
-  experienceLevel: '5+ years'
+  company: '',
+  position: '',
+  requiredSkills: [] as string[],
+  niceToHave: [] as string[],
+  experienceLevel: ''
+})
+
+// Template options (these would come from API in production)
+const templateOptions = ref([
+  { label: 'Modern Professional', value: 'template-modern' },
+  { label: 'Classic Traditional', value: 'template-classic' },
+  { label: 'Minimalist', value: 'template-minimal' },
+  { label: 'Creative', value: 'template-creative' }
+])
+
+const generationStatusText = computed(() => {
+  if (generationProgress.value < 30) return 'Analyzing your experience bullets...'
+  if (generationProgress.value < 60) return 'Selecting the best matches for this job...'
+  if (generationProgress.value < 90) return 'Tailoring content for maximum impact...'
+  return 'Finalizing your resume...'
 })
 
 function getStepClasses(index: number) {
@@ -273,32 +304,107 @@ function getStepClasses(index: number) {
   return 'bg-zinc-800 text-zinc-500'
 }
 
-function nextStep() {
-  if (currentStep.value === 0) {
-    // Simulate analysis.
+async function analyzeJob() {
+  if (!form.description.trim()) return
+
+  isAnalyzing.value = true
+
+  try {
+    const request: AnalyzeJobRequest = {
+      job_description: form.description,
+      job_url: form.jobUrl || undefined
+    }
+
+    const response = await apiFetch<AnalyzeJobResponse>('/resumes/analyze', {
+      method: 'POST',
+      body: request
+    })
+
+    // Update analysis with response
+    analysis.company = response.company || ''
+    analysis.position = response.position || ''
+    analysis.requiredSkills = response.required_skills || []
+    analysis.niceToHave = response.nice_to_have || []
+    analysis.experienceLevel = response.experience_level || ''
+
     currentStep.value = 1
-    isAnalyzing.value = true
-    setTimeout(() => {
-      isAnalyzing.value = false
-    }, 2000)
-  } else if (currentStep.value === 1) {
-    // Simulate generation.
-    currentStep.value = 2
-    simulateGeneration()
+  } catch (error) {
+    console.error('[NewResume] Analysis failed:', error)
+    toast.add({
+      title: 'Analysis Failed',
+      description: 'Could not analyze the job description. Please try again.',
+      color: 'error',
+      icon: 'i-heroicons-exclamation-circle'
+    })
+  } finally {
+    isAnalyzing.value = false
   }
 }
 
-function simulateGeneration() {
+async function generateResume() {
+  if (!selectedTemplateId.value) return
+
+  isGenerating.value = true
+  generationError.value = null
+  currentStep.value = 2
   generationProgress.value = 0
-  const interval = setInterval(() => {
-    generationProgress.value += 10
-    if (generationProgress.value >= 100) {
-      clearInterval(interval)
-      // Navigate to the resume detail page.
-      setTimeout(() => {
-        navigateTo('/dashboard/resumes/new-resume-id')
-      }, 500)
-    }
-  }, 300)
+
+  try {
+    // Create the resume
+    const resume = await apiFetch<ResumeResponse>('/resumes', {
+      method: 'POST',
+      body: {
+        job_description: form.description,
+        job_title: analysis.position || undefined,
+        company_name: analysis.company || undefined
+      }
+    })
+
+    createdResumeId.value = resume.id
+
+    // Simulate progress while the backend generates
+    await simulateProgress()
+
+    // Trigger generation
+    await apiFetch(`/resumes/${resume.id}/generate`, {
+      method: 'POST'
+    })
+
+    generationProgress.value = 100
+
+    toast.add({
+      title: 'Resume Generated!',
+      description: 'Your tailored resume is ready to view.',
+      color: 'success',
+      icon: 'i-heroicons-check-circle'
+    })
+
+    // Navigate to the resume detail page
+    await router.push(`/dashboard/resumes/${resume.id}`)
+  } catch (error) {
+    console.error('[NewResume] Generation failed:', error)
+    generationError.value = error instanceof Error ? error.message : 'Failed to generate resume'
+    toast.add({
+      title: 'Generation Failed',
+      description: 'Could not generate the resume. Please try again.',
+      color: 'error',
+      icon: 'i-heroicons-exclamation-circle'
+    })
+    isGenerating.value = false
+  }
+}
+
+async function simulateProgress() {
+  return new Promise<void>((resolve) => {
+    const interval = setInterval(() => {
+      if (generationProgress.value < 85) {
+        generationProgress.value += Math.random() * 15
+      }
+      if (generationProgress.value >= 85) {
+        clearInterval(interval)
+        resolve()
+      }
+    }, 500)
+  })
 }
 </script>
