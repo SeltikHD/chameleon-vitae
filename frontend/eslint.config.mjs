@@ -1,5 +1,6 @@
 // @ts-check
 import withNuxt from './.nuxt/eslint.config.mjs'
+import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended'
 
 export default withNuxt(
   // Global rules for all files.
@@ -17,5 +18,7 @@ export default withNuxt(
     rules: {
       'no-console': 'off'
     }
-  }
+  },
+  // Prettier integration (must be last to override other formatting rules).
+  eslintPluginPrettierRecommended
 )

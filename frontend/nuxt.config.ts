@@ -1,9 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  modules: [
-    '@nuxt/eslint',
-    '@nuxt/ui'
-  ],
+  modules: ['@nuxt/eslint', '@nuxt/ui'],
 
   devtools: {
     enabled: true
@@ -30,17 +27,12 @@ export default defineNuxtConfig({
 
   compatibilityDate: '2025-01-15',
 
-  // ESLint configuration using ESLint Stylistic (no Prettier needed).
-  // This provides formatting rules directly in ESLint for a simpler toolchain.
+  // ESLint configuration.
+  // Formatting is handled by Prettier (see .prettierrc).
+  // ESLint Stylistic is disabled to avoid conflicts with Prettier.
   eslint: {
     config: {
-      stylistic: {
-        indent: 2,
-        semi: false,
-        quotes: 'single',
-        commaDangle: 'never',
-        braceStyle: '1tbs'
-      }
+      stylistic: false
     }
   }
 })
