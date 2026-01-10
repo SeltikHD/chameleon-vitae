@@ -23,6 +23,7 @@
     "pinia": "^3.0.4"
   },
   "devDependencies": {
+    "@iconify-json/heroicons": "^1.2.3",
     "@nuxt/eslint": "^1.12.1",
     "eslint": "^9.39.2",
     "eslint-config-prettier": "^10.1.8",
