@@ -160,6 +160,7 @@ CREATE INDEX IF NOT EXISTS idx_skills_category ON skills(category);
 CREATE INDEX IF NOT EXISTS idx_spoken_languages_user_id ON spoken_languages(user_id);
 CREATE INDEX IF NOT EXISTS idx_resumes_user_id ON resumes(user_id);
 CREATE INDEX IF NOT EXISTS idx_resumes_status ON resumes(status);
+CREATE UNIQUE INDEX idx_skills_user_name_unique ON skills (user_id, LOWER(name));
 
 -- ============================================================================
 -- Triggers for updated_at
