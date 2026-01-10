@@ -9,14 +9,19 @@
     >
       <!-- Logo -->
       <div class="flex h-16 items-center border-b border-zinc-800 px-4">
-        <NuxtLink to="/dashboard" class="flex items-center gap-2">
-          <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-emerald-500">
-            <UIcon name="i-lucide-file-text" class="h-5 w-5 text-zinc-950" />
-          </div>
+        <NuxtLink
+          to="/dashboard"
+          class="flex items-center gap-2 overflow-hidden"
+        >
+          <img
+            src="~/assets/icons/logo.svg"
+            alt="Chameleon Vitae Logo"
+            class="h-8 w-8 shrink-0 -scale-x-100"
+          />
           <span
             :class="[
-              'text-lg font-bold text-zinc-100 transition-opacity duration-300',
-              isSidebarOpen ? 'opacity-100' : 'opacity-0 w-0 overflow-hidden'
+              'whitespace-nowrap text-lg font-bold text-zinc-100 transition-all duration-300',
+              isSidebarOpen ? 'w-auto opacity-100' : 'w-0 opacity-0'
             ]"
           >
             Chameleon
@@ -48,7 +53,10 @@
           class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-zinc-400 transition hover:bg-zinc-800 hover:text-zinc-100"
           @click="handleSignOut"
         >
-          <UIcon name="i-lucide-log-out" class="h-5 w-5 shrink-0" />
+          <UIcon
+            name="i-lucide-log-out"
+            class="h-5 w-5 shrink-0"
+          />
           <span
             :class="[
               'text-sm transition-opacity duration-300',
@@ -80,7 +88,9 @@
       ]"
     >
       <!-- Top Header -->
-      <header class="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-zinc-800 bg-zinc-950/80 px-6 backdrop-blur-sm">
+      <header
+        class="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-zinc-800 bg-zinc-950/80 px-6 backdrop-blur-sm"
+      >
         <div class="flex items-center gap-4">
           <h1 class="text-xl font-semibold text-zinc-100">
             {{ pageTitle }}
@@ -89,8 +99,15 @@
 
         <!-- User Menu -->
         <div class="flex items-center gap-4">
-          <UButton to="/dashboard/resumes/new" color="primary" size="sm">
-            <UIcon name="i-lucide-plus" class="mr-1 h-4 w-4" />
+          <UButton
+            to="/dashboard/resumes/new"
+            color="primary"
+            size="sm"
+          >
+            <UIcon
+              name="i-lucide-plus"
+              class="mr-1 h-4 w-4"
+            />
             New Resume
           </UButton>
 
@@ -98,18 +115,32 @@
             :items="userMenuItems"
             :ui="{ content: 'w-48' }"
           >
-            <UButton variant="ghost" color="neutral" size="sm" class="gap-2">
-              <UAvatar :src="mockUser.avatar" :alt="mockUser.name" size="xs" />
+            <UButton
+              variant="ghost"
+              color="neutral"
+              size="sm"
+              class="gap-2"
+            >
+              <UAvatar
+                :src="mockUser.avatar"
+                :alt="mockUser.name"
+                size="xs"
+              />
               <span class="hidden text-sm md:inline">{{ mockUser.name }}</span>
-              <UIcon name="i-lucide-chevron-down" class="h-4 w-4" />
+              <UIcon
+                name="i-lucide-chevron-down"
+                class="h-4 w-4"
+              />
             </UButton>
           </UDropdownMenu>
         </div>
       </header>
 
       <!-- Page Content -->
-      <main class="flex-1 p-6">
-        <slot />
+      <main class="flex-1 p-4 md:p-6 lg:p-8">
+        <div class="mx-auto max-w-7xl">
+          <slot />
+        </div>
       </main>
     </div>
   </div>
@@ -141,9 +172,7 @@ const userMenuItems = [
     { label: 'Profile', icon: 'i-lucide-user', to: '/dashboard/profile' },
     { label: 'Settings', icon: 'i-lucide-settings', to: '/dashboard/profile' }
   ],
-  [
-    { label: 'Sign Out', icon: 'i-lucide-log-out', click: () => handleSignOut() }
-  ]
+  [{ label: 'Sign Out', icon: 'i-lucide-log-out', click: () => handleSignOut() }]
 ]
 
 // Page title based on route.
