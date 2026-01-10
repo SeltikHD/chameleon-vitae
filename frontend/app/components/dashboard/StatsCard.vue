@@ -8,7 +8,10 @@
         <p class="mt-1 text-2xl font-bold text-zinc-100">
           {{ formattedValue }}
         </p>
-        <p v-if="change" class="mt-1 flex items-center gap-1 text-xs">
+        <p
+          v-if="change"
+          class="mt-1 flex items-center gap-1 text-xs"
+        >
           <UIcon
             :name="changeIcon"
             :class="['h-3 w-3', changeColor]"
@@ -17,13 +20,11 @@
           <span class="text-zinc-500">vs last month</span>
         </p>
       </div>
-      <div
-        :class="[
-          'flex h-10 w-10 items-center justify-center rounded-lg',
-          iconBackground
-        ]"
-      >
-        <UIcon :name="icon" :class="['h-5 w-5', iconColor]" />
+      <div :class="['flex h-10 w-10 items-center justify-center rounded-lg', iconBackground]">
+        <UIcon
+          :name="icon"
+          :class="['h-5 w-5', iconColor]"
+        />
       </div>
     </div>
   </UCard>

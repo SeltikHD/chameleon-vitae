@@ -12,18 +12,27 @@
         <h1 class="text-2xl font-bold text-zinc-100">
           {{ resume.company }} - {{ resume.position }}
         </h1>
-        <p class="mt-1 text-zinc-400">
-          Created {{ resume.createdAt }}
-        </p>
+        <p class="mt-1 text-zinc-400">Created {{ resume.createdAt }}</p>
       </div>
       <div class="flex items-center gap-2">
-        <UBadge :color="getStatusColor(resume.status)" variant="subtle" size="lg">
+        <UBadge
+          :color="getStatusColor(resume.status)"
+          variant="subtle"
+          size="lg"
+        >
           {{ resume.status }}
         </UBadge>
-        <UButton color="neutral" variant="outline" icon="i-lucide-download">
+        <UButton
+          color="neutral"
+          variant="outline"
+          icon="i-lucide-download"
+        >
           Download PDF
         </UButton>
-        <UButton color="primary" icon="i-lucide-refresh-cw">
+        <UButton
+          color="primary"
+          icon="i-lucide-refresh-cw"
+        >
           Regenerate
         </UButton>
       </div>
@@ -34,7 +43,10 @@
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-4">
           <div class="flex h-14 w-14 items-center justify-center rounded-full bg-emerald-500/20">
-            <UIcon name="i-lucide-target" class="h-7 w-7 text-emerald-400" />
+            <UIcon
+              name="i-lucide-target"
+              class="h-7 w-7 text-emerald-400"
+            />
           </div>
           <div>
             <p class="text-sm text-zinc-400">ATS Match Score</p>
@@ -55,7 +67,12 @@
         <template #header>
           <div class="flex items-center justify-between">
             <h2 class="font-semibold text-zinc-100">Selected Experience Bullets</h2>
-            <UButton color="neutral" variant="ghost" size="xs" icon="i-lucide-plus">
+            <UButton
+              color="neutral"
+              variant="ghost"
+              size="xs"
+              icon="i-lucide-plus"
+            >
               Add Bullet
             </UButton>
           </div>
@@ -63,7 +80,7 @@
 
         <div class="space-y-4">
           <div
-            v-for="(experience, index) in resume.experiences"
+            v-for="experience in resume.experiences"
             :key="experience.id"
             class="group"
           >
@@ -78,7 +95,10 @@
               class="relative mb-3 rounded-lg border border-zinc-800 bg-zinc-900 p-4 transition-colors hover:border-zinc-700"
             >
               <div class="flex items-start gap-3">
-                <UIcon name="i-lucide-grip-vertical" class="mt-1 h-4 w-4 cursor-grab text-zinc-600" />
+                <UIcon
+                  name="i-lucide-grip-vertical"
+                  class="mt-1 h-4 w-4 cursor-grab text-zinc-600"
+                />
                 <div class="flex-1">
                   <p class="text-sm text-zinc-300">{{ bullet.text }}</p>
                   <div class="mt-2 flex flex-wrap gap-2">
@@ -93,9 +113,21 @@
                     </UBadge>
                   </div>
                 </div>
-                <div class="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
-                  <UButton color="neutral" variant="ghost" icon="i-lucide-pencil" size="xs" />
-                  <UButton color="neutral" variant="ghost" icon="i-lucide-trash-2" size="xs" />
+                <div
+                  class="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100"
+                >
+                  <UButton
+                    color="neutral"
+                    variant="ghost"
+                    icon="i-lucide-pencil"
+                    size="xs"
+                  />
+                  <UButton
+                    color="neutral"
+                    variant="ghost"
+                    icon="i-lucide-trash-2"
+                    size="xs"
+                  />
                 </div>
               </div>
             </div>
@@ -109,9 +141,19 @@
           <div class="flex items-center justify-between">
             <h2 class="font-semibold text-zinc-100">PDF Preview</h2>
             <div class="flex items-center gap-2">
-              <UButton color="neutral" variant="ghost" size="xs" icon="i-lucide-zoom-out" />
+              <UButton
+                color="neutral"
+                variant="ghost"
+                size="xs"
+                icon="i-lucide-zoom-out"
+              />
               <span class="text-sm text-zinc-400">100%</span>
-              <UButton color="neutral" variant="ghost" size="xs" icon="i-lucide-zoom-in" />
+              <UButton
+                color="neutral"
+                variant="ghost"
+                size="xs"
+                icon="i-lucide-zoom-in"
+              />
             </div>
           </div>
         </template>
@@ -121,28 +163,42 @@
           <div class="space-y-4">
             <div class="border-b-2 border-zinc-900 pb-4">
               <h3 class="text-xl font-bold text-zinc-900">John Developer</h3>
-              <p class="text-sm text-zinc-600">john@example.com • +1 (555) 123-4567 • San Francisco, CA</p>
-              <p class="text-sm text-zinc-600">linkedin.com/in/johndeveloper • github.com/johndeveloper</p>
+              <p class="text-sm text-zinc-600">
+                john@example.com • +1 (555) 123-4567 • San Francisco, CA
+              </p>
+              <p class="text-sm text-zinc-600">
+                linkedin.com/in/johndeveloper • github.com/johndeveloper
+              </p>
             </div>
 
             <div>
               <h4 class="mb-2 font-semibold text-zinc-900">Summary</h4>
               <p class="text-xs text-zinc-700">
-                Senior Software Engineer with 7+ years of experience building scalable web applications.
-                Expert in React, TypeScript, and Node.js with a passion for clean code and user experience.
+                Senior Software Engineer with 7+ years of experience building scalable web
+                applications. Expert in React, TypeScript, and Node.js with a passion for clean code
+                and user experience.
               </p>
             </div>
 
             <div>
               <h4 class="mb-2 font-semibold text-zinc-900">Experience</h4>
               <div class="space-y-3">
-                <div v-for="exp in resume.experiences" :key="exp.id">
+                <div
+                  v-for="exp in resume.experiences"
+                  :key="exp.id"
+                >
                   <div class="flex items-baseline justify-between">
-                    <span class="text-sm font-medium text-zinc-900">{{ exp.role }} @ {{ exp.company }}</span>
+                    <span class="text-sm font-medium text-zinc-900"
+                      >{{ exp.role }} @ {{ exp.company }}</span
+                    >
                     <span class="text-xs text-zinc-500">{{ exp.period }}</span>
                   </div>
                   <ul class="ml-4 mt-1 list-disc space-y-1">
-                    <li v-for="bullet in exp.bullets" :key="bullet.id" class="text-xs text-zinc-700">
+                    <li
+                      v-for="bullet in exp.bullets"
+                      :key="bullet.id"
+                      class="text-xs text-zinc-700"
+                    >
                       {{ bullet.text }}
                     </li>
                   </ul>
@@ -153,7 +209,8 @@
             <div>
               <h4 class="mb-2 font-semibold text-zinc-900">Skills</h4>
               <p class="text-xs text-zinc-700">
-                React, TypeScript, Next.js, Node.js, PostgreSQL, GraphQL, AWS, Docker, Kubernetes, CI/CD
+                React, TypeScript, Next.js, Node.js, PostgreSQL, GraphQL, AWS, Docker, Kubernetes,
+                CI/CD
               </p>
             </div>
           </div>

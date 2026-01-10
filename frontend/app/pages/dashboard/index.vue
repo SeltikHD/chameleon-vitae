@@ -5,9 +5,7 @@
       <h1 class="text-2xl font-bold text-zinc-100">
         Welcome back, {{ mockUser.name.split(' ')[0] }}!
       </h1>
-      <p class="mt-1 text-zinc-400">
-        Here's what's happening with your resumes this week.
-      </p>
+      <p class="mt-1 text-zinc-400">Here's what's happening with your resumes this week.</p>
     </div>
 
     <!-- Stats Grid -->
@@ -27,19 +25,32 @@
     <!-- Recent Resumes -->
     <div>
       <div class="mb-4 flex items-center justify-between">
-        <h2 class="text-lg font-semibold text-zinc-100">
-          Recent Resumes
-        </h2>
-        <UButton to="/dashboard/resumes" color="neutral" variant="ghost" size="sm">
+        <h2 class="text-lg font-semibold text-zinc-100">Recent Resumes</h2>
+        <UButton
+          to="/dashboard/resumes"
+          color="neutral"
+          variant="ghost"
+          size="sm"
+        >
           View all
-          <UIcon name="i-lucide-arrow-right" class="ml-1 h-4 w-4" />
+          <UIcon
+            name="i-lucide-arrow-right"
+            class="ml-1 h-4 w-4"
+          />
         </UButton>
       </div>
 
       <UCard>
-        <UTable :data="recentResumes" :columns="resumeColumns">
+        <UTable
+          :data="recentResumes"
+          :columns="resumeColumns"
+        >
           <template #status-cell="{ row }">
-            <UBadge :color="getStatusColor(row.original.status)" variant="subtle" size="sm">
+            <UBadge
+              :color="getStatusColor(row.original.status)"
+              variant="subtle"
+              size="sm"
+            >
               {{ row.original.status }}
             </UBadge>
           </template>
@@ -58,15 +69,25 @@
 
           <template #actions-cell="{ row }">
             <UDropdownMenu
-              :items="[[
-                { label: 'View', icon: 'i-lucide-eye', click: () => navigateTo(`/dashboard/resumes/${row.original.id}`) },
-                { label: 'Download', icon: 'i-lucide-download' },
-                { label: 'Duplicate', icon: 'i-lucide-copy' }
-              ], [
-                { label: 'Delete', icon: 'i-lucide-trash-2', color: 'error' }
-              ]]"
+              :items="[
+                [
+                  {
+                    label: 'View',
+                    icon: 'i-lucide-eye',
+                    click: () => navigateTo(`/dashboard/resumes/${row.original.id}`)
+                  },
+                  { label: 'Download', icon: 'i-lucide-download' },
+                  { label: 'Duplicate', icon: 'i-lucide-copy' }
+                ],
+                [{ label: 'Delete', icon: 'i-lucide-trash-2', color: 'error' }]
+              ]"
             >
-              <UButton color="neutral" variant="ghost" icon="i-lucide-more-horizontal" size="xs" />
+              <UButton
+                color="neutral"
+                variant="ghost"
+                icon="i-lucide-more-horizontal"
+                size="xs"
+              />
             </UDropdownMenu>
           </template>
         </UTable>
@@ -75,9 +96,7 @@
 
     <!-- Quick Actions -->
     <div>
-      <h2 class="mb-4 text-lg font-semibold text-zinc-100">
-        Quick Actions
-      </h2>
+      <h2 class="mb-4 text-lg font-semibold text-zinc-100">Quick Actions</h2>
 
       <div class="grid gap-4 sm:grid-cols-3">
         <UCard
@@ -86,7 +105,10 @@
         >
           <div class="flex items-center gap-4">
             <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-emerald-500/10">
-              <UIcon name="i-lucide-plus" class="h-6 w-6 text-emerald-400" />
+              <UIcon
+                name="i-lucide-plus"
+                class="h-6 w-6 text-emerald-400"
+              />
             </div>
             <div>
               <h3 class="font-medium text-zinc-100">Create Resume</h3>
@@ -101,7 +123,10 @@
         >
           <div class="flex items-center gap-4">
             <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-violet-500/10">
-              <UIcon name="i-lucide-briefcase" class="h-6 w-6 text-violet-400" />
+              <UIcon
+                name="i-lucide-briefcase"
+                class="h-6 w-6 text-violet-400"
+              />
             </div>
             <div>
               <h3 class="font-medium text-zinc-100">Add Experience</h3>
@@ -116,7 +141,10 @@
         >
           <div class="flex items-center gap-4">
             <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-sky-500/10">
-              <UIcon name="i-lucide-tags" class="h-6 w-6 text-sky-400" />
+              <UIcon
+                name="i-lucide-tags"
+                class="h-6 w-6 text-sky-400"
+              />
             </div>
             <div>
               <h3 class="font-medium text-zinc-100">Manage Skills</h3>

@@ -13,7 +13,10 @@
       <div class="flex flex-col items-center">
         <!-- Icon -->
         <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-zinc-800">
-          <UIcon :name="icon" class="h-6 w-6 text-emerald-400" />
+          <UIcon
+            :name="icon"
+            class="h-6 w-6 text-emerald-400"
+          />
         </div>
 
         <!-- Title -->

@@ -2,12 +2,8 @@
   <div class="mx-auto max-w-2xl space-y-8">
     <!-- Header -->
     <div class="text-center">
-      <h1 class="text-2xl font-bold text-zinc-100">
-        Create New Resume
-      </h1>
-      <p class="mt-2 text-zinc-400">
-        Paste a job description to generate a tailored resume.
-      </p>
+      <h1 class="text-2xl font-bold text-zinc-100">Create New Resume</h1>
+      <p class="mt-2 text-zinc-400">Paste a job description to generate a tailored resume.</p>
     </div>
 
     <!-- Steps Indicator -->
@@ -21,10 +17,17 @@
           class="flex h-8 w-8 items-center justify-center rounded-full text-sm font-medium transition-colors"
           :class="getStepClasses(index)"
         >
-          <UIcon v-if="currentStep > index" name="i-lucide-check" class="h-4 w-4" />
+          <UIcon
+            v-if="currentStep > index"
+            name="i-lucide-check"
+            class="h-4 w-4"
+          />
           <span v-else>{{ index + 1 }}</span>
         </div>
-        <span class="ml-2 hidden text-sm sm:block" :class="currentStep >= index ? 'text-zinc-100' : 'text-zinc-500'">
+        <span
+          class="ml-2 hidden text-sm sm:block"
+          :class="currentStep >= index ? 'text-zinc-100' : 'text-zinc-500'"
+        >
           {{ step.label }}
         </span>
         <UIcon
@@ -38,13 +41,17 @@
     <!-- Step 1: Job Description -->
     <UCard v-if="currentStep === 0">
       <template #header>
-        <h2 class="font-semibold text-zinc-100">
-          Job Description
-        </h2>
+        <h2 class="font-semibold text-zinc-100">Job Description</h2>
       </template>
 
-      <form class="space-y-4" @submit.prevent="nextStep">
-        <UFormField label="Job URL (optional)" name="jobUrl">
+      <form
+        class="space-y-4"
+        @submit.prevent="nextStep"
+      >
+        <UFormField
+          label="Job URL (optional)"
+          name="jobUrl"
+        >
           <UInput
             v-model="form.jobUrl"
             placeholder="https://careers.example.com/job/123"
@@ -58,7 +65,11 @@
           <div class="h-px flex-1 bg-zinc-800" />
         </div>
 
-        <UFormField label="Job Description" name="description" required>
+        <UFormField
+          label="Job Description"
+          name="description"
+          required
+        >
           <UTextarea
             v-model="form.description"
             :rows="12"
@@ -67,9 +78,16 @@
         </UFormField>
 
         <div class="flex justify-end">
-          <UButton type="submit" color="primary" :disabled="!form.description">
+          <UButton
+            type="submit"
+            color="primary"
+            :disabled="!form.description"
+          >
             Analyze Job
-            <UIcon name="i-lucide-arrow-right" class="ml-2 h-4 w-4" />
+            <UIcon
+              name="i-lucide-arrow-right"
+              class="ml-2 h-4 w-4"
+            />
           </UButton>
         </div>
       </form>
@@ -78,28 +96,40 @@
     <!-- Step 2: AI Analysis -->
     <UCard v-if="currentStep === 1">
       <template #header>
-        <h2 class="font-semibold text-zinc-100">
-          AI Analysis
-        </h2>
+        <h2 class="font-semibold text-zinc-100">AI Analysis</h2>
       </template>
 
       <!-- Loading State -->
-      <div v-if="isAnalyzing" class="flex flex-col items-center py-12">
+      <div
+        v-if="isAnalyzing"
+        class="flex flex-col items-center py-12"
+      >
         <div class="relative">
-          <div class="h-16 w-16 animate-spin rounded-full border-4 border-zinc-700 border-t-emerald-500" />
-          <UIcon name="i-lucide-brain" class="absolute left-1/2 top-1/2 h-6 w-6 -translate-x-1/2 -translate-y-1/2 text-emerald-400" />
+          <div
+            class="h-16 w-16 animate-spin rounded-full border-4 border-zinc-700 border-t-emerald-500"
+          />
+          <UIcon
+            name="i-lucide-brain"
+            class="absolute left-1/2 top-1/2 h-6 w-6 -translate-x-1/2 -translate-y-1/2 text-emerald-400"
+          />
         </div>
         <p class="mt-4 text-zinc-400">Analyzing job requirements...</p>
         <p class="text-sm text-zinc-500">This may take a few seconds</p>
       </div>
 
       <!-- Analysis Results -->
-      <div v-else class="space-y-6">
+      <div
+        v-else
+        class="space-y-6"
+      >
         <div>
           <h3 class="mb-3 text-sm font-medium text-zinc-400">Detected Company & Role</h3>
           <div class="flex items-center gap-4">
             <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-zinc-800">
-              <UIcon name="i-lucide-building-2" class="h-6 w-6 text-emerald-400" />
+              <UIcon
+                name="i-lucide-building-2"
+                class="h-6 w-6 text-emerald-400"
+              />
             </div>
             <div>
               <p class="font-semibold text-zinc-100">{{ analysis.company }}</p>
@@ -138,19 +168,35 @@
 
         <div>
           <h3 class="mb-3 text-sm font-medium text-zinc-400">Experience Level</h3>
-          <UBadge color="secondary" variant="subtle">
+          <UBadge
+            color="secondary"
+            variant="subtle"
+          >
             {{ analysis.experienceLevel }}
           </UBadge>
         </div>
 
         <div class="flex justify-between pt-4">
-          <UButton color="neutral" variant="ghost" @click="currentStep = 0">
-            <UIcon name="i-lucide-arrow-left" class="mr-2 h-4 w-4" />
+          <UButton
+            color="neutral"
+            variant="ghost"
+            @click="currentStep = 0"
+          >
+            <UIcon
+              name="i-lucide-arrow-left"
+              class="mr-2 h-4 w-4"
+            />
             Back
           </UButton>
-          <UButton color="primary" @click="nextStep">
+          <UButton
+            color="primary"
+            @click="nextStep"
+          >
             Generate Resume
-            <UIcon name="i-lucide-sparkles" class="ml-2 h-4 w-4" />
+            <UIcon
+              name="i-lucide-sparkles"
+              class="ml-2 h-4 w-4"
+            />
           </UButton>
         </div>
       </div>
@@ -162,7 +208,10 @@
         <div class="relative">
           <div class="h-20 w-20 animate-pulse rounded-full bg-emerald-500/20" />
           <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-            <UIcon name="i-lucide-file-text" class="h-10 w-10 text-emerald-400" />
+            <UIcon
+              name="i-lucide-file-text"
+              class="h-10 w-10 text-emerald-400"
+            />
           </div>
         </div>
         <h3 class="mt-6 text-lg font-semibold text-zinc-100">Generating Your Resume</h3>
@@ -232,8 +281,7 @@ function nextStep() {
     setTimeout(() => {
       isAnalyzing.value = false
     }, 2000)
-  }
-  else if (currentStep.value === 1) {
+  } else if (currentStep.value === 1) {
     // Simulate generation.
     currentStep.value = 2
     simulateGeneration()

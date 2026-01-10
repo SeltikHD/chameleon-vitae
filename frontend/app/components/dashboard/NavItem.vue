@@ -8,7 +8,10 @@
         : 'text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100'
     ]"
   >
-    <UIcon :name="icon" class="h-5 w-5 shrink-0" />
+    <UIcon
+      :name="icon"
+      class="h-5 w-5 shrink-0"
+    />
     <span
       :class="[
         'text-sm font-medium transition-opacity duration-300',

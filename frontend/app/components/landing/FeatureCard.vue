@@ -8,7 +8,11 @@
         class="mb-4 flex h-14 w-14 items-center justify-center rounded-xl"
         :class="iconBgClasses"
       >
-        <UIcon :name="icon" class="h-7 w-7" :class="iconColorClasses" />
+        <UIcon
+          :name="icon"
+          class="h-7 w-7"
+          :class="iconColorClasses"
+        />
       </div>
 
       <h3 class="text-lg font-semibold text-zinc-100">

@@ -8,7 +8,7 @@
  * - Secondary (Violet #8b5cf6): AI features, highlights, premium
  * - Neutral (Zinc): Backgrounds, borders, text
  *
- * @see docs/decisions/ADR-012-frontend-design-system.md
+ * @see DECISIONS.md
  */
 export default defineAppConfig({
   ui: {

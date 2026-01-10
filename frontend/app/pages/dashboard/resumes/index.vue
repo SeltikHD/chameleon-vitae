@@ -3,15 +3,17 @@
     <!-- Header -->
     <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <div>
-        <h1 class="text-2xl font-bold text-zinc-100">
-          Resumes
-        </h1>
-        <p class="mt-1 text-zinc-400">
-          Manage all your tailored resumes in one place.
-        </p>
+        <h1 class="text-2xl font-bold text-zinc-100">Resumes</h1>
+        <p class="mt-1 text-zinc-400">Manage all your tailored resumes in one place.</p>
       </div>
-      <UButton to="/dashboard/resumes/new" color="primary">
-        <UIcon name="i-lucide-plus" class="mr-2 h-4 w-4" />
+      <UButton
+        to="/dashboard/resumes/new"
+        color="primary"
+      >
+        <UIcon
+          name="i-lucide-plus"
+          class="mr-2 h-4 w-4"
+        />
         Create Resume
       </UButton>
     </div>
@@ -54,11 +56,17 @@
 
     <!-- Table View -->
     <UCard v-if="viewMode === 'table'">
-      <UTable :data="filteredResumes" :columns="columns">
+      <UTable
+        :data="filteredResumes"
+        :columns="columns"
+      >
         <template #company-cell="{ row }">
           <div class="flex items-center gap-3">
             <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-zinc-800">
-              <UIcon name="i-lucide-building-2" class="h-5 w-5 text-zinc-400" />
+              <UIcon
+                name="i-lucide-building-2"
+                class="h-5 w-5 text-zinc-400"
+              />
             </div>
             <div>
               <p class="font-medium text-zinc-100">{{ row.original.company }}</p>
@@ -68,7 +76,11 @@
         </template>
 
         <template #status-cell="{ row }">
-          <UBadge :color="getStatusColor(row.original.status)" variant="subtle" size="sm">
+          <UBadge
+            :color="getStatusColor(row.original.status)"
+            variant="subtle"
+            size="sm"
+          >
             {{ row.original.status }}
           </UBadge>
         </template>
@@ -102,14 +114,20 @@
               size="xs"
             />
             <UDropdownMenu
-              :items="[[
-                { label: 'Duplicate', icon: 'i-lucide-copy' },
-                { label: 'Edit', icon: 'i-lucide-pencil' }
-              ], [
-                { label: 'Delete', icon: 'i-lucide-trash-2', color: 'error' }
-              ]]"
+              :items="[
+                [
+                  { label: 'Duplicate', icon: 'i-lucide-copy' },
+                  { label: 'Edit', icon: 'i-lucide-pencil' }
+                ],
+                [{ label: 'Delete', icon: 'i-lucide-trash-2', color: 'error' }]
+              ]"
             >
-              <UButton color="neutral" variant="ghost" icon="i-lucide-more-horizontal" size="xs" />
+              <UButton
+                color="neutral"
+                variant="ghost"
+                icon="i-lucide-more-horizontal"
+                size="xs"
+              />
             </UDropdownMenu>
           </div>
         </template>
@@ -117,7 +135,10 @@
     </UCard>
 
     <!-- Grid View -->
-    <div v-else class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <div
+      v-else
+      class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+    >
       <UCard
         v-for="resume in filteredResumes"
         :key="resume.id"
@@ -127,9 +148,16 @@
         <div class="space-y-4">
           <div class="flex items-start justify-between">
             <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-zinc-800">
-              <UIcon name="i-lucide-building-2" class="h-6 w-6 text-zinc-400" />
+              <UIcon
+                name="i-lucide-building-2"
+                class="h-6 w-6 text-zinc-400"
+              />
             </div>
-            <UBadge :color="getStatusColor(resume.status)" variant="subtle" size="sm">
+            <UBadge
+              :color="getStatusColor(resume.status)"
+              variant="subtle"
+              size="sm"
+            >
               {{ resume.status }}
             </UBadge>
           </div>
@@ -155,7 +183,12 @@
 
           <div class="flex items-center justify-between text-sm text-zinc-500">
             <span>{{ resume.createdAt }}</span>
-            <UButton color="primary" variant="ghost" size="xs" icon="i-lucide-download" />
+            <UButton
+              color="primary"
+              variant="ghost"
+              size="xs"
+              icon="i-lucide-download"
+            />
           </div>
         </div>
       </UCard>
@@ -251,9 +284,10 @@ const resumes = [
 
 const filteredResumes = computed(() => {
   return resumes.filter((resume) => {
-    const matchesSearch = searchQuery.value === ''
-      || resume.company.toLowerCase().includes(searchQuery.value.toLowerCase())
-      || resume.position.toLowerCase().includes(searchQuery.value.toLowerCase())
+    const matchesSearch =
+      searchQuery.value === '' ||
+      resume.company.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+      resume.position.toLowerCase().includes(searchQuery.value.toLowerCase())
 
     const matchesStatus = statusFilter.value === '' || resume.status === statusFilter.value
 

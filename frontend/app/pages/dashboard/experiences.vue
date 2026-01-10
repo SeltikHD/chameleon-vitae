@@ -3,15 +3,19 @@
     <!-- Header -->
     <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <div>
-        <h1 class="text-2xl font-bold text-zinc-100">
-          Experiences
-        </h1>
+        <h1 class="text-2xl font-bold text-zinc-100">Experiences</h1>
         <p class="mt-1 text-zinc-400">
           Your career journey broken down into powerful, reusable bullets.
         </p>
       </div>
-      <UButton color="primary" @click="showAddModal = true">
-        <UIcon name="i-lucide-plus" class="mr-2 h-4 w-4" />
+      <UButton
+        color="primary"
+        @click="showAddModal = true"
+      >
+        <UIcon
+          name="i-lucide-plus"
+          class="mr-2 h-4 w-4"
+        />
         Add Experience
       </UButton>
     </div>
@@ -51,19 +55,29 @@
           class="relative pl-16"
         >
           <!-- Timeline Dot -->
-          <div class="absolute left-0 flex h-12 w-12 items-center justify-center rounded-full border-4 border-zinc-950 bg-zinc-800">
-            <UIcon name="i-lucide-briefcase" class="h-5 w-5 text-emerald-400" />
+          <div
+            class="absolute left-0 flex h-12 w-12 items-center justify-center rounded-full border-4 border-zinc-950 bg-zinc-800"
+          >
+            <UIcon
+              name="i-lucide-briefcase"
+              class="h-5 w-5 text-emerald-400"
+            />
           </div>
 
           <UCard>
             <template #header>
               <div class="flex items-start justify-between">
                 <div>
-                  <h3 class="font-semibold text-zinc-100">{{ experience.role }}</h3>
+                  <h3 class="font-semibold text-zinc-100">
+                    {{ experience.role }}
+                  </h3>
                   <p class="text-sm text-zinc-400">{{ experience.company }}</p>
                 </div>
                 <div class="text-right">
-                  <UBadge color="neutral" variant="subtle">
+                  <UBadge
+                    color="neutral"
+                    variant="subtle"
+                  >
                     {{ experience.period }}
                   </UBadge>
                   <p class="mt-1 text-xs text-zinc-500">{{ experience.bullets.length }} bullets</p>
@@ -79,7 +93,10 @@
                 class="group relative rounded-lg border border-zinc-800 bg-zinc-900 p-3 transition-colors hover:border-zinc-700"
               >
                 <div class="flex items-start gap-3">
-                  <UIcon name="i-lucide-chevron-right" class="mt-1 h-4 w-4 text-emerald-400" />
+                  <UIcon
+                    name="i-lucide-chevron-right"
+                    class="mt-1 h-4 w-4 text-emerald-400"
+                  />
                   <div class="flex-1">
                     <p class="text-sm text-zinc-300">{{ bullet.text }}</p>
                     <div class="mt-2 flex flex-wrap gap-1">
@@ -94,16 +111,41 @@
                       </UBadge>
                     </div>
                   </div>
-                  <div class="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
-                    <UButton color="neutral" variant="ghost" icon="i-lucide-pencil" size="xs" />
-                    <UButton color="neutral" variant="ghost" icon="i-lucide-copy" size="xs" />
-                    <UButton color="neutral" variant="ghost" icon="i-lucide-trash-2" size="xs" />
+                  <div
+                    class="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100"
+                  >
+                    <UButton
+                      color="neutral"
+                      variant="ghost"
+                      icon="i-lucide-pencil"
+                      size="xs"
+                    />
+                    <UButton
+                      color="neutral"
+                      variant="ghost"
+                      icon="i-lucide-copy"
+                      size="xs"
+                    />
+                    <UButton
+                      color="neutral"
+                      variant="ghost"
+                      icon="i-lucide-trash-2"
+                      size="xs"
+                    />
                   </div>
                 </div>
               </div>
 
-              <UButton color="neutral" variant="dashed" block size="sm">
-                <UIcon name="i-lucide-plus" class="mr-2 h-4 w-4" />
+              <UButton
+                color="neutral"
+                variant="dashed"
+                block
+                size="sm"
+              >
+                <UIcon
+                  name="i-lucide-plus"
+                  class="mr-2 h-4 w-4"
+                />
                 Add Bullet
               </UButton>
             </div>
@@ -114,10 +156,20 @@
                   <span>Used in {{ experience.usedInResumes }} resumes</span>
                 </div>
                 <div class="flex items-center gap-2">
-                  <UButton color="neutral" variant="ghost" size="xs" icon="i-lucide-pencil">
+                  <UButton
+                    color="neutral"
+                    variant="ghost"
+                    size="xs"
+                    icon="i-lucide-pencil"
+                  >
                     Edit
                   </UButton>
-                  <UButton color="error" variant="ghost" size="xs" icon="i-lucide-trash-2">
+                  <UButton
+                    color="error"
+                    variant="ghost"
+                    size="xs"
+                    icon="i-lucide-trash-2"
+                  >
                     Delete
                   </UButton>
                 </div>
@@ -213,15 +265,13 @@ const experiences = [
   }
 ]
 
-const totalBullets = computed(() =>
-  experiences.reduce((acc, exp) => acc + exp.bullets.length, 0)
-)
+const totalBullets = computed(() => experiences.reduce((acc, exp) => acc + exp.bullets.length, 0))
 
 const uniqueSkills = computed(() => {
   const skills = new Set<string>()
   experiences.forEach((exp) => {
     exp.bullets.forEach((bullet) => {
-      bullet.tags.forEach(tag => skills.add(tag))
+      bullet.tags.forEach((tag) => skills.add(tag))
     })
   })
   return Array.from(skills)
