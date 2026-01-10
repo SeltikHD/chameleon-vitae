@@ -2512,7 +2512,7 @@ const docTemplate = `{
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0.0",
 	Host:             "localhost:8080",
-	BasePath:         "/v1",
+	BasePath:         "",
 	Schemes:          []string{},
 	Title:            "Chameleon Vitae API",
 	Description:      "AI-powered resume engineering using Hexagonal Architecture. Tailors resumes to specific job descriptions using LLM technology.",
