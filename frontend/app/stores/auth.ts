@@ -88,16 +88,19 @@ export const useAuthStore = defineStore('auth', {
 
         if (firebaseUser) {
           try {
-            // Get ID Token from Firebase.
-            this.idToken = await firebaseUser.getIdToken()
+            // Get ID Token from Firebase FIRST before any API calls.
+            const token = await firebaseUser.getIdToken(true) // Force refresh.
+            this.idToken = token
 
-            // Sync with backend.
+            // Sync with backend using the fresh token.
             await this.syncWithBackend(firebaseUser)
           } catch (error) {
             console.error('[AuthStore] Failed to sync with backend:', error)
             this.error = error instanceof Error ? error.message : 'Failed to sync with backend'
+            // IMPORTANT: Keep the token and firebaseUser even if backend sync fails.
+            // This allows retry and prevents forced logout on network errors.
+            // Only clear the backend user profile.
             this.user = null
-            this.idToken = null
           }
         } else {
           this.user = null
@@ -116,6 +119,10 @@ export const useAuthStore = defineStore('auth', {
     async syncWithBackend(firebaseUser: FirebaseUser) {
       const config = useRuntimeConfig()
       const apiBase = config.public.apiBase as string
+
+      if (!this.idToken) {
+        throw new Error('No ID token available for backend sync')
+      }
 
       const syncPayload = {
         firebase_uid: firebaseUser.uid,
