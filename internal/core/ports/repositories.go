@@ -40,10 +40,10 @@ type ExperienceRepository interface {
 	GetByIDWithBullets(ctx context.Context, id string) (*domain.Experience, error)
 
 	// ListByUserID lists all experiences for a user.
-	ListByUserID(ctx context.Context, userID string, opts ListOptions) ([]domain.Experience, int, error)
+	ListByUserIDWithBullets(ctx context.Context, userID string, opts ListOptions) ([]domain.Experience, int, error)
 
 	// ListByUserIDAndType lists experiences filtered by type.
-	ListByUserIDAndType(ctx context.Context, userID string, expType domain.ExperienceType, opts ListOptions) ([]domain.Experience, int, error)
+	ListByUserIDAndTypeWithBullets(ctx context.Context, userID string, expType domain.ExperienceType, opts ListOptions) ([]domain.Experience, int, error)
 
 	// Update updates an existing experience.
 	Update(ctx context.Context, experience *domain.Experience) error

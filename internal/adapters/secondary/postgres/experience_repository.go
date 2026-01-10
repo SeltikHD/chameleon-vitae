@@ -126,7 +126,7 @@ func (r *ExperienceRepository) GetByIDWithBullets(ctx context.Context, id string
 }
 
 // ListByUserID lists all experiences for a user.
-func (r *ExperienceRepository) ListByUserID(ctx context.Context, userID string, opts ports.ListOptions) ([]domain.Experience, int, error) {
+func (r *ExperienceRepository) ListByUserIDWithBullets(ctx context.Context, userID string, opts ports.ListOptions) ([]domain.Experience, int, error) {
 	countQuery := `SELECT COUNT(*) FROM experiences WHERE user_id = $1`
 	var total int
 	if err := r.pool.QueryRow(ctx, countQuery, userID).Scan(&total); err != nil {
@@ -154,11 +154,43 @@ func (r *ExperienceRepository) ListByUserID(ctx context.Context, userID string, 
 		return nil, 0, err
 	}
 
+	for i := range experiences {
+		bulletQuery := `
+			SELECT id, experience_id, content, impact_score, keywords,
+				   metadata, display_order, created_at, updated_at
+			FROM bullets
+			WHERE experience_id = $1
+			ORDER BY display_order ASC, created_at ASC
+		`
+
+		bulletRows, err := r.pool.Query(ctx, bulletQuery, experiences[i].ID)
+		if err != nil {
+			return nil, 0, domain.NewDatabaseError("get bullets for experience", err)
+		}
+
+		bullets := make([]domain.Bullet, 0)
+		for bulletRows.Next() {
+			bullet, err := scanBulletRow(bulletRows)
+			if err != nil {
+				bulletRows.Close()
+				return nil, 0, err
+			}
+			bullets = append(bullets, *bullet)
+		}
+
+		if err := bulletRows.Err(); err != nil {
+			bulletRows.Close()
+			return nil, 0, domain.NewDatabaseError("iterate bullets", err)
+		}
+		bulletRows.Close()
+		experiences[i].Bullets = bullets
+	}
+
 	return experiences, total, nil
 }
 
 // ListByUserIDAndType lists experiences filtered by type.
-func (r *ExperienceRepository) ListByUserIDAndType(ctx context.Context, userID string, expType domain.ExperienceType, opts ports.ListOptions) ([]domain.Experience, int, error) {
+func (r *ExperienceRepository) ListByUserIDAndTypeWithBullets(ctx context.Context, userID string, expType domain.ExperienceType, opts ports.ListOptions) ([]domain.Experience, int, error) {
 	countQuery := `SELECT COUNT(*) FROM experiences WHERE user_id = $1 AND type = $2`
 	var total int
 	if err := r.pool.QueryRow(ctx, countQuery, userID, string(expType)).Scan(&total); err != nil {
@@ -184,6 +216,38 @@ func (r *ExperienceRepository) ListByUserIDAndType(ctx context.Context, userID s
 	experiences, err := r.scanExperiences(ctx, rows)
 	if err != nil {
 		return nil, 0, err
+	}
+
+	for i := range experiences {
+		bulletQuery := `
+			SELECT id, experience_id, content, impact_score, keywords,
+				   metadata, display_order, created_at, updated_at
+			FROM bullets
+			WHERE experience_id = $1
+			ORDER BY display_order ASC, created_at ASC
+		`
+
+		bulletRows, err := r.pool.Query(ctx, bulletQuery, experiences[i].ID)
+		if err != nil {
+			return nil, 0, domain.NewDatabaseError("get bullets for experience", err)
+		}
+
+		bullets := make([]domain.Bullet, 0)
+		for bulletRows.Next() {
+			bullet, err := scanBulletRow(bulletRows)
+			if err != nil {
+				bulletRows.Close()
+				return nil, 0, err
+			}
+			bullets = append(bullets, *bullet)
+		}
+
+		if err := bulletRows.Err(); err != nil {
+			bulletRows.Close()
+			return nil, 0, domain.NewDatabaseError("iterate bullets", err)
+		}
+		bulletRows.Close()
+		experiences[i].Bullets = bullets
 	}
 
 	return experiences, total, nil

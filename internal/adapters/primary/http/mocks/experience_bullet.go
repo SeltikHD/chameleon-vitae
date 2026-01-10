@@ -51,8 +51,8 @@ func (r *InMemoryExperienceRepository) GetByIDWithBullets(ctx context.Context, i
 	return r.GetByID(ctx, id)
 }
 
-// ListByUserID lists all experiences for a user.
-func (r *InMemoryExperienceRepository) ListByUserID(ctx context.Context, userID string, opts ports.ListOptions) ([]domain.Experience, int, error) {
+// ListByUserIDWithBullets lists all experiences for a user.
+func (r *InMemoryExperienceRepository) ListByUserIDWithBullets(ctx context.Context, userID string, opts ports.ListOptions) ([]domain.Experience, int, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
@@ -67,8 +67,8 @@ func (r *InMemoryExperienceRepository) ListByUserID(ctx context.Context, userID 
 	return result, len(result), nil
 }
 
-// ListByUserIDAndType lists experiences filtered by type.
-func (r *InMemoryExperienceRepository) ListByUserIDAndType(ctx context.Context, userID string, expType domain.ExperienceType, opts ports.ListOptions) ([]domain.Experience, int, error) {
+// ListByUserIDAndTypeWithBullets lists experiences filtered by type.
+func (r *InMemoryExperienceRepository) ListByUserIDAndTypeWithBullets(ctx context.Context, userID string, expType domain.ExperienceType, opts ports.ListOptions) ([]domain.Experience, int, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 

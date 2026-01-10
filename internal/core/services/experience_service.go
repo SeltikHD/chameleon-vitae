@@ -144,9 +144,9 @@ func (s *ExperienceService) ListExperiences(ctx context.Context, req ListExperie
 		if parseErr != nil {
 			return nil, parseErr
 		}
-		experiences, total, err = s.experienceRepo.ListByUserIDAndType(ctx, req.UserID, expType, opts)
+		experiences, total, err = s.experienceRepo.ListByUserIDAndTypeWithBullets(ctx, req.UserID, expType, opts)
 	} else {
-		experiences, total, err = s.experienceRepo.ListByUserID(ctx, req.UserID, opts)
+		experiences, total, err = s.experienceRepo.ListByUserIDWithBullets(ctx, req.UserID, opts)
 	}
 
 	if err != nil {
