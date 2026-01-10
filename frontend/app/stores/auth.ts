@@ -12,11 +12,26 @@ import {
 import type { UserResponse, SyncUserResponse } from '~/types/api'
 
 /**
+ * Serializable Firebase user data.
+ *
+ * CRITICAL: We store a plain object instead of the raw FirebaseUser class
+ * to avoid Vue reactivity proxying Firebase's internal iframe/window properties,
+ * which causes SecurityError: "Blocked a frame with origin..."
+ */
+interface SerializableFirebaseUser {
+  uid: string
+  email: string | null
+  displayName: string | null
+  photoURL: string | null
+  providerId: string
+}
+
+/**
  * Authentication state managed by Pinia.
  */
 interface AuthState {
-  /** Firebase user object. */
-  firebaseUser: FirebaseUser | null
+  /** Serializable Firebase user data (NOT the raw Firebase User class). */
+  firebaseUser: SerializableFirebaseUser | null
   /** Backend user profile after sync. */
   user: UserResponse | null
   /** Firebase ID Token for API authentication. */
@@ -55,11 +70,31 @@ export const useAuthStore = defineStore('auth', {
       return $isFirebaseConfigured as boolean
     },
 
-    /** User's display name from backend profile. */
-    displayName: (state) => state.user?.name || state.user?.email || 'Anonymous User',
+    /** User's display name from backend profile or Firebase. */
+    displayName: (state) =>
+      state.user?.name || state.firebaseUser?.displayName || state.user?.email || 'Anonymous User',
 
-    /** User's avatar URL. */
-    avatarUrl: (state) => state.user?.picture_url || null,
+    /** User's avatar URL from backend or Firebase. */
+    avatarUrl: (state) => state.user?.picture_url || state.firebaseUser?.photoURL || null,
+
+    /** User's initials for avatar fallback (e.g., "John Doe" -> "JD"). */
+    userInitials(): string {
+      const name = this.displayName
+      if (!name || name === 'Anonymous User') return 'U'
+      const parts = name.trim().split(/\s+/)
+      if (parts.length >= 2) {
+        return `${parts[0]?.[0] ?? ''}${parts[1]?.[0] ?? ''}`.toUpperCase()
+      }
+      return (parts[0]?.slice(0, 2) ?? 'U').toUpperCase()
+    },
+
+    /** Auth provider name (Google, GitHub, or Email). */
+    providerName: (state) => {
+      const providerId = state.firebaseUser?.providerId || ''
+      if (providerId.includes('google')) return 'Google'
+      if (providerId.includes('github')) return 'GitHub'
+      return 'Email'
+    },
 
     /** Backend user ID (UUID). */
     userId: (state) => state.user?.id || null
@@ -84,7 +119,19 @@ export const useAuthStore = defineStore('auth', {
 
       // Listen for auth state changes.
       onAuthStateChanged($firebaseAuth, async (firebaseUser) => {
-        this.firebaseUser = firebaseUser
+        // CRITICAL: Serialize Firebase user to avoid Vue reactivity proxying
+        // internal iframe/window properties which causes SecurityError.
+        if (firebaseUser) {
+          this.firebaseUser = {
+            uid: firebaseUser.uid,
+            email: firebaseUser.email,
+            displayName: firebaseUser.displayName,
+            photoURL: firebaseUser.photoURL,
+            providerId: firebaseUser.providerData[0]?.providerId || 'password'
+          }
+        } else {
+          this.firebaseUser = null
+        }
 
         if (firebaseUser) {
           try {
@@ -292,10 +339,12 @@ export const useAuthStore = defineStore('auth', {
      * Call this before making API requests to ensure token freshness.
      */
     async refreshIdToken(): Promise<string | null> {
-      if (!this.firebaseUser) return null
+      const { $firebaseAuth } = useNuxtApp()
+
+      if (!$firebaseAuth?.currentUser) return null
 
       try {
-        this.idToken = await this.firebaseUser.getIdToken(true)
+        this.idToken = await $firebaseAuth.currentUser.getIdToken(true)
         return this.idToken
       } catch (error) {
         console.error('[AuthStore] Failed to refresh ID token:', error)
