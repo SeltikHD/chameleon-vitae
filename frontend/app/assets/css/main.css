@@ -19,10 +19,6 @@
 /* Global dark mode styles */
 html {
   color-scheme: dark;
-}
-
-/* Smooth scrolling */
-html {
   scroll-behavior: smooth;
 }
 

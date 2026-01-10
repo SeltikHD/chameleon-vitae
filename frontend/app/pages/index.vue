@@ -5,10 +5,10 @@
       <!-- Background Gradient -->
       <div class="absolute inset-0 -z-10">
         <div
-          class="absolute left-1/2 top-0 h-[500px] w-[800px] -translate-x-1/2 rounded-full bg-emerald-500/10 blur-3xl"
+          class="absolute left-1/2 top-0 h-125 w-200 -translate-x-1/2 rounded-full bg-emerald-500/10 blur-3xl"
         />
         <div
-          class="absolute left-1/4 top-1/2 h-[400px] w-[600px] -translate-x-1/2 rounded-full bg-violet-500/10 blur-3xl"
+          class="absolute left-1/4 top-1/2 h-100 w-150 -translate-x-1/2 rounded-full bg-violet-500/10 blur-3xl"
         />
       </div>
 
@@ -33,7 +33,7 @@
         >
           The CV That
           <span
-            class="bg-gradient-to-r from-emerald-400 to-emerald-600 bg-clip-text text-transparent"
+            class="bg-linear-to-r from-emerald-400 to-emerald-600 bg-clip-text text-transparent"
           >
             Adapts
           </span>

@@ -4,13 +4,11 @@
     <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <div>
         <h1 class="text-2xl font-bold text-zinc-100">Skills</h1>
-        <p class="mt-1 text-zinc-400">
-          Manage your skill matrix and see how they're used across experiences.
-        </p>
+        <p class="mt-1 text-zinc-400">Manage your skill matrix and proficiency levels.</p>
       </div>
       <UButton
         color="primary"
-        @click="showAddModal = true"
+        @click="openAddModal"
       >
         <UIcon
           name="i-lucide-plus"
@@ -33,335 +31,532 @@
         <USelectMenu
           v-model="categoryFilter"
           :items="categoryOptions"
+          value-key="value"
           placeholder="All categories"
           class="w-full sm:w-48"
         />
       </div>
     </UCard>
 
-    <!-- Skills by Category -->
-    <div class="space-y-6">
-      <div
-        v-for="category in filteredCategories"
-        :key="category.name"
-      >
-        <div class="mb-4 flex items-center gap-2">
-          <UIcon
-            :name="category.icon"
-            class="h-5 w-5"
-            :class="category.color"
-          />
-          <h2 class="text-lg font-semibold text-zinc-100">{{ category.name }}</h2>
-          <UBadge
-            color="neutral"
-            variant="subtle"
-            size="sm"
-          >
-            {{ category.skills.length }}
-          </UBadge>
-        </div>
-
-        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <UCard
-            v-for="skill in category.skills"
-            :key="skill.id"
-            class="group cursor-pointer transition-colors hover:border-emerald-500/40"
-          >
-            <div class="flex items-start justify-between">
-              <div class="flex-1">
-                <div class="flex items-center gap-2">
-                  <h3 class="font-medium text-zinc-100">{{ skill.name }}</h3>
-                  <UBadge
-                    :color="getLevelColor(skill.level)"
-                    variant="subtle"
-                    size="xs"
-                  >
-                    {{ skill.level }}
-                  </UBadge>
-                </div>
-                <p class="mt-1 text-sm text-zinc-400">Used in {{ skill.bulletCount }} bullets</p>
-
-                <!-- Proficiency Bar -->
-                <div class="mt-3">
-                  <div class="flex items-center justify-between text-xs">
-                    <span class="text-zinc-500">Proficiency</span>
-                    <span class="text-zinc-400">{{ skill.proficiency }}%</span>
-                  </div>
-                  <div class="mt-1 h-1.5 overflow-hidden rounded-full bg-zinc-800">
-                    <div
-                      class="h-full rounded-full bg-emerald-500"
-                      :style="{ width: `${skill.proficiency}%` }"
-                    />
-                  </div>
-                </div>
-
-                <!-- Years of Experience -->
-                <div class="mt-2 flex items-center gap-1 text-xs text-zinc-500">
-                  <UIcon
-                    name="i-lucide-calendar"
-                    class="h-3 w-3"
-                  />
-                  <span>{{ skill.yearsOfExperience }} years</span>
-                </div>
-              </div>
-
-              <div
-                class="flex flex-col items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100"
-              >
-                <UButton
-                  color="neutral"
-                  variant="ghost"
-                  icon="i-lucide-pencil"
-                  size="xs"
-                />
-                <UButton
-                  color="neutral"
-                  variant="ghost"
-                  icon="i-lucide-trash-2"
-                  size="xs"
-                />
-              </div>
-            </div>
-          </UCard>
-        </div>
-      </div>
+    <!-- Loading State -->
+    <div
+      v-if="loading"
+      class="flex items-center justify-center py-12"
+    >
+      <UIcon
+        name="i-lucide-loader-2"
+        class="h-8 w-8 animate-spin text-emerald-400"
+      />
     </div>
+
+    <!-- Error State -->
+    <UCard
+      v-else-if="error"
+      class="border-red-500/20"
+    >
+      <div class="flex flex-col items-center gap-4 py-8 text-center">
+        <UIcon
+          name="i-lucide-alert-circle"
+          class="h-12 w-12 text-red-400"
+        />
+        <div>
+          <p class="font-medium text-zinc-100">Failed to load skills</p>
+          <p class="mt-1 text-sm text-zinc-400">{{ error }}</p>
+        </div>
+        <UButton
+          color="primary"
+          @click="fetchSkills()"
+        >
+          Try Again
+        </UButton>
+      </div>
+    </UCard>
 
     <!-- Empty State -->
     <SharedEmptyState
-      v-if="filteredCategories.length === 0"
+      v-else-if="skills.length === 0"
       icon="i-lucide-tags"
-      title="No skills found"
-      description="Add skills to build your expertise matrix."
+      title="No skills yet"
+      description="Add your skills to build your expertise matrix."
       action-label="Add Skill"
-      @action="showAddModal = true"
+      @action="openAddModal"
     />
 
-    <!-- Skill Matrix Summary -->
-    <UCard>
-      <template #header>
-        <h2 class="font-semibold text-zinc-100">Skill Matrix Summary</h2>
-      </template>
+    <!-- Skills Grid -->
+    <template v-else>
+      <!-- Skills by Category -->
+      <div class="space-y-6">
+        <div
+          v-for="category in filteredCategories"
+          :key="category.name"
+        >
+          <div class="mb-4 flex items-center gap-2">
+            <UIcon
+              :name="getCategoryIcon(category.name)"
+              class="h-5 w-5"
+              :class="getCategoryColor(category.name)"
+            />
+            <h2 class="text-lg font-semibold text-zinc-100">{{ category.name }}</h2>
+            <UBadge
+              color="neutral"
+              variant="subtle"
+              size="sm"
+            >
+              {{ category.skills.length }}
+            </UBadge>
+          </div>
 
-      <div class="grid gap-6 md:grid-cols-3">
-        <div class="text-center">
-          <p class="text-3xl font-bold text-emerald-400">{{ totalSkills }}</p>
-          <p class="text-sm text-zinc-400">Total Skills</p>
-        </div>
-        <div class="text-center">
-          <p class="text-3xl font-bold text-violet-400">{{ expertSkills }}</p>
-          <p class="text-sm text-zinc-400">Expert Level</p>
-        </div>
-        <div class="text-center">
-          <p class="text-3xl font-bold text-sky-400">{{ avgProficiency }}%</p>
-          <p class="text-sm text-zinc-400">Avg. Proficiency</p>
+          <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <UCard
+              v-for="skill in category.skills"
+              :key="skill.id"
+              class="group cursor-pointer transition-colors hover:border-emerald-500/40"
+            >
+              <div class="flex items-start justify-between">
+                <div class="flex-1">
+                  <div class="flex items-center gap-2">
+                    <h3 class="font-medium text-zinc-100">{{ skill.name }}</h3>
+                    <UBadge
+                      :color="getSkillLevelColor(skill.proficiency_level)"
+                      variant="subtle"
+                      size="xs"
+                    >
+                      {{ getSkillLevel(skill.proficiency_level) }}
+                    </UBadge>
+                    <UIcon
+                      v-if="skill.is_highlighted"
+                      name="i-lucide-star"
+                      class="h-4 w-4 text-amber-400"
+                    />
+                  </div>
+
+                  <!-- Proficiency Bar -->
+                  <div class="mt-3">
+                    <div class="flex items-center justify-between text-xs">
+                      <span class="text-zinc-500">Proficiency</span>
+                      <span class="text-zinc-400">{{ skill.proficiency_level }}%</span>
+                    </div>
+                    <div class="mt-1 h-1.5 overflow-hidden rounded-full bg-zinc-800">
+                      <div
+                        class="h-full rounded-full bg-emerald-500"
+                        :style="{ width: `${skill.proficiency_level}%` }"
+                      />
+                    </div>
+                  </div>
+
+                  <!-- Years of Experience -->
+                  <div
+                    v-if="skill.years_of_experience"
+                    class="mt-2 flex items-center gap-1 text-xs text-zinc-500"
+                  >
+                    <UIcon
+                      name="i-lucide-calendar"
+                      class="h-3 w-3"
+                    />
+                    <span>{{ skill.years_of_experience }} years</span>
+                  </div>
+                </div>
+
+                <div
+                  class="flex flex-col items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100"
+                >
+                  <UButton
+                    color="neutral"
+                    variant="ghost"
+                    icon="i-lucide-pencil"
+                    size="xs"
+                    @click="openEditModal(skill)"
+                  />
+                  <UButton
+                    color="neutral"
+                    variant="ghost"
+                    icon="i-lucide-trash-2"
+                    size="xs"
+                    @click="deleteSkill(skill.id)"
+                  />
+                </div>
+              </div>
+            </UCard>
+          </div>
         </div>
       </div>
-    </UCard>
+
+      <!-- Empty filtered state -->
+      <SharedEmptyState
+        v-if="filteredCategories.length === 0 && skills.length > 0"
+        icon="i-lucide-search"
+        title="No skills found"
+        description="Try adjusting your search or filter."
+      />
+
+      <!-- Skill Matrix Summary -->
+      <UCard>
+        <template #header>
+          <h2 class="font-semibold text-zinc-100">Skill Matrix Summary</h2>
+        </template>
+
+        <div class="grid gap-6 md:grid-cols-3">
+          <div class="text-center">
+            <p class="text-3xl font-bold text-emerald-400">{{ skills.length }}</p>
+            <p class="text-sm text-zinc-400">Total Skills</p>
+          </div>
+          <div class="text-center">
+            <p class="text-3xl font-bold text-violet-400">{{ expertSkillsCount }}</p>
+            <p class="text-sm text-zinc-400">Expert Level</p>
+          </div>
+          <div class="text-center">
+            <p class="text-3xl font-bold text-sky-400">{{ avgProficiency }}%</p>
+            <p class="text-sm text-zinc-400">Avg. Proficiency</p>
+          </div>
+        </div>
+      </UCard>
+    </template>
+
+    <!-- Add/Edit Skill Modal -->
+    <UModal v-model:open="showSkillModal">
+      <template #content>
+        <UCard>
+          <template #header>
+            <div class="flex items-center justify-between">
+              <h3 class="text-lg font-semibold text-zinc-100">
+                {{ editingSkill ? 'Edit Skill' : 'Add Skill' }}
+              </h3>
+              <UButton
+                color="neutral"
+                variant="ghost"
+                icon="i-lucide-x"
+                size="xs"
+                @click="showSkillModal = false"
+              />
+            </div>
+          </template>
+
+          <form
+            class="space-y-4"
+            @submit.prevent="saveSkill"
+          >
+            <UFormField
+              label="Skill Name"
+              name="name"
+              required
+            >
+              <UInput
+                v-model="skillForm.name"
+                placeholder="React, Python, Leadership..."
+              />
+            </UFormField>
+
+            <UFormField
+              label="Category"
+              name="category"
+            >
+              <USelectMenu
+                v-model="categoryModel"
+                :items="skillCategoryOptions"
+                value-key="value"
+                class="w-full"
+                placeholder="Select a category..."
+              />
+            </UFormField>
+
+            <UFormField
+              label="Proficiency Level"
+              name="proficiency_level"
+            >
+              <div class="flex items-center gap-4">
+                <UInput
+                  v-model.number="skillForm.proficiency_level"
+                  type="range"
+                  min="0"
+                  max="100"
+                  class="flex-1"
+                />
+                <span class="w-12 text-right text-sm text-zinc-400"
+                  >{{ skillForm.proficiency_level }}%</span
+                >
+              </div>
+            </UFormField>
+
+            <UFormField
+              label="Years of Experience"
+              name="years_of_experience"
+            >
+              <UInput
+                v-model.number="skillForm.years_of_experience"
+                type="number"
+                min="0"
+                step="0.5"
+                placeholder="3.5"
+              />
+            </UFormField>
+
+            <UCheckbox
+              v-model="skillForm.is_highlighted"
+              label="Highlight this skill"
+            />
+
+            <div class="flex justify-end gap-3 pt-4">
+              <UButton
+                color="neutral"
+                variant="ghost"
+                @click="showSkillModal = false"
+              >
+                Cancel
+              </UButton>
+              <UButton
+                type="submit"
+                color="primary"
+                :loading="isSaving"
+              >
+                {{ editingSkill ? 'Save Changes' : 'Add Skill' }}
+              </UButton>
+            </div>
+          </form>
+        </UCard>
+      </template>
+    </UModal>
   </div>
 </template>
 
 <script setup lang="ts">
+import { apiFetch } from '~/composables/useApiFetch'
+import type { SkillResponse, SkillInput, ListSkillsResponse } from '~/types/api'
+
 definePageMeta({
-  layout: 'dashboard'
+  layout: 'dashboard',
+  middleware: 'auth'
 })
 
-const showAddModal = ref(false)
+const toast = useToast()
+
+// State
+const loading = ref(true)
+const error = ref<string | null>(null)
+const isSaving = ref(false)
+const skills = ref<SkillResponse[]>([])
+
+// Filters
 const searchQuery = ref('')
 const categoryFilter = ref('')
 
-const categoryOptions = [
-  { label: 'All categories', value: '' },
+// Modal
+const showSkillModal = ref(false)
+const editingSkill = ref<SkillResponse | null>(null)
+
+// Form
+const skillForm = reactive<SkillInput & { is_highlighted: boolean }>({
+  name: '',
+  category: null,
+  proficiency_level: 50,
+  years_of_experience: null,
+  is_highlighted: false
+})
+
+// Computed wrapper for USelectMenu - converts null to undefined
+const categoryModel = computed({
+  get: () => skillForm.category ?? undefined,
+  set: (value: string | undefined) => {
+    skillForm.category = value ?? null
+  }
+})
+
+// Category options
+const skillCategoryOptions = [
   { label: 'Frontend', value: 'Frontend' },
   { label: 'Backend', value: 'Backend' },
   { label: 'DevOps', value: 'DevOps' },
-  { label: 'Soft Skills', value: 'Soft Skills' }
+  { label: 'Database', value: 'Database' },
+  { label: 'Mobile', value: 'Mobile' },
+  { label: 'AI/ML', value: 'AI/ML' },
+  { label: 'Soft Skills', value: 'Soft Skills' },
+  { label: 'Tools', value: 'Tools' },
+  { label: 'Other', value: 'Other' }
 ]
 
-// Mock skills data organized by category.
-const categories = [
-  {
-    name: 'Frontend',
-    icon: 'i-lucide-layout',
-    color: 'text-emerald-400',
-    skills: [
-      {
-        id: '1',
-        name: 'React',
-        level: 'Expert',
-        proficiency: 95,
-        yearsOfExperience: 5,
-        bulletCount: 12
-      },
-      {
-        id: '2',
-        name: 'TypeScript',
-        level: 'Expert',
-        proficiency: 90,
-        yearsOfExperience: 4,
-        bulletCount: 10
-      },
-      {
-        id: '3',
-        name: 'Vue.js',
-        level: 'Advanced',
-        proficiency: 80,
-        yearsOfExperience: 3,
-        bulletCount: 6
-      },
-      {
-        id: '4',
-        name: 'Tailwind CSS',
-        level: 'Expert',
-        proficiency: 92,
-        yearsOfExperience: 3,
-        bulletCount: 8
-      },
-      {
-        id: '5',
-        name: 'Next.js',
-        level: 'Advanced',
-        proficiency: 85,
-        yearsOfExperience: 2,
-        bulletCount: 5
-      }
-    ]
-  },
-  {
-    name: 'Backend',
-    icon: 'i-lucide-server',
-    color: 'text-violet-400',
-    skills: [
-      {
-        id: '6',
-        name: 'Node.js',
-        level: 'Advanced',
-        proficiency: 85,
-        yearsOfExperience: 5,
-        bulletCount: 8
-      },
-      {
-        id: '7',
-        name: 'Go',
-        level: 'Intermediate',
-        proficiency: 65,
-        yearsOfExperience: 1,
-        bulletCount: 3
-      },
-      {
-        id: '8',
-        name: 'PostgreSQL',
-        level: 'Advanced',
-        proficiency: 80,
-        yearsOfExperience: 4,
-        bulletCount: 6
-      },
-      {
-        id: '9',
-        name: 'GraphQL',
-        level: 'Advanced',
-        proficiency: 78,
-        yearsOfExperience: 3,
-        bulletCount: 4
-      }
-    ]
-  },
-  {
-    name: 'DevOps',
-    icon: 'i-lucide-cloud',
-    color: 'text-sky-400',
-    skills: [
-      {
-        id: '10',
-        name: 'Docker',
-        level: 'Advanced',
-        proficiency: 82,
-        yearsOfExperience: 4,
-        bulletCount: 5
-      },
-      {
-        id: '11',
-        name: 'AWS',
-        level: 'Advanced',
-        proficiency: 75,
-        yearsOfExperience: 3,
-        bulletCount: 4
-      },
-      {
-        id: '12',
-        name: 'CI/CD',
-        level: 'Expert',
-        proficiency: 88,
-        yearsOfExperience: 4,
-        bulletCount: 6
-      }
-    ]
-  },
-  {
-    name: 'Soft Skills',
-    icon: 'i-lucide-users',
-    color: 'text-amber-400',
-    skills: [
-      {
-        id: '13',
-        name: 'Leadership',
-        level: 'Advanced',
-        proficiency: 85,
-        yearsOfExperience: 3,
-        bulletCount: 4
-      },
-      {
-        id: '14',
-        name: 'Communication',
-        level: 'Expert',
-        proficiency: 90,
-        yearsOfExperience: 7,
-        bulletCount: 3
-      },
-      {
-        id: '15',
-        name: 'Problem Solving',
-        level: 'Expert',
-        proficiency: 92,
-        yearsOfExperience: 7,
-        bulletCount: 5
-      }
-    ]
-  }
-]
+const categoryOptions = computed(() => [
+  { label: 'All categories', value: '' },
+  ...skillCategoryOptions
+])
+
+// Computed
+const categories = computed(() => {
+  const categoryMap = new Map<string, SkillResponse[]>()
+
+  skills.value.forEach((skill) => {
+    const cat = skill.category || 'Other'
+    if (!categoryMap.has(cat)) {
+      categoryMap.set(cat, [])
+    }
+    categoryMap.get(cat)!.push(skill)
+  })
+
+  return Array.from(categoryMap.entries())
+    .map(([name, skills]) => ({ name, skills }))
+    .sort((a, b) => a.name.localeCompare(b.name))
+})
 
 const filteredCategories = computed(() => {
-  return categories
-    .filter((category) => categoryFilter.value === '' || category.name === categoryFilter.value)
-    .map((category) => ({
-      ...category,
-      skills: category.skills.filter(
+  return categories.value
+    .filter((cat) => categoryFilter.value === '' || cat.name === categoryFilter.value)
+    .map((cat) => ({
+      ...cat,
+      skills: cat.skills.filter(
         (skill) =>
           searchQuery.value === '' ||
           skill.name.toLowerCase().includes(searchQuery.value.toLowerCase())
       )
     }))
-    .filter((category) => category.skills.length > 0)
+    .filter((cat) => cat.skills.length > 0)
 })
 
-const totalSkills = computed(() => categories.reduce((acc, cat) => acc + cat.skills.length, 0))
-
-const expertSkills = computed(() =>
-  categories.reduce((acc, cat) => acc + cat.skills.filter((s) => s.level === 'Expert').length, 0)
+const expertSkillsCount = computed(
+  () => skills.value.filter((s) => s.proficiency_level >= 80).length
 )
 
 const avgProficiency = computed(() => {
-  const all = categories.flatMap((c) => c.skills)
-  const sum = all.reduce((acc, s) => acc + s.proficiency, 0)
-  return Math.round(sum / all.length)
+  if (skills.value.length === 0) return 0
+  const sum = skills.value.reduce((acc, s) => acc + s.proficiency_level, 0)
+  return Math.round(sum / skills.value.length)
 })
 
-function getLevelColor(level: string) {
-  const colors: Record<string, 'primary' | 'secondary' | 'warning'> = {
-    Expert: 'primary',
-    Advanced: 'secondary',
-    Intermediate: 'warning'
+// Fetch skills
+async function fetchSkills() {
+  loading.value = true
+  error.value = null
+
+  try {
+    const response = await apiFetch<ListSkillsResponse>('/skills')
+    skills.value = response.data
+  } catch (e) {
+    error.value = e instanceof Error ? e.message : 'Failed to load skills'
+  } finally {
+    loading.value = false
   }
-  return colors[level] || 'neutral'
 }
+
+// Skill CRUD
+function openAddModal() {
+  editingSkill.value = null
+  Object.assign(skillForm, {
+    name: '',
+    category: null,
+    proficiency_level: 50,
+    years_of_experience: null,
+    is_highlighted: false
+  })
+  showSkillModal.value = true
+}
+
+function openEditModal(skill: SkillResponse) {
+  editingSkill.value = skill
+  Object.assign(skillForm, {
+    name: skill.name,
+    category: skill.category,
+    proficiency_level: skill.proficiency_level,
+    years_of_experience: skill.years_of_experience,
+    is_highlighted: skill.is_highlighted
+  })
+  showSkillModal.value = true
+}
+
+async function saveSkill() {
+  isSaving.value = true
+
+  try {
+    // Use batch upsert API for both create and update.
+    const skillData: SkillInput = {
+      name: skillForm.name,
+      category: skillForm.category || null,
+      proficiency_level: skillForm.proficiency_level,
+      years_of_experience: skillForm.years_of_experience || null,
+      is_highlighted: skillForm.is_highlighted
+    }
+
+    await apiFetch('/skills/batch', {
+      method: 'POST',
+      body: { skills: [skillData] }
+    })
+
+    toast.add({
+      title: editingSkill.value ? 'Skill Updated' : 'Skill Added',
+      description: `${skillForm.name} has been saved.`,
+      color: 'success'
+    })
+
+    showSkillModal.value = false
+    await fetchSkills()
+  } catch (e) {
+    console.error('Failed to save skill:', e)
+  } finally {
+    isSaving.value = false
+  }
+}
+
+async function deleteSkill(id: string) {
+  if (!confirm('Are you sure you want to delete this skill?')) return
+
+  try {
+    await apiFetch(`/skills/${id}`, { method: 'DELETE' })
+
+    toast.add({
+      title: 'Skill Deleted',
+      description: 'The skill has been removed.',
+      color: 'success'
+    })
+
+    await fetchSkills()
+  } catch (e) {
+    console.error('Failed to delete skill:', e)
+  }
+}
+
+// Helpers
+function getCategoryIcon(category: string): string {
+  const icons: Record<string, string> = {
+    Frontend: 'i-lucide-layout',
+    Backend: 'i-lucide-server',
+    DevOps: 'i-lucide-cloud',
+    Database: 'i-lucide-database',
+    Mobile: 'i-lucide-smartphone',
+    'AI/ML': 'i-lucide-brain',
+    'Soft Skills': 'i-lucide-users',
+    Tools: 'i-lucide-wrench',
+    Other: 'i-lucide-tag'
+  }
+  return icons[category] || 'i-lucide-tag'
+}
+
+function getCategoryColor(category: string): string {
+  const colors: Record<string, string> = {
+    Frontend: 'text-emerald-400',
+    Backend: 'text-violet-400',
+    DevOps: 'text-sky-400',
+    Database: 'text-orange-400',
+    Mobile: 'text-pink-400',
+    'AI/ML': 'text-purple-400',
+    'Soft Skills': 'text-amber-400',
+    Tools: 'text-cyan-400',
+    Other: 'text-zinc-400'
+  }
+  return colors[category] || 'text-zinc-400'
+}
+
+function getSkillLevel(proficiency: number): string {
+  if (proficiency >= 80) return 'Expert'
+  if (proficiency >= 60) return 'Advanced'
+  if (proficiency >= 40) return 'Intermediate'
+  return 'Beginner'
+}
+
+function getSkillLevelColor(proficiency: number): 'primary' | 'secondary' | 'warning' | 'neutral' {
+  if (proficiency >= 80) return 'primary'
+  if (proficiency >= 60) return 'secondary'
+  if (proficiency >= 40) return 'warning'
+  return 'neutral'
+}
+
+// Fetch on mount
+onMounted(() => {
+  fetchSkills()
+})
 </script>
