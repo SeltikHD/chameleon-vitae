@@ -12,6 +12,18 @@ export default defineNuxtConfig({
     '/': { prerender: true }
   },
 
+  // Font configuration to avoid font decoding warnings.
+  // @nuxt/ui includes @nuxt/fonts which handles Google Fonts.
+  fonts: {
+    families: [
+      { name: 'Inter', provider: 'google', weights: [400, 500, 600, 700] },
+      { name: 'JetBrains Mono', provider: 'google', weights: [400, 500, 600] }
+    ],
+    defaults: {
+      weights: [400, 500, 600, 700]
+    }
+  },
+
   runtimeConfig: {
     public: {
       apiBase: process.env.NUXT_PUBLIC_API_BASE || 'http://localhost:8080/api',
