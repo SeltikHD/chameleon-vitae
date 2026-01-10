@@ -221,7 +221,7 @@
               >
                 <UTextarea
                   v-model="formData.summary"
-                  :rows="4"
+                  :rows="6"
                   placeholder="Write a brief professional summary that will be used as the default for your resumes..."
                 />
               </UFormField>
@@ -389,17 +389,21 @@ const hasChanges = computed(() => {
   )
 })
 
-// Auth provider info.
+// Auth provider info - use actual Firebase provider from authStore.
 const authProviderIcon = computed(() => {
-  const email = profile.value?.email ?? ''
-  if (email.includes('gmail')) return 'i-simple-icons-google'
-  return 'i-lucide-mail'
+  const provider = authStore.providerName
+  switch (provider) {
+    case 'Google':
+      return 'i-simple-icons-google'
+    case 'GitHub':
+      return 'i-simple-icons-github'
+    default:
+      return 'i-lucide-mail'
+  }
 })
 
 const authProviderName = computed(() => {
-  const email = profile.value?.email ?? ''
-  if (email.includes('gmail')) return 'Google'
-  return 'Email'
+  return authStore.providerName
 })
 
 // Fetch profile data.
