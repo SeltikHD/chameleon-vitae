@@ -1,38 +1,44 @@
 <template>
-  <div class="flex min-h-screen items-center justify-center py-12">
+  <div class="flex min-h-screen items-center justify-center bg-zinc-950 py-12">
     <!-- Background Gradient -->
     <div class="absolute inset-0 -z-10">
-      <div class="absolute right-1/4 top-1/4 h-[400px] w-[400px] rounded-full bg-emerald-500/5 blur-3xl" />
-      <div class="absolute bottom-1/4 left-1/4 h-[300px] w-[300px] rounded-full bg-violet-500/5 blur-3xl" />
+      <div
+        class="absolute right-1/4 top-1/4 h-[400px] w-[400px] rounded-full bg-emerald-500/5 blur-3xl"
+      />
+      <div
+        class="absolute bottom-1/4 left-1/4 h-[300px] w-[300px] rounded-full bg-violet-500/5 blur-3xl"
+      />
     </div>
 
     <div class="w-full max-w-md px-4">
       <!-- Logo -->
-      <div class="mb-8 text-center">
-        <NuxtLink to="/" class="inline-flex items-center gap-2">
-          <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-500">
-            <UIcon name="i-lucide-file-text" class="h-6 w-6 text-zinc-950" />
-          </div>
-          <span class="text-xl font-bold text-zinc-100">Chameleon Vitae</span>
-        </NuxtLink>
+      <div class="mb-8 flex justify-center">
+        <SharedLogo
+          to="/"
+          size="lg"
+        />
       </div>
 
       <!-- Login Card -->
       <UCard>
         <template #header>
           <div class="text-center">
-            <h1 class="text-2xl font-bold text-zinc-100">
-              Welcome Back
-            </h1>
+            <h1 class="text-2xl font-bold text-zinc-100">Welcome Back</h1>
             <p class="mt-2 text-sm text-zinc-400">
               Sign in to continue building your tailored resumes
             </p>
           </div>
         </template>
 
-        <form class="space-y-4" @submit.prevent="handleSubmit">
+        <form
+          class="space-y-4"
+          @submit.prevent="handleSubmit"
+        >
           <!-- Email Input -->
-          <UFormField label="Email" name="email">
+          <UFormField
+            label="Email"
+            name="email"
+          >
             <UInput
               v-model="form.email"
               type="email"
@@ -43,7 +49,10 @@
           </UFormField>
 
           <!-- Password Input -->
-          <UFormField label="Password" name="password">
+          <UFormField
+            label="Password"
+            name="password"
+          >
             <UInput
               v-model="form.password"
               :type="showPassword ? 'text' : 'password'"
@@ -66,14 +75,27 @@
 
           <!-- Remember Me & Forgot Password -->
           <div class="flex items-center justify-between">
-            <UCheckbox v-model="form.rememberMe" label="Remember me" />
-            <UButton variant="link" color="primary" size="xs">
+            <UCheckbox
+              v-model="form.rememberMe"
+              label="Remember me"
+            />
+            <UButton
+              variant="link"
+              color="primary"
+              size="xs"
+            >
               Forgot password?
             </UButton>
           </div>
 
           <!-- Submit Button -->
-          <UButton type="submit" color="primary" size="lg" block :loading="isLoading">
+          <UButton
+            type="submit"
+            color="primary"
+            size="lg"
+            block
+            :loading="isLoading"
+          >
             Sign In
           </UButton>
         </form>
@@ -110,7 +132,11 @@
         <template #footer>
           <p class="text-center text-sm text-zinc-400">
             Don't have an account?
-            <UButton variant="link" color="primary" size="xs">
+            <UButton
+              variant="link"
+              color="primary"
+              size="xs"
+            >
               Sign up
             </UButton>
           </p>
@@ -120,9 +146,19 @@
       <!-- Terms -->
       <p class="mt-6 text-center text-xs text-zinc-500">
         By signing in, you agree to our
-        <UButton variant="link" color="neutral" size="xs">Terms of Service</UButton>
+        <UButton
+          variant="link"
+          color="neutral"
+          size="xs"
+          >Terms of Service</UButton
+        >
         and
-        <UButton variant="link" color="neutral" size="xs">Privacy Policy</UButton>
+        <UButton
+          variant="link"
+          color="neutral"
+          size="xs"
+          >Privacy Policy</UButton
+        >
       </p>
     </div>
   </div>
@@ -152,7 +188,7 @@ function handleSubmit() {
   }, 1500)
 }
 
-function handleSocialLogin(provider: 'google' | 'github') {
+function handleSocialLogin(_provider: 'google' | 'github') {
   // Mock social login.
   navigateTo('/dashboard')
 }
