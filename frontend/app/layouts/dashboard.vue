@@ -122,11 +122,13 @@
               class="gap-2"
             >
               <UAvatar
-                :src="mockUser.avatar"
-                :alt="mockUser.name"
+                :src="authStore.avatarUrl ?? undefined"
+                :alt="authStore.displayName"
                 size="xs"
-              />
-              <span class="hidden text-sm md:inline">{{ mockUser.name }}</span>
+              >
+                <span v-if="!authStore.avatarUrl">{{ authStore.userInitials }}</span>
+              </UAvatar>
+              <span class="hidden text-sm md:inline">{{ authStore.displayName }}</span>
               <UIcon
                 name="i-lucide-chevron-down"
                 class="h-4 w-4"
@@ -148,14 +150,8 @@
 
 <script setup lang="ts">
 const route = useRoute()
+const authStore = useAuthStore()
 const isSidebarOpen = ref(true)
-
-// Mock user data.
-const mockUser = {
-  name: 'John Developer',
-  email: 'john@example.com',
-  avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=john'
-}
 
 // Navigation items.
 const navItems = [
@@ -194,8 +190,12 @@ const pageTitle = computed(() => {
   return titles[route.path] || 'Dashboard'
 })
 
-function handleSignOut() {
-  // Mock sign out - will be replaced with real auth.
-  navigateTo('/login')
+async function handleSignOut() {
+  try {
+    await authStore.signOut()
+    navigateTo('/login')
+  } catch (error) {
+    console.error('Failed to sign out:', error)
+  }
 }
 </script>

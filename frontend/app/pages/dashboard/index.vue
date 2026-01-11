@@ -196,7 +196,14 @@
 <script setup lang="ts">
 import { useAuthStore } from '~/stores/auth'
 import { apiFetch } from '~/composables/useApiFetch'
-import type { ResumeResponse, ExperienceResponse, SkillResponse } from '~/types/api'
+import type {
+  ResumeResponse,
+  ExperienceResponse,
+  SkillResponse,
+  ListResumesResponse,
+  ListExperiencesResponse,
+  ListSkillsResponse
+} from '~/types/api'
 
 definePageMeta({
   layout: 'dashboard'
@@ -302,16 +309,17 @@ async function fetchDashboardData() {
   isLoading.value = true
 
   try {
-    // Fetch all data in parallel
+    // Fetch all data in parallel - API returns paginated responses with data array
     const [resumesRes, experiencesRes, skillsRes] = await Promise.all([
-      apiFetch<ResumeResponse[]>('/resumes'),
-      apiFetch<ExperienceResponse[]>('/experiences'),
-      apiFetch<SkillResponse[]>('/skills')
+      apiFetch<ListResumesResponse>('/resumes'),
+      apiFetch<ListExperiencesResponse>('/experiences'),
+      apiFetch<ListSkillsResponse>('/skills')
     ])
 
-    resumes.value = resumesRes
-    experiences.value = experiencesRes
-    skills.value = skillsRes
+    // Extract data arrays from paginated responses
+    resumes.value = resumesRes.data ?? []
+    experiences.value = experiencesRes.data ?? []
+    skills.value = skillsRes.data ?? []
   } catch (error) {
     console.error('[Dashboard] Failed to fetch data:', error)
     toast.add({
