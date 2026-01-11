@@ -38,16 +38,42 @@
       </div>
     </div>
 
-    <!-- Step 1: Job Description -->
+    <!-- Step 1: Job Details -->
     <UCard v-if="currentStep === 0">
       <template #header>
-        <h2 class="font-semibold text-zinc-100">Job Description</h2>
+        <h2 class="font-semibold text-zinc-100">Job Details</h2>
       </template>
 
       <form
         class="space-y-4"
-        @submit.prevent="analyzeJob"
+        @submit.prevent="goToTemplate"
       >
+        <div class="grid gap-4 sm:grid-cols-2">
+          <UFormField
+            label="Company Name"
+            name="companyName"
+          >
+            <UInput
+              v-model="form.companyName"
+              placeholder="e.g. Google, Microsoft..."
+              icon="i-lucide-building-2"
+              :disabled="isCreating"
+            />
+          </UFormField>
+
+          <UFormField
+            label="Job Title"
+            name="jobTitle"
+          >
+            <UInput
+              v-model="form.jobTitle"
+              placeholder="e.g. Senior Software Engineer"
+              icon="i-lucide-briefcase"
+              :disabled="isCreating"
+            />
+          </UFormField>
+        </div>
+
         <UFormField
           label="Job URL (optional)"
           name="jobUrl"
@@ -56,15 +82,9 @@
             v-model="form.jobUrl"
             placeholder="https://careers.example.com/job/123"
             icon="i-lucide-link"
-            :disabled="isAnalyzing"
+            :disabled="isCreating"
           />
         </UFormField>
-
-        <div class="flex items-center gap-4">
-          <div class="h-px flex-1 bg-zinc-800" />
-          <span class="text-xs text-zinc-500">or paste the description</span>
-          <div class="h-px flex-1 bg-zinc-800" />
-        </div>
 
         <UFormField
           label="Job Description"
@@ -73,9 +93,9 @@
         >
           <UTextarea
             v-model="form.description"
-            :rows="12"
+            :rows="10"
             placeholder="Paste the full job description here..."
-            :disabled="isAnalyzing"
+            :disabled="isCreating"
           />
         </UFormField>
 
@@ -83,12 +103,10 @@
           <UButton
             type="submit"
             color="primary"
-            :disabled="!form.description || isAnalyzing"
-            :loading="isAnalyzing"
+            :disabled="!form.description"
           >
-            {{ isAnalyzing ? 'Analyzing...' : 'Analyze Job' }}
+            Continue
             <UIcon
-              v-if="!isAnalyzing"
               name="i-lucide-arrow-right"
               class="ml-2 h-4 w-4"
             />
@@ -97,60 +115,36 @@
       </form>
     </UCard>
 
-    <!-- Step 2: AI Analysis -->
+    <!-- Step 2: Template Selection -->
     <UCard v-if="currentStep === 1">
       <template #header>
-        <h2 class="font-semibold text-zinc-100">AI Analysis</h2>
+        <h2 class="font-semibold text-zinc-100">Select Template</h2>
       </template>
 
-      <!-- Analysis Results -->
       <div class="space-y-6">
-        <div>
-          <h3 class="mb-3 text-sm font-medium text-zinc-400">Detected Company & Role</h3>
-          <div class="flex items-center gap-4">
-            <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-zinc-800">
+        <!-- Job Summary -->
+        <div class="rounded-lg border border-zinc-800 bg-zinc-900/50 p-4">
+          <div class="flex items-center gap-3">
+            <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-zinc-800">
               <UIcon
                 name="i-lucide-building-2"
-                class="h-6 w-6 text-emerald-400"
+                class="h-5 w-5 text-emerald-400"
               />
             </div>
             <div>
-              <UInput
-                v-model="analysis.company"
-                placeholder="Company name"
-                class="mb-1"
-              />
-              <UInput
-                v-model="analysis.position"
-                placeholder="Position title"
-              />
+              <p class="font-medium text-zinc-100">
+                {{ form.companyName || 'Company' }} - {{ form.jobTitle || 'Position' }}
+              </p>
+              <p class="text-sm text-zinc-400">
+                {{ form.description.slice(0, 100) }}{{ form.description.length > 100 ? '...' : '' }}
+              </p>
             </div>
           </div>
         </div>
 
+        <!-- Template Selection -->
         <div>
-          <h3 class="mb-3 text-sm font-medium text-zinc-400">Detected Requirements</h3>
-          <div class="flex flex-wrap gap-2">
-            <UBadge
-              v-for="skill in analysis.requiredSkills"
-              :key="skill"
-              color="primary"
-              variant="subtle"
-            >
-              {{ skill }}
-            </UBadge>
-            <UBadge
-              v-if="analysis.requiredSkills.length === 0"
-              color="neutral"
-              variant="subtle"
-            >
-              No specific skills detected
-            </UBadge>
-          </div>
-        </div>
-
-        <div>
-          <h3 class="mb-3 text-sm font-medium text-zinc-400">Template Selection</h3>
+          <h3 class="mb-3 text-sm font-medium text-zinc-400">Choose a Template</h3>
           <USelectMenu
             v-model="selectedTemplateId"
             :items="templateOptions"
@@ -243,7 +237,7 @@
 
 <script setup lang="ts">
 import { apiFetch } from '~/composables/useApiFetch'
-import type { ResumeResponse, AnalyzeJobRequest, AnalyzeJobResponse } from '~/types/api'
+import type { ResumeResponse, CreateResumeRequest } from '~/types/api'
 
 definePageMeta({
   layout: 'dashboard'
@@ -253,7 +247,7 @@ const router = useRouter()
 const toast = useToast()
 
 const currentStep = ref(0)
-const isAnalyzing = ref(false)
+const isCreating = ref(false)
 const isGenerating = ref(false)
 const generationProgress = ref(0)
 const generationError = ref<string | null>(null)
@@ -261,22 +255,16 @@ const selectedTemplateId = ref('')
 const createdResumeId = ref<string | null>(null)
 
 const steps = [
-  { id: 'description', label: 'Job Description' },
-  { id: 'analysis', label: 'AI Analysis' },
+  { id: 'description', label: 'Job Details' },
+  { id: 'template', label: 'Template' },
   { id: 'generate', label: 'Generate' }
 ]
 
 const form = reactive({
   jobUrl: '',
-  description: ''
-})
-
-const analysis = reactive({
-  company: '',
-  position: '',
-  requiredSkills: [] as string[],
-  niceToHave: [] as string[],
-  experienceLevel: ''
+  description: '',
+  companyName: '',
+  jobTitle: ''
 })
 
 // Template options (these would come from API in production)
@@ -288,8 +276,8 @@ const templateOptions = ref([
 ])
 
 const generationStatusText = computed(() => {
-  if (generationProgress.value < 30) return 'Analyzing your experience bullets...'
-  if (generationProgress.value < 60) return 'Selecting the best matches for this job...'
+  if (generationProgress.value < 30) return 'Creating resume draft...'
+  if (generationProgress.value < 60) return 'Selecting the best experience bullets...'
   if (generationProgress.value < 90) return 'Tailoring content for maximum impact...'
   return 'Finalizing your resume...'
 })
@@ -304,41 +292,9 @@ function getStepClasses(index: number) {
   return 'bg-zinc-800 text-zinc-500'
 }
 
-async function analyzeJob() {
+function goToTemplate() {
   if (!form.description.trim()) return
-
-  isAnalyzing.value = true
-
-  try {
-    const request: AnalyzeJobRequest = {
-      job_description: form.description,
-      job_url: form.jobUrl || undefined
-    }
-
-    const response = await apiFetch<AnalyzeJobResponse>('/resumes/analyze', {
-      method: 'POST',
-      body: request
-    })
-
-    // Update analysis with response
-    analysis.company = response.company || ''
-    analysis.position = response.position || ''
-    analysis.requiredSkills = response.required_skills || []
-    analysis.niceToHave = response.nice_to_have || []
-    analysis.experienceLevel = response.experience_level || ''
-
-    currentStep.value = 1
-  } catch (error) {
-    console.error('[NewResume] Analysis failed:', error)
-    toast.add({
-      title: 'Analysis Failed',
-      description: 'Could not analyze the job description. Please try again.',
-      color: 'error',
-      icon: 'i-heroicons-exclamation-circle'
-    })
-  } finally {
-    isAnalyzing.value = false
-  }
+  currentStep.value = 1
 }
 
 async function generateResume() {
@@ -350,25 +306,34 @@ async function generateResume() {
   generationProgress.value = 0
 
   try {
-    // Create the resume
+    // Start progress simulation
+    const progressPromise = simulateProgress()
+
+    // Create the resume - the backend handles creation and initial tailoring
+    const request: CreateResumeRequest = {
+      job_description: form.description,
+      job_title: form.jobTitle || undefined,
+      company_name: form.companyName || undefined,
+      job_url: form.jobUrl || undefined
+    }
+
     const resume = await apiFetch<ResumeResponse>('/resumes', {
       method: 'POST',
-      body: {
-        job_description: form.description,
-        job_title: analysis.position || undefined,
-        company_name: analysis.company || undefined
-      }
+      body: request
     })
 
     createdResumeId.value = resume.id
 
-    // Simulate progress while the backend generates
-    await simulateProgress()
+    // Wait for progress simulation to complete
+    await progressPromise
 
-    // Trigger generation
-    await apiFetch(`/resumes/${resume.id}/generate`, {
-      method: 'POST'
-    })
+    // If the resume is still in draft status, trigger tailoring
+    if (resume.status === 'draft') {
+      await apiFetch(`/resumes/${resume.id}/tailor`, {
+        method: 'POST',
+        body: { max_bullets_per_job: 5 }
+      })
+    }
 
     generationProgress.value = 100
 
