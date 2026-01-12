@@ -32,6 +32,8 @@ export interface ApiFetchOptions {
   skipAuth?: boolean
   /** Custom error handler. */
   onError?: (error: Error) => void
+  /** Response type for binary data. */
+  responseType?: 'json' | 'blob' | 'text' | 'arrayBuffer'
 }
 
 /**
@@ -217,7 +219,15 @@ export async function apiFetch<T>(endpoint: string, options: ApiFetchOptions = {
   const authStore = useAuthStore()
   const toast = useToast()
 
-  const { skipAuth = false, onError, method, body, query, headers: customHeaders } = options
+  const {
+    skipAuth = false,
+    onError,
+    method,
+    body,
+    query,
+    headers: customHeaders,
+    responseType = 'json'
+  } = options
 
   // Build headers.
   const headers: Record<string, string> = customHeaders
@@ -242,7 +252,8 @@ export async function apiFetch<T>(endpoint: string, options: ApiFetchOptions = {
       method,
       body: body as BodyInit | Record<string, unknown> | null | undefined,
       query,
-      headers
+      headers,
+      responseType: responseType as 'json' | 'blob' | 'text' | 'arrayBuffer'
     })
 
     return data
