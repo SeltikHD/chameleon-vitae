@@ -261,7 +261,7 @@
 
 <script setup lang="ts">
 import { apiFetch } from '~/composables/useApiFetch'
-import type { ResumeResponse } from '~/types/api'
+import type { ResumeResponse, ListResumesResponse } from '~/types/api'
 
 definePageMeta({
   layout: 'dashboard'
@@ -317,9 +317,12 @@ async function fetchResumes() {
   isLoading.value = true
 
   try {
-    resumes.value = await apiFetch<ResumeResponse[]>('/resumes')
+    const response = await apiFetch<ListResumesResponse>('/resumes')
+    // API returns paginated response with data array - default to empty array if null
+    resumes.value = response?.data ?? []
   } catch (error) {
     console.error('[Resumes] Failed to fetch:', error)
+    resumes.value = [] // Reset to empty array on error
     toast.add({
       title: 'Error',
       description: 'Failed to load resumes. Please try again.',
@@ -378,8 +381,38 @@ async function downloadResume(id: string) {
       icon: 'i-heroicons-arrow-down-tray'
     })
 
-    // TODO: Implement actual download when backend endpoint is ready
-    console.warn('[Resumes] Download not implemented yet, resume:', id)
+    // Find resume to get job title and company for filename
+    const resume = resumes.value.find((r) => r.id === id)
+
+    // Fetch PDF as blob
+    const blob = await apiFetch<Blob>(`/resumes/${id}/pdf`, {
+      responseType: 'blob'
+    })
+
+    // Create download link
+    const url = globalThis.URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+
+    // Generate filename
+    const jobTitle = resume?.job_title || 'resume'
+    const company = resume?.company_name || ''
+    const filename = company
+      ? `${jobTitle.replaceAll(/\s+/g, '-')}_${company.replaceAll(/\s+/g, '-')}.pdf`
+      : `${jobTitle.replaceAll(/\s+/g, '-')}.pdf`
+
+    link.download = filename
+    document.body.appendChild(link)
+    link.click()
+    link.remove()
+    globalThis.URL.revokeObjectURL(url)
+
+    toast.add({
+      title: 'Downloaded',
+      description: 'Your resume PDF has been downloaded.',
+      color: 'success',
+      icon: 'i-heroicons-arrow-down-tray'
+    })
   } catch (error) {
     console.error('[Resumes] Download failed:', error)
     toast.add({

@@ -1,574 +1,206 @@
-<template>
-  <div class="space-y-6">
-    <!-- Loading State -->
-    <template v-if="isLoading">
-      <div class="flex items-center gap-4">
-        <USkeleton class="h-10 w-10 rounded" />
-        <div class="flex-1">
-          <USkeleton class="mb-2 h-6 w-64" />
-          <USkeleton class="h-4 w-32" />
-        </div>
-      </div>
-      <USkeleton class="h-24 w-full rounded-lg" />
-      <div class="grid gap-6 lg:grid-cols-2">
-        <USkeleton class="h-96 w-full rounded-lg" />
-        <USkeleton class="h-96 w-full rounded-lg" />
-      </div>
-    </template>
-
-    <!-- Error State -->
-    <template v-else-if="error">
-      <UAlert
-        color="error"
-        variant="subtle"
-        icon="i-heroicons-exclamation-triangle"
-        :title="error"
-        :description="'Could not load the resume. Please try again.'"
-      />
-      <div class="flex gap-4">
-        <UButton
-          color="primary"
-          @click="fetchResume"
-        >
-          Retry
-        </UButton>
-        <UButton
-          to="/dashboard/resumes"
-          color="neutral"
-          variant="ghost"
-        >
-          Back to Resumes
-        </UButton>
-      </div>
-    </template>
-
-    <!-- Resume Content -->
-    <template v-else-if="resume">
-      <!-- Header -->
-      <div class="flex items-center gap-4">
-        <UButton
-          color="neutral"
-          variant="ghost"
-          icon="i-lucide-arrow-left"
-          to="/dashboard/resumes"
-        />
-        <div class="flex-1">
-          <h1 class="text-2xl font-bold text-zinc-100">
-            {{ resume.company_name || 'Untitled Resume' }} - {{ resume.job_title || 'Position' }}
-          </h1>
-          <p class="mt-1 text-zinc-400">Created {{ formatDate(resume.created_at) }}</p>
-        </div>
-        <div class="flex items-center gap-2">
-          <UBadge
-            :color="getStatusColor(resume.status)"
-            variant="subtle"
-            size="lg"
-          >
-            {{ formatStatus(resume.status) }}
-          </UBadge>
-          <UButton
-            color="neutral"
-            variant="outline"
-            icon="i-lucide-download"
-            :loading="isDownloading"
-            @click="downloadResume"
-          >
-            Download PDF
-          </UButton>
-          <UButton
-            color="primary"
-            icon="i-lucide-refresh-cw"
-            :loading="isRegenerating"
-            @click="regenerateResume"
-          >
-            Regenerate
-          </UButton>
-        </div>
-      </div>
-
-      <!-- Match Score Banner -->
-      <UCard class="border-emerald-500/20 bg-emerald-500/5">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-4">
-            <div class="flex h-14 w-14 items-center justify-center rounded-full bg-emerald-500/20">
-              <UIcon
-                name="i-lucide-target"
-                class="h-7 w-7 text-emerald-400"
-              />
-            </div>
-            <div>
-              <p class="text-sm text-zinc-400">ATS Match Score</p>
-              <p class="text-3xl font-bold text-emerald-400">{{ resume.score || 0 }}%</p>
-            </div>
-          </div>
-          <div class="text-right">
-            <p class="text-sm text-zinc-400">{{ selectedBullets.length }} bullets selected</p>
-            <p class="text-sm text-zinc-400">{{ matchedSkillsCount }} skills matched</p>
-          </div>
-        </div>
-      </UCard>
-
-      <!-- Split View -->
-      <div class="grid gap-6 lg:grid-cols-2">
-        <!-- Left: Selected Bullets -->
-        <UCard>
-          <template #header>
-            <div class="flex items-center justify-between">
-              <h2 class="font-semibold text-zinc-100">Selected Experience Bullets</h2>
-              <UButton
-                color="neutral"
-                variant="ghost"
-                size="xs"
-                icon="i-lucide-plus"
-                @click="showAddBulletModal = true"
-              >
-                Add Bullet
-              </UButton>
-            </div>
-          </template>
-
-          <div
-            v-if="selectedBullets.length > 0"
-            class="space-y-4"
-          >
-            <div
-              v-for="(group, idx) in groupedBullets"
-              :key="idx"
-              class="group"
-            >
-              <div class="mb-2 flex items-center justify-between">
-                <span class="text-sm font-medium text-zinc-400">{{ group.organization }}</span>
-                <span class="text-xs text-zinc-500">{{ group.period }}</span>
-              </div>
-
-              <div
-                v-for="bullet in group.bullets"
-                :key="bullet.id"
-                class="relative mb-3 rounded-lg border border-zinc-800 bg-zinc-900 p-4 transition-colors hover:border-zinc-700"
-              >
-                <div class="flex items-start gap-3">
-                  <UIcon
-                    name="i-lucide-grip-vertical"
-                    class="mt-1 h-4 w-4 cursor-grab text-zinc-600"
-                  />
-                  <div class="flex-1">
-                    <p class="text-sm text-zinc-300">{{ bullet.content }}</p>
-                    <div
-                      v-if="bullet.keywords && bullet.keywords.length > 0"
-                      class="mt-2 flex flex-wrap gap-2"
-                    >
-                      <UBadge
-                        v-for="keyword in bullet.keywords"
-                        :key="keyword"
-                        color="primary"
-                        variant="subtle"
-                        size="xs"
-                      >
-                        {{ keyword }}
-                      </UBadge>
-                    </div>
-                  </div>
-                  <div
-                    class="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100"
-                  >
-                    <UButton
-                      color="neutral"
-                      variant="ghost"
-                      icon="i-lucide-pencil"
-                      size="xs"
-                      @click="editBullet(bullet)"
-                    />
-                    <UButton
-                      color="neutral"
-                      variant="ghost"
-                      icon="i-lucide-trash-2"
-                      size="xs"
-                      @click="removeBullet(bullet.id)"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div
-            v-else
-            class="py-8 text-center text-zinc-500"
-          >
-            <UIcon
-              name="i-lucide-file-text"
-              class="mx-auto h-12 w-12 text-zinc-600"
-            />
-            <p class="mt-2">No bullets selected yet</p>
-            <UButton
-              color="primary"
-              variant="ghost"
-              class="mt-4"
-              @click="showAddBulletModal = true"
-            >
-              Add Bullet
-            </UButton>
-          </div>
-        </UCard>
-
-        <!-- Right: PDF Preview -->
-        <UCard>
-          <template #header>
-            <div class="flex items-center justify-between">
-              <h2 class="font-semibold text-zinc-100">PDF Preview</h2>
-              <div class="flex items-center gap-2">
-                <UButton
-                  color="neutral"
-                  variant="ghost"
-                  size="xs"
-                  icon="i-lucide-zoom-out"
-                  @click="zoomLevel = Math.max(50, zoomLevel - 25)"
-                />
-                <span class="text-sm text-zinc-400">{{ zoomLevel }}%</span>
-                <UButton
-                  color="neutral"
-                  variant="ghost"
-                  size="xs"
-                  icon="i-lucide-zoom-in"
-                  @click="zoomLevel = Math.min(150, zoomLevel + 25)"
-                />
-              </div>
-            </div>
-          </template>
-
-          <!-- PDF Preview Placeholder -->
-          <div
-            class="aspect-[8.5/11] overflow-hidden rounded-lg border border-zinc-800 bg-white p-8"
-            :style="{ transform: `scale(${zoomLevel / 100})`, transformOrigin: 'top center' }"
-          >
-            <div class="space-y-4">
-              <div class="border-b-2 border-zinc-900 pb-4">
-                <h3 class="text-xl font-bold text-zinc-900">{{ userName }}</h3>
-                <p class="text-sm text-zinc-600">{{ userEmail }}</p>
-              </div>
-
-              <div v-if="resume.job_description">
-                <h4 class="mb-2 font-semibold text-zinc-900">Summary</h4>
-                <p class="text-xs text-zinc-700">
-                  {{ truncateText(resume.job_description, 200) }}
-                </p>
-              </div>
-
-              <div>
-                <h4 class="mb-2 font-semibold text-zinc-900">Experience</h4>
-                <div class="space-y-3">
-                  <div
-                    v-for="(group, idx) in groupedBullets"
-                    :key="idx"
-                  >
-                    <div class="flex items-baseline justify-between">
-                      <span class="text-sm font-medium text-zinc-900">
-                        {{ group.title }} @ {{ group.organization }}
-                      </span>
-                      <span class="text-xs text-zinc-500">{{ group.period }}</span>
-                    </div>
-                    <ul class="ml-4 mt-1 list-disc space-y-1">
-                      <li
-                        v-for="bullet in group.bullets.slice(0, 3)"
-                        :key="bullet.id"
-                        class="text-xs text-zinc-700"
-                      >
-                        {{ truncateText(bullet.content, 150) }}
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-
-              <div v-if="skills.length > 0">
-                <h4 class="mb-2 font-semibold text-zinc-900">Skills</h4>
-                <p class="text-xs text-zinc-700">
-                  {{ skills.map((s) => s.name).join(', ') }}
-                </p>
-              </div>
-            </div>
-          </div>
-        </UCard>
-      </div>
-    </template>
-
-    <!-- Add Bullet Modal -->
-    <UModal v-model:open="showAddBulletModal">
-      <template #content>
-        <UCard>
-          <template #header>
-            <div class="flex items-center justify-between">
-              <h3 class="font-semibold text-zinc-100">Add Bullet from Library</h3>
-              <UButton
-                color="neutral"
-                variant="ghost"
-                icon="i-lucide-x"
-                size="xs"
-                @click="showAddBulletModal = false"
-              />
-            </div>
-          </template>
-
-          <div class="space-y-4">
-            <UInput
-              v-model="bulletSearchQuery"
-              placeholder="Search bullets..."
-              icon="i-lucide-search"
-            />
-
-            <div class="max-h-64 space-y-2 overflow-y-auto">
-              <div
-                v-for="bullet in availableBullets"
-                :key="bullet.id"
-                class="cursor-pointer rounded-lg border border-zinc-800 p-3 transition-colors hover:border-emerald-500/40"
-                @click="addBullet(bullet)"
-              >
-                <p class="text-sm text-zinc-300">{{ bullet.content }}</p>
-                <div class="mt-2 flex flex-wrap gap-1">
-                  <UBadge
-                    v-for="keyword in bullet.keywords?.slice(0, 3)"
-                    :key="keyword"
-                    color="neutral"
-                    variant="subtle"
-                    size="xs"
-                  >
-                    {{ keyword }}
-                  </UBadge>
-                </div>
-              </div>
-
-              <div
-                v-if="availableBullets.length === 0"
-                class="py-4 text-center text-zinc-500"
-              >
-                No bullets found. Add some in the Experiences section.
-              </div>
-            </div>
-          </div>
-        </UCard>
-      </template>
-    </UModal>
-  </div>
-</template>
-
 <script setup lang="ts">
-import { useAuthStore } from '~/stores/auth'
 import { apiFetch } from '~/composables/useApiFetch'
-import type { ResumeResponse, BulletResponse, ExperienceResponse, SkillResponse } from '~/types/api'
+import type { ResumeResponse, TailorResumeRequest, UpdateResumeContentRequest } from '~/types/api'
 
 definePageMeta({
   layout: 'dashboard'
 })
 
 const route = useRoute()
+const router = useRouter()
 const toast = useToast()
-const authStore = useAuthStore()
-
-const resumeId = computed(() => route.params.id as string)
 
 // State
 const resume = ref<ResumeResponse | null>(null)
-const experiences = ref<ExperienceResponse[]>([])
-const skills = ref<SkillResponse[]>([])
 const isLoading = ref(true)
 const error = ref<string | null>(null)
 const isDownloading = ref(false)
-const isRegenerating = ref(false)
-const zoomLevel = ref(100)
-const showAddBulletModal = ref(false)
-const bulletSearchQuery = ref('')
+const isRetailoring = ref(false)
+const isUpdatingStatus = ref(false)
+const showDeleteModal = ref(false)
+const isDeleting = ref(false)
+const notes = ref('')
 
-// User info from auth store
-const userName = computed(() => authStore.user?.name || 'Your Name')
-const userEmail = computed(() => authStore.user?.email || 'email@example.com')
+const resumeId = computed(() => route.params.id as string)
 
-// Build a map of all bullets from experiences for quick lookup
-const allBulletsMap = computed(() => {
-  const map = new Map<string, { bullet: BulletResponse; experience: ExperienceResponse }>()
-  experiences.value.forEach((exp) => {
-    if (exp.bullets) {
-      exp.bullets.forEach((bullet) => {
-        map.set(bullet.id, { bullet, experience: exp })
-      })
-    }
+// Computed
+const statusColor = computed(() => {
+  switch (resume.value?.status) {
+    case 'tailored':
+      return 'success'
+    case 'draft':
+      return 'warning'
+    case 'exported':
+      return 'primary'
+    case 'reviewed':
+      return 'secondary'
+    default:
+      return 'neutral'
+  }
+})
+
+const formattedScore = computed(() => {
+  if (!resume.value?.tailoring_score) return null
+  return resume.value.tailoring_score.toFixed(2)
+})
+
+const formattedDate = computed(() => {
+  if (!resume.value?.created_at) return ''
+  return new Date(resume.value.created_at).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
   })
-  return map
 })
 
-// Selected bullet IDs from resume
-const selectedBulletIds = computed(() => {
-  return new Set(resume.value?.selected_bullets || [])
-})
-
-// Selected bullets with full data
-const selectedBullets = computed(() => {
-  const bullets: BulletResponse[] = []
-  selectedBulletIds.value.forEach((id) => {
-    const data = allBulletsMap.value.get(id)
-    if (data) {
-      bullets.push(data.bullet)
-    }
+const formattedUpdatedDate = computed(() => {
+  if (!resume.value?.updated_at) return ''
+  return new Date(resume.value.updated_at).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
   })
-  return bullets
 })
 
-// Available bullets for adding (not already selected)
-const availableBullets = computed(() => {
-  const allBullets: BulletResponse[] = []
-
-  experiences.value.forEach((exp) => {
-    if (exp.bullets) {
-      exp.bullets.forEach((bullet) => {
-        if (!selectedBulletIds.value.has(bullet.id)) {
-          // Filter by search query
-          if (
-            bulletSearchQuery.value === '' ||
-            bullet.content.toLowerCase().includes(bulletSearchQuery.value.toLowerCase())
-          ) {
-            allBullets.push(bullet)
-          }
-        }
-      })
-    }
-  })
-
-  return allBullets
-})
-
-// Group bullets by experience
-const groupedBullets = computed(() => {
-  const groups: {
-    organization: string
-    title: string
-    period: string
-    bullets: BulletResponse[]
-  }[] = []
-
-  selectedBullets.value.forEach((bullet) => {
-    const data = allBulletsMap.value.get(bullet.id)
-
-    if (data) {
-      const existingGroup = groups.find((g) => g.organization === data.experience.organization)
-      if (existingGroup) {
-        existingGroup.bullets.push(bullet)
-      } else {
-        groups.push({
-          organization: data.experience.organization,
-          title: data.experience.title,
-          period: `${formatYear(data.experience.start_date)} - ${data.experience.end_date ? formatYear(data.experience.end_date) : 'Present'}`,
-          bullets: [bullet]
-        })
-      }
-    } else {
-      // Orphan bullet
-      const orphanGroup = groups.find((g) => g.organization === 'Other')
-      if (orphanGroup) {
-        orphanGroup.bullets.push(bullet)
-      } else {
-        groups.push({
-          organization: 'Other',
-          title: '',
-          period: '',
-          bullets: [bullet]
-        })
-      }
-    }
-  })
-
-  return groups
-})
-
-// Count matched skills
-const matchedSkillsCount = computed(() => {
-  return skills.value.length
-})
-
-// Fetch data on mount
+// Lifecycle
 onMounted(async () => {
   await fetchResume()
 })
 
+// Methods
 async function fetchResume() {
   isLoading.value = true
   error.value = null
 
   try {
-    const [resumeRes, experiencesRes, skillsRes] = await Promise.all([
-      apiFetch<ResumeResponse>(`/resumes/${resumeId.value}`),
-      apiFetch<ExperienceResponse[]>('/experiences'),
-      apiFetch<SkillResponse[]>('/skills')
-    ])
-
-    resume.value = resumeRes
-    experiences.value = experiencesRes
-    skills.value = skillsRes
+    const response = await apiFetch<ResumeResponse>(`/resumes/${resumeId.value}`)
+    resume.value = response
+    notes.value = response.notes || ''
   } catch (err) {
-    console.error('[ResumeDetail] Failed to fetch:', err)
+    console.error('[ResumeDetail] Failed to fetch resume:', err)
     error.value = err instanceof Error ? err.message : 'Failed to load resume'
   } finally {
     isLoading.value = false
   }
 }
 
-function formatDate(dateString: string): string {
-  const date = new Date(dateString)
-  const now = new Date()
-  const diffMs = now.getTime() - date.getTime()
-  const diffHours = Math.floor(diffMs / (1000 * 60 * 60))
-  const diffDays = Math.floor(diffHours / 24)
+async function retailorResume() {
+  if (!resume.value) return
 
-  if (diffHours < 1) return 'Just now'
-  if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`
-  if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`
-  return date.toLocaleDateString()
-}
-
-function formatYear(dateString: string): string {
-  return new Date(dateString).getFullYear().toString()
-}
-
-function formatStatus(status: string): string {
-  return status.charAt(0).toUpperCase() + status.slice(1)
-}
-
-function getStatusColor(status: string) {
-  const colors: Record<string, 'primary' | 'warning' | 'secondary' | 'success' | 'error'> = {
-    draft: 'warning',
-    generated: 'primary',
-    reviewed: 'secondary',
-    submitted: 'primary',
-    interview: 'success',
-    rejected: 'error',
-    accepted: 'success'
-  }
-  return colors[status] || 'neutral'
-}
-
-function truncateText(text: string, maxLength: number): string {
-  if (text.length <= maxLength) return text
-  return text.slice(0, maxLength) + '...'
-}
-
-async function downloadResume() {
-  isDownloading.value = true
-
+  isRetailoring.value = true
   try {
-    toast.add({
-      title: 'Downloading...',
-      description: 'Preparing your PDF for download.',
-      color: 'info',
-      icon: 'i-heroicons-arrow-down-tray'
+    const request: TailorResumeRequest = {
+      max_bullets_per_job: 5
+    }
+
+    const updated = await apiFetch<ResumeResponse>(`/resumes/${resumeId.value}/tailor`, {
+      method: 'POST',
+      body: request
     })
 
-    // TODO: Implement actual download when backend endpoint is ready
-    console.warn('[ResumeDetail] Download not implemented yet')
+    resume.value = updated
 
-    // Download successful - could update status to 'reviewed' if needed
+    toast.add({
+      title: 'Resume Re-tailored',
+      description: 'Your resume has been regenerated with fresh AI-optimized content.',
+      color: 'success',
+      icon: 'i-heroicons-sparkles'
+    })
   } catch (err) {
-    console.error('[ResumeDetail] Download failed:', err)
+    console.error('[ResumeDetail] Failed to retailor:', err)
+    toast.add({
+      title: 'Tailoring Failed',
+      description: 'Could not regenerate the resume. Please try again.',
+      color: 'error',
+      icon: 'i-heroicons-exclamation-circle'
+    })
+  } finally {
+    isRetailoring.value = false
+  }
+}
+
+async function updateStatus(newStatus: 'reviewed' | 'exported') {
+  if (!resume.value) return
+
+  isUpdatingStatus.value = true
+  try {
+    const request: UpdateResumeContentRequest = {
+      status: newStatus,
+      notes: notes.value || undefined
+    }
+
+    const updated = await apiFetch<ResumeResponse>(`/resumes/${resumeId.value}/content`, {
+      method: 'PATCH',
+      body: request
+    })
+
+    resume.value = updated
+
+    toast.add({
+      title: 'Status Updated',
+      description: `Resume marked as ${newStatus}.`,
+      color: 'success',
+      icon: 'i-heroicons-check-circle'
+    })
+  } catch (err) {
+    console.error('[ResumeDetail] Failed to update status:', err)
+    toast.add({
+      title: 'Update Failed',
+      description: 'Could not update the resume status.',
+      color: 'error',
+      icon: 'i-heroicons-exclamation-circle'
+    })
+  } finally {
+    isUpdatingStatus.value = false
+  }
+}
+
+async function downloadPDF() {
+  if (!resume.value) return
+
+  isDownloading.value = true
+  try {
+    // Fetch PDF - the endpoint returns a blob
+    const response = await apiFetch<Blob>(`/resumes/${resumeId.value}/pdf`, {
+      responseType: 'blob'
+    })
+
+    // Create download link
+    const url = globalThis.URL.createObjectURL(response)
+    const link = document.createElement('a')
+    link.href = url
+
+    // Generate filename
+    const jobTitle = resume.value.job_title || 'resume'
+    const company = resume.value.company_name || ''
+    const filename = company
+      ? `${jobTitle.replaceAll(/\s+/g, '-')}_${company.replaceAll(/\s+/g, '-')}.pdf`
+      : `${jobTitle.replaceAll(/\s+/g, '-')}.pdf`
+
+    link.download = filename
+    document.body.appendChild(link)
+    link.click()
+    link.remove()
+    globalThis.URL.revokeObjectURL(url)
+
+    // Update status to exported
+    await updateStatus('exported')
+
+    toast.add({
+      title: 'Downloaded',
+      description: 'Your resume PDF has been downloaded.',
+      color: 'success',
+      icon: 'i-heroicons-arrow-down-tray'
+    })
+  } catch (err) {
+    console.error('[ResumeDetail] Failed to download PDF:', err)
     toast.add({
       title: 'Download Failed',
-      description: 'Could not download the resume. Please try again.',
+      description: 'Could not generate PDF. Please try again.',
       color: 'error',
       icon: 'i-heroicons-exclamation-circle'
     })
@@ -577,106 +209,340 @@ async function downloadResume() {
   }
 }
 
-async function regenerateResume() {
-  isRegenerating.value = true
+async function deleteResume() {
+  if (!resume.value) return
 
+  isDeleting.value = true
   try {
-    await apiFetch(`/resumes/${resumeId.value}/generate`, {
-      method: 'POST'
+    await apiFetch(`/resumes/${resumeId.value}`, {
+      method: 'DELETE'
     })
 
-    await fetchResume()
-
     toast.add({
-      title: 'Resume Regenerated',
-      description: 'Your resume has been regenerated with updated content.',
+      title: 'Resume Deleted',
+      description: 'The resume has been permanently deleted.',
       color: 'success',
-      icon: 'i-heroicons-check-circle'
+      icon: 'i-heroicons-trash'
     })
+
+    await router.push('/dashboard/resumes')
   } catch (err) {
-    console.error('[ResumeDetail] Regenerate failed:', err)
+    console.error('[ResumeDetail] Failed to delete resume:', err)
     toast.add({
-      title: 'Regeneration Failed',
-      description: 'Could not regenerate the resume. Please try again.',
+      title: 'Delete Failed',
+      description: 'Could not delete the resume. Please try again.',
       color: 'error',
       icon: 'i-heroicons-exclamation-circle'
     })
   } finally {
-    isRegenerating.value = false
+    isDeleting.value = false
+    showDeleteModal.value = false
   }
 }
 
-async function addBullet(bullet: BulletResponse) {
-  try {
-    await apiFetch(`/resumes/${resumeId.value}/bullets`, {
-      method: 'POST',
-      body: { bullet_id: bullet.id }
-    })
-
-    // Add to local state - selected_bullets is string[] of IDs
-    if (resume.value) {
-      if (!resume.value.selected_bullets) {
-        resume.value.selected_bullets = []
-      }
-      resume.value.selected_bullets.push(bullet.id)
-    }
-
-    showAddBulletModal.value = false
-
-    toast.add({
-      title: 'Bullet Added',
-      description: 'The bullet has been added to your resume.',
-      color: 'success',
-      icon: 'i-heroicons-check-circle'
-    })
-  } catch (err) {
-    console.error('[ResumeDetail] Add bullet failed:', err)
-    toast.add({
-      title: 'Add Failed',
-      description: 'Could not add the bullet. Please try again.',
-      color: 'error',
-      icon: 'i-heroicons-exclamation-circle'
-    })
-  }
-}
-
-async function removeBullet(bulletId: string) {
-  if (!confirm('Remove this bullet from the resume?')) return
-
-  try {
-    await apiFetch(`/resumes/${resumeId.value}/bullets/${bulletId}`, {
-      method: 'DELETE'
-    })
-
-    // Remove from local state
-    if (resume.value && resume.value.selected_bullets) {
-      resume.value.selected_bullets = resume.value.selected_bullets.filter((id) => id !== bulletId)
-    }
-
-    toast.add({
-      title: 'Bullet Removed',
-      description: 'The bullet has been removed from your resume.',
-      color: 'success',
-      icon: 'i-heroicons-check-circle'
-    })
-  } catch (err) {
-    console.error('[ResumeDetail] Remove bullet failed:', err)
-    toast.add({
-      title: 'Remove Failed',
-      description: 'Could not remove the bullet. Please try again.',
-      color: 'error',
-      icon: 'i-heroicons-exclamation-circle'
-    })
-  }
-}
-
-function editBullet(_bullet: BulletResponse) {
-  // TODO: Implement bullet editing modal
-  toast.add({
-    title: 'Coming Soon',
-    description: 'Bullet editing will be available soon.',
-    color: 'info',
-    icon: 'i-heroicons-information-circle'
-  })
+function formatStatus(status: string): string {
+  return status.charAt(0).toUpperCase() + status.slice(1)
 }
 </script>
+
+<template>
+  <div class="min-h-screen p-6 lg:p-8">
+    <!-- Loading State -->
+    <div
+      v-if="isLoading"
+      class="flex items-center justify-center min-h-100"
+    >
+      <div class="text-center">
+        <UIcon
+          name="i-heroicons-arrow-path"
+          class="w-8 h-8 text-emerald-400 animate-spin mb-4"
+        />
+        <p class="text-zinc-400">Loading resume...</p>
+      </div>
+    </div>
+
+    <!-- Error State -->
+    <div
+      v-else-if="error"
+      class="max-w-2xl mx-auto text-center py-16"
+    >
+      <UIcon
+        name="i-heroicons-exclamation-triangle"
+        class="w-12 h-12 text-red-400 mx-auto mb-4"
+      />
+      <h2 class="text-xl font-semibold text-zinc-100 mb-2">Failed to Load Resume</h2>
+      <p class="text-zinc-400 mb-6">{{ error }}</p>
+      <div class="flex justify-center gap-4">
+        <UButton
+          variant="solid"
+          color="primary"
+          @click="fetchResume"
+        >
+          Retry
+        </UButton>
+        <UButton
+          variant="ghost"
+          color="neutral"
+          to="/dashboard/resumes"
+        >
+          Back to Resumes
+        </UButton>
+      </div>
+    </div>
+
+    <!-- Resume Content -->
+    <div
+      v-else-if="resume"
+      class="max-w-6xl mx-auto"
+    >
+      <!-- Header -->
+      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-8">
+        <div class="flex items-start gap-4">
+          <!-- Back Button -->
+          <UButton
+            variant="ghost"
+            color="neutral"
+            size="sm"
+            icon="i-heroicons-arrow-left"
+            to="/dashboard/resumes"
+          />
+
+          <div>
+            <h1 class="text-2xl font-bold text-zinc-100">
+              {{ resume.job_title || 'Untitled Resume' }}
+            </h1>
+            <div class="flex flex-wrap items-center gap-3 mt-2 text-sm text-zinc-400">
+              <span
+                v-if="resume.company_name"
+                class="flex items-center gap-1"
+              >
+                <UIcon
+                  name="i-heroicons-building-office-2"
+                  class="w-4 h-4"
+                />
+                {{ resume.company_name }}
+              </span>
+              <span class="flex items-center gap-1">
+                <UIcon
+                  name="i-heroicons-calendar"
+                  class="w-4 h-4"
+                />
+                {{ formattedDate }}
+              </span>
+              <UBadge
+                :color="statusColor"
+                variant="subtle"
+                size="sm"
+              >
+                {{ formatStatus(resume.status) }}
+              </UBadge>
+            </div>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex items-center gap-2 flex-wrap">
+          <UButton
+            variant="soft"
+            color="primary"
+            size="sm"
+            icon="i-heroicons-sparkles"
+            :loading="isRetailoring"
+            @click="retailorResume"
+          >
+            Re-tailor
+          </UButton>
+          <UButton
+            variant="soft"
+            color="primary"
+            size="sm"
+            icon="i-heroicons-arrow-down-tray"
+            :loading="isDownloading"
+            @click="downloadPDF"
+          >
+            Download PDF
+          </UButton>
+          <UButton
+            v-if="resume.status !== 'reviewed'"
+            variant="ghost"
+            color="neutral"
+            size="sm"
+            icon="i-heroicons-check"
+            :loading="isUpdatingStatus"
+            @click="updateStatus('reviewed')"
+          >
+            Mark Reviewed
+          </UButton>
+          <UButton
+            variant="ghost"
+            color="error"
+            size="sm"
+            icon="i-heroicons-trash"
+            @click="showDeleteModal = true"
+          />
+        </div>
+      </div>
+
+      <!-- Tailoring Score -->
+      <div
+        v-if="formattedScore"
+        class="mb-6 p-4 bg-zinc-900 rounded-xl border border-zinc-800"
+      >
+        <div class="flex items-center gap-3">
+          <div class="p-2 bg-emerald-500/10 rounded-lg">
+            <UIcon
+              name="i-heroicons-chart-bar"
+              class="w-5 h-5 text-emerald-400"
+            />
+          </div>
+          <div>
+            <p class="text-sm text-zinc-400">Tailoring Score</p>
+            <p class="text-lg font-semibold text-emerald-400">{{ formattedScore }}%</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Content Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Left: Job Description -->
+        <div class="bg-zinc-900 rounded-xl border border-zinc-800 p-6">
+          <div class="flex items-center gap-2 mb-4">
+            <UIcon
+              name="i-heroicons-briefcase"
+              class="w-5 h-5 text-emerald-400"
+            />
+            <h2 class="text-lg font-semibold text-zinc-100">Job Description</h2>
+          </div>
+          <div class="prose prose-invert prose-sm max-w-none">
+            <pre class="whitespace-pre-wrap text-zinc-300 text-sm leading-relaxed font-mono bg-zinc-950 p-4 rounded-lg overflow-auto max-h-125">{{ resume.job_description || 'No job description available.' }}</pre>
+          </div>
+          <div
+            v-if="resume.job_url"
+            class="mt-4 pt-4 border-t border-zinc-800"
+          >
+            <a
+              :href="resume.job_url"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-sm text-emerald-400 hover:text-emerald-300 flex items-center gap-1"
+            >
+              <UIcon
+                name="i-heroicons-link"
+                class="w-4 h-4"
+              />
+              View Original Posting
+            </a>
+          </div>
+        </div>
+
+        <!-- Right: Generated Content -->
+        <div class="bg-zinc-900 rounded-xl border border-zinc-800 p-6">
+          <div class="flex items-center gap-2 mb-4">
+            <UIcon
+              name="i-heroicons-document-text"
+              class="w-5 h-5 text-emerald-400"
+            />
+            <h2 class="text-lg font-semibold text-zinc-100">Generated Resume</h2>
+          </div>
+
+          <!-- Generated Content Display -->
+          <div
+            v-if="resume.generated_content"
+            class="prose prose-invert prose-sm max-w-none"
+          >
+            <pre class="whitespace-pre-wrap text-zinc-300 text-sm leading-relaxed font-mono bg-zinc-950 p-4 rounded-lg overflow-auto max-h-125">{{ resume.generated_content }}</pre>
+          </div>
+          <div
+            v-else
+            class="text-center py-8"
+          >
+            <UIcon
+              name="i-heroicons-document"
+              class="w-12 h-12 text-zinc-600 mx-auto mb-4"
+            />
+            <p class="text-zinc-400">No content generated yet.</p>
+            <UButton
+              variant="soft"
+              color="primary"
+              size="sm"
+              icon="i-heroicons-sparkles"
+              class="mt-4"
+              :loading="isRetailoring"
+              @click="retailorResume"
+            >
+              Generate Content
+            </UButton>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notes Section -->
+      <div class="mt-6 bg-zinc-900 rounded-xl border border-zinc-800 p-6">
+        <div class="flex items-center gap-2 mb-4">
+          <UIcon
+            name="i-heroicons-pencil-square"
+            class="w-5 h-5 text-emerald-400"
+          />
+          <h2 class="text-lg font-semibold text-zinc-100">Notes</h2>
+        </div>
+        <UTextarea
+          v-model="notes"
+          :rows="3"
+          placeholder="Add notes about this resume..."
+          class="w-full"
+        />
+        <p class="mt-2 text-xs text-zinc-500">
+          Notes are saved when you update the resume status.
+        </p>
+      </div>
+
+      <!-- Metadata Footer -->
+      <div class="mt-6 p-4 bg-zinc-900/50 rounded-xl border border-zinc-800/50 text-sm text-zinc-500">
+        <div class="flex flex-wrap gap-6">
+          <span>Created: {{ formattedDate }}</span>
+          <span v-if="resume.updated_at !== resume.created_at">Updated: {{ formattedUpdatedDate }}</span>
+          <span>ID: {{ resume.id }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <UModal v-model:open="showDeleteModal">
+      <template #content>
+        <div class="p-6">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="p-2 bg-red-500/10 rounded-full">
+              <UIcon
+                name="i-heroicons-exclamation-triangle"
+                class="w-6 h-6 text-red-400"
+              />
+            </div>
+            <h3 class="text-lg font-semibold text-zinc-100">Delete Resume</h3>
+          </div>
+
+          <p class="text-zinc-400 mb-6">
+            Are you sure you want to delete this resume? This action cannot be undone.
+          </p>
+
+          <div class="flex justify-end gap-3">
+            <UButton
+              variant="ghost"
+              color="neutral"
+              @click="showDeleteModal = false"
+            >
+              Cancel
+            </UButton>
+            <UButton
+              variant="solid"
+              color="error"
+              :loading="isDeleting"
+              @click="deleteResume"
+            >
+              Delete Resume
+            </UButton>
+          </div>
+        </div>
+      </template>
+    </UModal>
+  </div>
+</template>

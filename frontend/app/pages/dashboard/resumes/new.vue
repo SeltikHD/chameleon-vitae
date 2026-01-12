@@ -3,7 +3,9 @@
     <!-- Header -->
     <div class="text-center">
       <h1 class="text-2xl font-bold text-zinc-100">Create New Resume</h1>
-      <p class="mt-2 text-zinc-400">Paste a job description to generate a tailored resume.</p>
+      <p class="mt-2 text-zinc-400">
+        Enter a job posting URL to automatically fetch and generate a tailored resume.
+      </p>
     </div>
 
     <!-- Steps Indicator -->
@@ -46,46 +48,89 @@
 
       <form
         class="space-y-4"
-        @submit.prevent="goToTemplate"
+        @submit.prevent="handleSubmitJobDetails"
       >
+        <!-- Job URL (Required) -->
+        <UFormField
+          label="Job URL"
+          name="jobUrl"
+          required
+          :error="urlError"
+        >
+          <div class="flex gap-2">
+            <UInput
+              v-model="form.jobUrl"
+              placeholder="https://linkedin.com/jobs/view/12345"
+              icon="i-lucide-link"
+              class="flex-1"
+              :disabled="isParsing"
+              @blur="handleUrlBlur"
+            />
+            <UButton
+              type="button"
+              color="neutral"
+              variant="outline"
+              :loading="isParsing"
+              :disabled="!form.jobUrl || isParsing"
+              @click="parseJobUrl"
+            >
+              <UIcon
+                v-if="!isParsing"
+                name="i-lucide-download"
+                class="mr-1 h-4 w-4"
+              />
+              {{ isParsing ? 'Fetching...' : 'Fetch' }}
+            </UButton>
+          </div>
+          <template #hint>
+            <span class="text-xs text-zinc-500">
+              Enter a job posting URL and click Fetch to auto-fill the description.
+            </span>
+          </template>
+        </UFormField>
+
+        <!-- Additional Info (Optional, shown after parsing) -->
+        <div
+          v-if="parsedJobTitle"
+          class="rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-4"
+        >
+          <div class="flex items-center gap-2">
+            <UIcon
+              name="i-lucide-check-circle"
+              class="h-5 w-5 text-emerald-400"
+            />
+            <span class="font-medium text-emerald-400">Job Parsed Successfully</span>
+          </div>
+          <p class="mt-1 text-sm text-zinc-300">{{ parsedJobTitle }}</p>
+        </div>
+
         <div class="grid gap-4 sm:grid-cols-2">
           <UFormField
-            label="Company Name"
+            label="Company Name (Optional)"
             name="companyName"
           >
             <UInput
               v-model="form.companyName"
               placeholder="e.g. Google, Microsoft..."
               icon="i-lucide-building-2"
-              :disabled="isCreating"
+              :disabled="isParsing"
             />
           </UFormField>
 
           <UFormField
-            label="Job Title"
+            label="Job Title (Optional)"
             name="jobTitle"
           >
             <UInput
               v-model="form.jobTitle"
               placeholder="e.g. Senior Software Engineer"
               icon="i-lucide-briefcase"
-              :disabled="isCreating"
+              :disabled="isParsing"
             />
           </UFormField>
         </div>
 
-        <UFormField
-          label="Job URL (optional)"
-          name="jobUrl"
-        >
-          <UInput
-            v-model="form.jobUrl"
-            placeholder="https://careers.example.com/job/123"
-            icon="i-lucide-link"
-            :disabled="isCreating"
-          />
-        </UFormField>
-
+        <!-- Job Description (Large, Required) -->
         <UFormField
           label="Job Description"
           name="description"
@@ -93,21 +138,27 @@
         >
           <UTextarea
             v-model="form.description"
-            :rows="10"
-            placeholder="Paste the full job description here..."
-            :disabled="isCreating"
+            :rows="12"
+            class="font-mono text-sm"
+            placeholder="The job description will appear here after fetching from the URL..."
+            :disabled="isParsing"
           />
+          <template #hint>
+            <span class="text-xs text-zinc-500">
+              {{ form.description.length }} characters
+            </span>
+          </template>
         </UFormField>
 
-        <div class="flex justify-end">
+        <div class="flex justify-end pt-4">
           <UButton
             type="submit"
             color="primary"
-            :disabled="!form.description"
+            :disabled="!canGenerate"
           >
-            Continue
+            Generate Resume
             <UIcon
-              name="i-lucide-arrow-right"
+              name="i-lucide-sparkles"
               class="ml-2 h-4 w-4"
             />
           </UButton>
@@ -115,76 +166,8 @@
       </form>
     </UCard>
 
-    <!-- Step 2: Template Selection -->
+    <!-- Step 2: Generating -->
     <UCard v-if="currentStep === 1">
-      <template #header>
-        <h2 class="font-semibold text-zinc-100">Select Template</h2>
-      </template>
-
-      <div class="space-y-6">
-        <!-- Job Summary -->
-        <div class="rounded-lg border border-zinc-800 bg-zinc-900/50 p-4">
-          <div class="flex items-center gap-3">
-            <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-zinc-800">
-              <UIcon
-                name="i-lucide-building-2"
-                class="h-5 w-5 text-emerald-400"
-              />
-            </div>
-            <div>
-              <p class="font-medium text-zinc-100">
-                {{ form.companyName || 'Company' }} - {{ form.jobTitle || 'Position' }}
-              </p>
-              <p class="text-sm text-zinc-400">
-                {{ form.description.slice(0, 100) }}{{ form.description.length > 100 ? '...' : '' }}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Template Selection -->
-        <div>
-          <h3 class="mb-3 text-sm font-medium text-zinc-400">Choose a Template</h3>
-          <USelectMenu
-            v-model="selectedTemplateId"
-            :items="templateOptions"
-            value-key="value"
-            placeholder="Select a template"
-            class="w-full"
-          />
-        </div>
-
-        <div class="flex justify-between pt-4">
-          <UButton
-            color="neutral"
-            variant="ghost"
-            @click="currentStep = 0"
-          >
-            <UIcon
-              name="i-lucide-arrow-left"
-              class="mr-2 h-4 w-4"
-            />
-            Back
-          </UButton>
-          <UButton
-            color="primary"
-            :disabled="!selectedTemplateId || isGenerating"
-            :loading="isGenerating"
-            @click="generateResume"
-          >
-            {{ isGenerating ? 'Generating...' : 'Generate Resume' }}
-            <UIcon
-              v-if="!isGenerating"
-              name="i-lucide-sparkles"
-              class="ml-2 h-4 w-4"
-            />
-          </UButton>
-        </div>
-      </div>
-    </UCard>
-
-    <!-- Step 3: Generating -->
-    <UCard v-if="currentStep === 2">
       <div class="flex flex-col items-center py-12">
         <div class="relative">
           <div class="h-20 w-20 animate-pulse rounded-full bg-emerald-500/20" />
@@ -201,7 +184,7 @@
         <div class="mt-6 w-full max-w-xs">
           <div class="flex justify-between text-sm text-zinc-400">
             <span>Progress</span>
-            <span>{{ generationProgress }}%</span>
+            <span>{{ formattedProgress }}%</span>
           </div>
           <div class="mt-2 h-2 overflow-hidden rounded-full bg-zinc-800">
             <div
@@ -237,7 +220,12 @@
 
 <script setup lang="ts">
 import { apiFetch } from '~/composables/useApiFetch'
-import type { ResumeResponse, CreateResumeRequest } from '~/types/api'
+import type {
+  ResumeResponse,
+  CreateResumeRequest,
+  ParseJobURLRequest,
+  ParseJobURLResponse
+} from '~/types/api'
 
 definePageMeta({
   layout: 'dashboard'
@@ -246,20 +234,23 @@ definePageMeta({
 const router = useRouter()
 const toast = useToast()
 
+// State
 const currentStep = ref(0)
-const isCreating = ref(false)
+const isParsing = ref(false)
 const isGenerating = ref(false)
 const generationProgress = ref(0)
 const generationError = ref<string | null>(null)
-const selectedTemplateId = ref('')
+const urlError = ref<string | null>(null)
+const parsedJobTitle = ref<string | null>(null)
 const createdResumeId = ref<string | null>(null)
 
+// Steps - simplified to 2 steps (removed template selection)
 const steps = [
-  { id: 'description', label: 'Job Details' },
-  { id: 'template', label: 'Template' },
+  { id: 'details', label: 'Job Details' },
   { id: 'generate', label: 'Generate' }
 ]
 
+// Form data
 const form = reactive({
   jobUrl: '',
   description: '',
@@ -267,21 +258,24 @@ const form = reactive({
   jobTitle: ''
 })
 
-// Template options (these would come from API in production)
-const templateOptions = ref([
-  { label: 'Modern Professional', value: 'template-modern' },
-  { label: 'Classic Traditional', value: 'template-classic' },
-  { label: 'Minimalist', value: 'template-minimal' },
-  { label: 'Creative', value: 'template-creative' }
-])
+// Computed
+const canGenerate = computed(() => {
+  return form.jobUrl.trim().length > 0 && form.description.trim().length > 0
+})
+
+const formattedProgress = computed(() => {
+  return generationProgress.value.toFixed(2)
+})
 
 const generationStatusText = computed(() => {
-  if (generationProgress.value < 30) return 'Creating resume draft...'
-  if (generationProgress.value < 60) return 'Selecting the best experience bullets...'
-  if (generationProgress.value < 90) return 'Tailoring content for maximum impact...'
+  if (generationProgress.value < 25) return 'Creating resume draft...'
+  if (generationProgress.value < 50) return 'Analyzing job requirements...'
+  if (generationProgress.value < 75) return 'Selecting the best experience bullets...'
+  if (generationProgress.value < 95) return 'Tailoring content for maximum impact...'
   return 'Finalizing your resume...'
 })
 
+// Methods
 function getStepClasses(index: number) {
   if (currentStep.value > index) {
     return 'bg-emerald-500 text-zinc-950'
@@ -292,17 +286,100 @@ function getStepClasses(index: number) {
   return 'bg-zinc-800 text-zinc-500'
 }
 
-function goToTemplate() {
-  if (!form.description.trim()) return
-  currentStep.value = 1
+/**
+ * Handle URL input blur - auto-parse if URL is valid.
+ */
+async function handleUrlBlur() {
+  if (form.jobUrl && !form.description) {
+    await parseJobUrl()
+  }
 }
 
-async function generateResume() {
-  if (!selectedTemplateId.value) return
+/**
+ * Parse job URL using the backend tools endpoint.
+ */
+async function parseJobUrl() {
+  if (!form.jobUrl.trim()) {
+    urlError.value = 'Please enter a valid job URL'
+    return
+  }
 
+  // Basic URL validation
+  try {
+    new URL(form.jobUrl)
+  } catch {
+    urlError.value = 'Please enter a valid URL'
+    return
+  }
+
+  urlError.value = null
+  isParsing.value = true
+  parsedJobTitle.value = null
+
+  try {
+    const request: ParseJobURLRequest = {
+      url: form.jobUrl.trim()
+    }
+
+    const response = await apiFetch<ParseJobURLResponse>('/tools/parse-job', {
+      method: 'POST',
+      body: request
+    })
+
+    // Fill the form with parsed data
+    form.description = response.markdown || ''
+    parsedJobTitle.value = response.title || 'Job description fetched'
+
+    // Try to extract company/title from the parsed title
+    if (response.title) {
+      // Common patterns: "Title at Company", "Title - Company", etc.
+      const atMatch = response.title.match(/^(.+?)\s+at\s+(.+)$/i)
+      const dashMatch = response.title.match(/^(.+?)\s*[-|]\s*(.+)$/i)
+
+      if (atMatch) {
+        form.jobTitle = form.jobTitle || atMatch[1]?.trim() || ''
+        form.companyName = form.companyName || atMatch[2]?.trim() || ''
+      } else if (dashMatch) {
+        form.jobTitle = form.jobTitle || dashMatch[1]?.trim() || ''
+        form.companyName = form.companyName || dashMatch[2]?.trim() || ''
+      }
+    }
+
+    toast.add({
+      title: 'Job Fetched',
+      description: 'The job description has been loaded successfully.',
+      color: 'success',
+      icon: 'i-heroicons-check-circle'
+    })
+  } catch (error) {
+    console.error('[NewResume] Failed to parse job URL:', error)
+    urlError.value = error instanceof Error ? error.message : 'Failed to fetch job posting'
+    toast.add({
+      title: 'Fetch Failed',
+      description: 'Could not fetch the job posting. Please paste the description manually.',
+      color: 'warning',
+      icon: 'i-heroicons-exclamation-triangle'
+    })
+  } finally {
+    isParsing.value = false
+  }
+}
+
+/**
+ * Handle form submission - go directly to generation.
+ */
+function handleSubmitJobDetails() {
+  if (!canGenerate.value) return
+  generateResume()
+}
+
+/**
+ * Generate the resume.
+ */
+async function generateResume() {
   isGenerating.value = true
   generationError.value = null
-  currentStep.value = 2
+  currentStep.value = 1
   generationProgress.value = 0
 
   try {
@@ -359,17 +436,20 @@ async function generateResume() {
   }
 }
 
+/**
+ * Simulate progress for better UX.
+ */
 async function simulateProgress() {
   return new Promise<void>((resolve) => {
     const interval = setInterval(() => {
       if (generationProgress.value < 85) {
-        generationProgress.value += Math.random() * 15
+        generationProgress.value += Math.random() * 12
       }
       if (generationProgress.value >= 85) {
         clearInterval(interval)
         resolve()
       }
-    }, 500)
+    }, 400)
   })
 }
 </script>
