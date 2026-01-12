@@ -16,9 +16,8 @@ import (
 )
 
 const (
-	baseURL            = "https://api.groq.com/openai/v1"
-	defaultMaxTokens   = 4096
-	defaultTemperature = 0.7
+	baseURL          = "https://api.groq.com/openai/v1"
+	defaultMaxTokens = 4096
 )
 
 // Config holds Groq API configuration.
@@ -43,7 +42,7 @@ type Config struct {
 func DefaultConfig() Config {
 	return Config{
 		ModelGeneration: "llama-3.3-70b-versatile",
-		ModelAnalysis:   "llama-4-scout-17b-16e-instruct",
+		ModelAnalysis:   "meta-llama/llama-4-scout-17b-16e-instruct",
 		MaxRetries:      3,
 		Timeout:         60 * time.Second,
 	}
@@ -264,7 +263,7 @@ func (c *Client) GenerateSummary(ctx context.Context, req ports.GenerateSummaryR
 
 	var bulletsContext strings.Builder
 	for _, bullet := range req.SelectedBullets {
-		bulletsContext.WriteString(fmt.Sprintf("- %s\n", bullet.Content))
+		fmt.Fprintf(&bulletsContext, "- %s\n", bullet.Content)
 	}
 
 	prompt := fmt.Sprintf(`Generate a professional summary for a resume application.
@@ -330,17 +329,17 @@ func (c *Client) ScoreMatch(ctx context.Context, req ports.ScoreMatchRequest) (*
 	// Build skills list.
 	var skillsList strings.Builder
 	for _, skill := range req.UserSkills {
-		skillsList.WriteString(fmt.Sprintf("- %s (proficiency: %d%%)\n", skill.Name, skill.ProficiencyLevel.Int()))
+		fmt.Fprintf(&skillsList, "- %s (proficiency: %d%%)\n", skill.Name, skill.ProficiencyLevel.Int())
 	}
 
 	// Build experiences from resume content.
 	var experiencesText strings.Builder
 	if req.Resume != nil {
-		experiencesText.WriteString(fmt.Sprintf("Summary: %s\n\n", req.Resume.Summary))
+		fmt.Fprintf(&experiencesText, "Summary: %s\n\n", req.Resume.Summary)
 		for _, exp := range req.Resume.Experiences {
-			experiencesText.WriteString(fmt.Sprintf("%s at %s:\n", exp.Title, exp.Organization))
+			fmt.Fprintf(&experiencesText, "%s at %s:\n", exp.Title, exp.Organization)
 			for _, bullet := range exp.Bullets {
-				experiencesText.WriteString(fmt.Sprintf("  - %s\n", bullet.TailoredContent))
+				fmt.Fprintf(&experiencesText, "  - %s\n", bullet.TailoredContent)
 			}
 		}
 	}
