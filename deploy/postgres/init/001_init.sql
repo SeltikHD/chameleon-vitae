@@ -143,6 +143,68 @@ CREATE TABLE IF NOT EXISTS resumes (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+
+-- Represents formal education entries (universities, colleges, certifications).
+-- Ordered by display_order for custom sorting, defaults to reverse chronological.
+CREATE TABLE IF NOT EXISTS education (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    -- Institution details
+    institution VARCHAR(255) NOT NULL,
+    degree VARCHAR(255) NOT NULL,
+    field_of_study VARCHAR(255),
+    location VARCHAR(255),
+    -- Date range
+    start_date DATE,
+    end_date DATE,  -- NULL means "Present" or "Expected"
+    -- Optional metadata
+    gpa VARCHAR(20),  -- e.g., "3.8/4.0" or "First Class Honours"
+    honors TEXT[],    -- e.g., {"Dean's List", "Summa Cum Laude"}
+    -- Display order (lower = higher priority)
+    display_order INTEGER NOT NULL DEFAULT 0,
+    -- Timestamps
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+);
+
+-- Represents side projects, open-source contributions, and personal work.
+-- Each project can have multiple bullets (achievements/features).
+CREATE TABLE IF NOT EXISTS projects (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    -- Project details
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    -- Tech stack as array for easy querying and display
+    -- e.g., {"Python", "Flask", "React", "PostgreSQL", "Docker"}
+    tech_stack TEXT[] NOT NULL DEFAULT '{}',
+    -- Links
+    url VARCHAR(500),           -- Project URL (GitHub, live demo, etc.)
+    repository_url VARCHAR(500), -- Source code URL if different
+    -- Date range
+    start_date DATE,
+    end_date DATE,  -- NULL means "Present" or ongoing
+    -- Display order (lower = higher priority)
+    display_order INTEGER NOT NULL DEFAULT 0,
+    -- Timestamps
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+);
+
+-- Atomic achievement/feature bullets for projects.
+-- Similar to experience bullets but tied to projects.
+CREATE TABLE IF NOT EXISTS project_bullets (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    project_id UUID NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+    -- The actual bullet content
+    content TEXT NOT NULL,
+    -- Display order within the project
+    display_order INTEGER NOT NULL DEFAULT 0,
+    -- Timestamps
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+);
+
 -- ============================================================================
 -- Indexes
 -- ============================================================================
@@ -160,6 +222,13 @@ CREATE INDEX IF NOT EXISTS idx_skills_category ON skills(category);
 CREATE INDEX IF NOT EXISTS idx_spoken_languages_user_id ON spoken_languages(user_id);
 CREATE INDEX IF NOT EXISTS idx_resumes_user_id ON resumes(user_id);
 CREATE INDEX IF NOT EXISTS idx_resumes_status ON resumes(status);
+CREATE INDEX IF NOT EXISTS idx_education_user_id ON education(user_id);
+CREATE INDEX IF NOT EXISTS idx_education_user_order ON education(user_id, display_order);
+CREATE INDEX IF NOT EXISTS idx_projects_user_id ON projects(user_id);
+CREATE INDEX IF NOT EXISTS idx_projects_user_order ON projects(user_id, display_order);
+CREATE INDEX IF NOT EXISTS idx_projects_tech_stack ON projects USING GIN(tech_stack);
+CREATE INDEX IF NOT EXISTS idx_project_bullets_project_id ON project_bullets(project_id);
+CREATE INDEX IF NOT EXISTS idx_project_bullets_project_order ON project_bullets(project_id, display_order);
 CREATE UNIQUE INDEX idx_skills_user_name_unique ON skills (user_id, LOWER(name));
 
 -- ============================================================================
@@ -194,6 +263,21 @@ CREATE TRIGGER update_resumes_updated_at
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
 
+CREATE TRIGGER update_education_updated_at
+    BEFORE UPDATE ON education
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_projects_updated_at
+    BEFORE UPDATE ON projects
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_project_bullets_updated_at
+    BEFORE UPDATE ON project_bullets
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at_column();
+
 -- ============================================================================
 -- Comments
 -- ============================================================================
@@ -221,3 +305,12 @@ COMMENT ON TABLE spoken_languages IS 'Natural languages spoken by the user';
 COMMENT ON TABLE resumes IS 'Generated resumes tailored to specific job applications';
 COMMENT ON COLUMN resumes.score IS 'AI-calculated match score with job description (0-100)';
 COMMENT ON COLUMN resumes.target_language IS 'Language for resume generation (e.g., en, pt-br)';
+
+COMMENT ON TABLE education IS 'Formal education entries for resume generation (ADR-012)';
+COMMENT ON TABLE projects IS 'Side projects and personal work for resume generation (ADR-012)';
+COMMENT ON TABLE project_bullets IS 'Achievement bullets for projects, similar to experience bullets';
+
+COMMENT ON COLUMN education.display_order IS 'Custom sort order; lower values appear first';
+COMMENT ON COLUMN education.honors IS 'Array of honors/awards (e.g., Dean''s List, Cum Laude)';
+COMMENT ON COLUMN projects.tech_stack IS 'Array of technologies used (e.g., Python, React, Docker)';
+COMMENT ON COLUMN projects.display_order IS 'Custom sort order; lower values appear first';
