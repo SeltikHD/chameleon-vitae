@@ -161,6 +161,7 @@ const navItems = [
   { to: '/dashboard/experiences', icon: 'i-lucide-briefcase', label: 'Experiences' },
   { to: '/dashboard/projects', icon: 'i-lucide-folder-open', label: 'Projects' },
   { to: '/dashboard/skills', icon: 'i-lucide-tags', label: 'Skills' },
+  { to: '/dashboard/languages', icon: 'i-lucide-languages', label: 'Languages' },
   { to: '/dashboard/profile', icon: 'i-lucide-user', label: 'Profile' }
 ]
 
@@ -183,6 +184,7 @@ const pageTitle = computed(() => {
     '/dashboard/experiences': 'Experiences',
     '/dashboard/projects': 'Projects',
     '/dashboard/skills': 'Skills',
+    '/dashboard/languages': 'Languages',
     '/dashboard/profile': 'Profile'
   }
 
