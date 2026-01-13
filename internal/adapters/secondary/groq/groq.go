@@ -218,9 +218,16 @@ GUIDELINES:
 5. Keep it concise (1-2 lines max)
 6. Write in %s style
 
+SMART BOLDING (REQUIRED):
+Apply **bold** markdown syntax to highlight:
+- Technical skills and technologies (e.g., **Python**, **AWS**, **React**)
+- Quantifiable metrics and numbers (e.g., **40%%**, **3x faster**, **$2M**)
+- Key achievements and impact words (e.g., **led**, **architected**, **reduced**)
+Use sparingly - maximum 3-4 bold terms per bullet to maintain readability.
+
 Respond with JSON:
 {
-  "tailored_content": "the rewritten bullet",
+  "tailored_content": "the rewritten bullet with **bold** keywords",
   "keywords": ["matched", "keywords", "used"]
 }
 
@@ -289,9 +296,17 @@ Write a compelling 3-4 sentence professional summary that:
 4. Uses confident, professional language
 5. Is written in %s
 
+SMART BOLDING (REQUIRED):
+Apply **bold** markdown syntax to highlight:
+- Years of experience (e.g., **7+ years**)
+- Key technical domains (e.g., **distributed systems**, **machine learning**)
+- Core competencies (e.g., **architecting**, **scaling**, **leading teams**)
+- Notable achievements or metrics (e.g., **Fortune 500**, **$10M revenue**)
+Use sparingly - maximum 4-6 bold terms in the summary to maintain readability.
+
 Respond with JSON:
 {
-  "summary": "the generated professional summary"
+  "summary": "the generated professional summary with **bold** highlights"
 }
 
 Respond ONLY with valid JSON.`,

@@ -276,6 +276,17 @@ func (t *JakeResumeTemplate) renderHead(data ResumeTemplateData) string {
             font-size: 10pt;
         }
 
+        .project-link {
+            font-size: 9pt;
+            color: #0066cc;
+            text-decoration: none;
+            margin-left: 4pt;
+        }
+
+        .project-link:hover {
+            text-decoration: underline;
+        }
+
         .project-links {
             font-size: 9pt;
         }
@@ -415,7 +426,7 @@ func (t *JakeResumeTemplate) renderSummary(summary string, i18n *I18n) string {
 	sb.WriteString(`<section class="resume-section summary-section">`)
 	sb.WriteString(fmt.Sprintf(`<h2 class="section-title">%s</h2>`, html.EscapeString(i18n.T(KeyProfessionalSummary))))
 	sb.WriteString(`<p class="summary-text">`)
-	sb.WriteString(html.EscapeString(summary))
+	sb.WriteString(renderMarkdownBold(summary))
 	sb.WriteString(`</p>`)
 	sb.WriteString(`</section>`)
 	return sb.String()
@@ -504,7 +515,7 @@ func (t *JakeResumeTemplate) renderExperience(experiences []domain.TailoredExper
 				if content == "" {
 					content = bullet.OriginalContent
 				}
-				fmt.Fprintf(&sb, `<li>%s</li>`, html.EscapeString(content))
+				fmt.Fprintf(&sb, `<li>%s</li>`, renderMarkdownBold(content))
 			}
 			sb.WriteString(`</ul>`)
 		}
@@ -529,13 +540,22 @@ func (t *JakeResumeTemplate) renderProjects(projects []domain.Project, i18n *I18
 	for _, proj := range projects {
 		sb.WriteString(`<div class="resume-entry">`)
 
-		// Project header: Name | Tech Stack | Date
+		// Project header: Name | Tech Stack | Links | Date
 		sb.WriteString(`<div class="entry-header">`)
 		sb.WriteString(`<div class="project-header">`)
 		fmt.Fprintf(&sb, `<span class="project-name">%s</span>`, html.EscapeString(proj.Name))
 		if len(proj.TechStack) > 0 {
 			fmt.Fprintf(&sb, `<span class="project-tech">| %s</span>`,
 				html.EscapeString(strings.Join(proj.TechStack, ", ")))
+		}
+		// Discrete project links
+		if proj.RepositoryURL != nil && *proj.RepositoryURL != "" {
+			fmt.Fprintf(&sb, `<a href="%s" class="project-link">[Source]</a>`,
+				html.EscapeString(*proj.RepositoryURL))
+		}
+		if proj.URL != nil && *proj.URL != "" {
+			fmt.Fprintf(&sb, `<a href="%s" class="project-link">[Demo]</a>`,
+				html.EscapeString(*proj.URL))
 		}
 		sb.WriteString(`</div>`)
 		dateStr := formatProjectDateRangeLocalized(proj.StartDate, proj.EndDate, i18n)
@@ -548,7 +568,7 @@ func (t *JakeResumeTemplate) renderProjects(projects []domain.Project, i18n *I18
 		if len(proj.Bullets) > 0 {
 			sb.WriteString(`<ul class="entry-bullets">`)
 			for _, bullet := range proj.Bullets {
-				fmt.Fprintf(&sb, `<li>%s</li>`, html.EscapeString(bullet.Content))
+				fmt.Fprintf(&sb, `<li>%s</li>`, renderMarkdownBold(bullet.Content))
 			}
 			sb.WriteString(`</ul>`)
 		}
@@ -647,6 +667,37 @@ func (t *JakeResumeTemplate) renderLanguages(languages []domain.SpokenLanguage, 
 }
 
 // Helper functions
+
+// renderMarkdownBold converts markdown **bold** syntax to HTML <strong> tags.
+// It first escapes HTML in the input, then converts **text** to <strong>text</strong>.
+func renderMarkdownBold(text string) string {
+	// First escape HTML to prevent XSS
+	escaped := html.EscapeString(text)
+
+	// Replace **text** with <strong>text</strong>
+	// Use a simple state machine approach
+	var result strings.Builder
+	i := 0
+	for i < len(escaped) {
+		// Check for ** at current position
+		if i+1 < len(escaped) && escaped[i] == '*' && escaped[i+1] == '*' {
+			// Find closing **
+			closeIdx := strings.Index(escaped[i+2:], "**")
+			if closeIdx != -1 {
+				// Found matching **
+				boldContent := escaped[i+2 : i+2+closeIdx]
+				result.WriteString("<strong>")
+				result.WriteString(boldContent)
+				result.WriteString("</strong>")
+				i = i + 2 + closeIdx + 2 // Skip past closing **
+				continue
+			}
+		}
+		result.WriteByte(escaped[i])
+		i++
+	}
+	return result.String()
+}
 
 func extractURLDisplay(url, prefix string) string {
 	// Try to extract meaningful part from URL

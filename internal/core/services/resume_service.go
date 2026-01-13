@@ -409,7 +409,7 @@ func (s *ResumeService) GeneratePDF(ctx context.Context, req GeneratePDFRequest)
 	}
 
 	// Get projects with bullets.
-	projects, err := s.projectRepo.ListByUserID(ctx, resume.UserID)
+	projects, err := s.projectRepo.ListByUserIDWithBullets(ctx, resume.UserID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get projects: %w", err)
 	}
@@ -537,7 +537,7 @@ func (s *ResumeService) DownloadPDF(ctx context.Context, req DownloadPDFRequest)
 	}
 
 	// Get projects with bullets.
-	projects, err := s.projectRepo.ListByUserID(ctx, resume.UserID)
+	projects, err := s.projectRepo.ListByUserIDWithBullets(ctx, resume.UserID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get projects: %w", err)
 	}
