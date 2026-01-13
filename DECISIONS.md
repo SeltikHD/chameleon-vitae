@@ -704,6 +704,137 @@ Additional theme customizations are applied via Tailwind's `@theme` directive:
 
 ---
 
+## ADR-015: Jake's Resume Template and Domain Expansion
+
+**Date:** 2026-01-13  
+**Status:** Accepted
+
+### Decision
+
+1. **Adopt "Jake's Resume" Layout** as the standard PDF template — a single-page, dense, ATS-friendly format widely considered the gold standard for developer resumes.
+
+2. **Expand Domain Model** to include two new entities:
+   - **Education**: Formal education entries (institution, degree, dates, location)
+   - **Projects**: Side projects and personal work (name, tech stack, description, bullets)
+
+3. **Enforce Strict One-Page Policy**: The system must algorithmically adjust content to fit exactly one page through:
+   - CSS font-size scaling (11pt → 10pt → 9pt minimum)
+   - Dynamic section visibility (drop oldest Projects if overflow)
+   - Character/content estimation in Go
+
+### Context
+
+The previous resume template was a placeholder that didn't match industry expectations. Developer resumes in top tech companies follow a consistent format characterized by:
+
+- **Header**: Name (large), contact info in a single centered line (Phone | Email | LinkedIn | GitHub)
+- **Education Section**: Always first, institution/degree with location/dates aligned
+- **Experience Section**: Reverse chronological, role/company with location/dates, bullet points for achievements
+- **Projects Section**: Acts as a "buffer" — fills space for junior developers, drops for experienced ones
+- **Technical Skills**: Key-value format (Languages: X, Y, Z / Frameworks: A, B, C)
+
+The existing "Experiences" entity covers work history, but competitive resumes require explicit Education and Projects sections. The AI should **select** which bullets/projects appear, not rewrite or hallucinate content.
+
+### Consequences
+
+- **Positive:** Generated resumes will match recruiter expectations and pass ATS filters.
+- **Positive:** Users with limited experience can showcase projects; experienced users auto-prioritize work history.
+- **Positive:** Clean separation between Education, Experience, and Projects in the domain model.
+- **Negative:** Breaking changes in DB schema (new tables: `education`, `projects`).
+- **Negative:** Breaking changes in API contracts (new endpoints, updated resume payload).
+- **Negative:** Increased complexity in the PDF generation algorithm.
+- **Risks:** One-page enforcement may drop important content for users with extensive history. Mitigation: Clear UI feedback about what was included/excluded.
+
+### Technical Details
+
+**New Database Tables:**
+
+```sql
+CREATE TABLE education (
+    id UUID PRIMARY KEY,
+    user_id UUID REFERENCES users(id),
+    institution VARCHAR(255) NOT NULL,
+    degree VARCHAR(255) NOT NULL,
+    field_of_study VARCHAR(255),
+    location VARCHAR(255),
+    start_date DATE,
+    end_date DATE,
+    gpa VARCHAR(10),
+    display_order INTEGER DEFAULT 0,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE TABLE projects (
+    id UUID PRIMARY KEY,
+    user_id UUID REFERENCES users(id),
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    tech_stack TEXT[] NOT NULL DEFAULT '{}',
+    url VARCHAR(500),
+    start_date DATE,
+    end_date DATE,
+    display_order INTEGER DEFAULT 0,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE TABLE project_bullets (
+    id UUID PRIMARY KEY,
+    project_id UUID REFERENCES projects(id) ON DELETE CASCADE,
+    content TEXT NOT NULL,
+    display_order INTEGER DEFAULT 0,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+```
+
+**HTML Template Structure (Jake's Resume):**
+
+```html
+<!-- Header: Name + Contact Line -->
+<header class="resume-header">
+  <h1 class="resume-name">{{.User.Name}}</h1>
+  <p class="resume-contact">
+    {{.User.Phone}} | {{.User.Email}} | {{.User.LinkedIn}} | {{.User.GitHub}}
+  </p>
+</header>
+
+<!-- Section 1: Education (Always First) -->
+<section class="resume-section">
+  <h2>Education</h2>
+  {{range .Education}}
+  <div class="resume-entry">
+    <div class="entry-header">
+      <span class="entry-title">{{.Institution}}</span>
+      <span class="entry-date">{{.Location}}</span>
+    </div>
+    <div class="entry-subheader">
+      <span class="entry-subtitle">{{.Degree}}</span>
+      <span class="entry-date">{{.DateRange}}</span>
+    </div>
+  </div>
+  {{end}}
+</section>
+
+<!-- Section 2: Experience -->
+<!-- Section 3: Projects (Buffer/Optional) -->
+<!-- Section 4: Technical Skills (Key: Value format) -->
+```
+
+**One-Page Algorithm:**
+
+1. Render at 11pt base font
+2. Estimate content height (character count × line height)
+3. If overflow: scale to 10pt, then 9pt
+4. If still overflow: remove oldest Project entries
+5. If still overflow: truncate Experience bullets (last ones first)
+
+### References
+
+- [Jake's Resume LaTeX Template](https://github.com/jakegut/resume)
+- [Overleaf Template](https://www.overleaf.com/latex/templates/jakes-resume/syzfjbzwjncs)
+
+---
+
 ## Template for New ADRs
 
 ```markdown
