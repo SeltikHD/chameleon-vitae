@@ -229,10 +229,13 @@ export async function apiFetch<T>(endpoint: string, options: ApiFetchOptions = {
     responseType = 'json'
   } = options
 
-  // Build headers.
-  const headers: Record<string, string> = customHeaders
-    ? { 'Content-Type': 'application/json', ...customHeaders }
-    : { 'Content-Type': 'application/json' }
+  // Build headers - only set Content-Type for JSON requests with body.
+  const headers: Record<string, string> = customHeaders ? { ...customHeaders } : {}
+
+  // Only add Content-Type: application/json for requests that send JSON body.
+  if (body && responseType === 'json') {
+    headers['Content-Type'] = 'application/json'
+  }
 
   if (!skipAuth) {
     let token = authStore.idToken
