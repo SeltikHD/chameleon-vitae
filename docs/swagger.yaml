@@ -1434,7 +1434,7 @@ paths:
       - resumes
   /v1/resumes/{resumeID}/pdf:
     get:
-      description: Generates a PDF file of the resume using the selected template
+      description: Generates and downloads a PDF file of the resume
       parameters:
       - description: Resume ID
         in: path
@@ -1447,12 +1447,12 @@ paths:
         name: template
         type: string
       produces:
-      - application/json
+      - application/pdf
       responses:
         "200":
-          description: OK
+          description: PDF file
           schema:
-            $ref: '#/definitions/internal_adapters_primary_http.ResumeResponse'
+            type: file
         "401":
           description: Unauthorized
           schema:

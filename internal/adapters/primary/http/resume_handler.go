@@ -2,6 +2,7 @@ package http
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -337,13 +338,17 @@ func (h *ResumeHandler) UpdateStatus(w http.ResponseWriter, r *http.Request) {
 // GeneratePDF generates a PDF of the resume.
 //
 //	@Summary		Generate PDF
-//	@Description	Generates a PDF file of the resume using the selected template
+//
+// GeneratePDF generates and returns a PDF file of the resume.
+//
+//	@Summary		Generate PDF
+//	@Description	Generates and downloads a PDF file of the resume
 //	@Tags			resumes
-//	@Produce		json
+//	@Produce		application/pdf
 //	@Security		BearerAuth
 //	@Param			resumeID	path		string	true	"Resume ID"
 //	@Param			template	query		string	false	"Template name"	default(modern)
-//	@Success		200			{object}	ResumeResponse
+//	@Success		200			{file}		binary	"PDF file"
 //	@Failure		401			{object}	ErrorResponse	"Unauthorized"
 //	@Failure		404			{object}	ErrorResponse	"Resume not found"
 //	@Failure		422			{object}	ErrorResponse	"Resume not ready for PDF"
@@ -382,12 +387,12 @@ func (h *ResumeHandler) GeneratePDF(w http.ResponseWriter, r *http.Request) {
 		template = "modern"
 	}
 
-	pdfReq := services.GeneratePDFRequest{
+	pdfReq := services.DownloadPDFRequest{
 		ResumeID:     resumeID,
 		TemplateName: template,
 	}
 
-	resume, err := h.resumeService.GeneratePDF(r.Context(), pdfReq)
+	result, err := h.resumeService.DownloadPDF(r.Context(), pdfReq)
 	if err != nil {
 		if errors.Is(err, domain.ErrResumeNotReady) {
 			respondError(w, http.StatusUnprocessableEntity, "RESUME_NOT_READY", "Resume content must be generated before PDF")
@@ -398,8 +403,18 @@ func (h *ResumeHandler) GeneratePDF(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response := mapResumeToResponse(resume)
-	respondJSON(w, http.StatusOK, response)
+	// Set headers for binary PDF download.
+	w.Header().Set("Content-Type", result.ContentType)
+	w.Header().Set("Content-Disposition", "attachment; filename=\""+result.Filename+"\"")
+	w.Header().Set("Content-Length", fmt.Sprintf("%d", len(result.Content)))
+	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
+	w.WriteHeader(http.StatusOK)
+
+	// Write raw PDF bytes directly to the response.
+	_, writeErr := w.Write(result.Content)
+	if writeErr != nil {
+		log.Error().Err(writeErr).Str("resume_id", resumeID).Msg("Failed to write PDF response")
+	}
 }
 
 // Delete removes a resume.

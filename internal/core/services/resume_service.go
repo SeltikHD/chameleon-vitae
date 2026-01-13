@@ -439,6 +439,115 @@ func (s *ResumeService) GeneratePDF(ctx context.Context, req GeneratePDFRequest)
 	return resume, nil
 }
 
+// DownloadPDFRequest contains parameters for downloading a resume PDF.
+type DownloadPDFRequest struct {
+	ResumeID     string
+	TemplateName string
+}
+
+// DownloadPDFResult contains the result of downloading a PDF.
+type DownloadPDFResult struct {
+	Content     []byte
+	Filename    string
+	ContentType string
+}
+
+// DownloadPDF generates (if needed) and returns the PDF bytes for a resume.
+func (s *ResumeService) DownloadPDF(ctx context.Context, req DownloadPDFRequest) (*DownloadPDFResult, error) {
+	resume, err := s.resumeRepo.GetByID(ctx, req.ResumeID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get resume: %w", err)
+	}
+
+	if !resume.CanGeneratePDF() {
+		return nil, domain.ErrResumeNotReady
+	}
+
+	// Get user for filename generation.
+	user, err := s.userRepo.GetByID(ctx, resume.UserID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get user: %w", err)
+	}
+
+	// Check if PDF already exists.
+	filename := fmt.Sprintf("resumes/%s/%s.pdf", resume.UserID, resume.ID)
+
+	// Try to download existing PDF.
+	reader, err := s.fileStorage.Download(ctx, filename)
+	if err == nil && reader != nil {
+		defer reader.Close()
+		content, readErr := readAll(reader)
+		if readErr == nil && len(content) > 0 {
+			return &DownloadPDFResult{
+				Content:     content,
+				Filename:    s.generatePDFFilename(user, resume),
+				ContentType: "application/pdf",
+			}, nil
+		}
+	}
+
+	// PDF doesn't exist, generate it.
+	languages, err := s.languageRepo.ListByUserID(ctx, resume.UserID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get languages: %w", err)
+	}
+
+	html := s.buildResumeHTML(user, resume, languages)
+
+	templateName := req.TemplateName
+	if templateName == "" {
+		templateName = "default"
+	}
+
+	pdfResult, err := s.pdfEngine.GeneratePDF(ctx, ports.GeneratePDFRequest{
+		HTML:         html,
+		TemplateName: templateName,
+		Options:      ports.DefaultPDFOptions(),
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to generate PDF: %w", err)
+	}
+	defer pdfResult.Content.Close()
+
+	// Read PDF content.
+	pdfBytes, err := readAll(pdfResult.Content)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read PDF content: %w", err)
+	}
+
+	// Upload for caching (best effort, don't fail if upload fails).
+	go func() {
+		uploadCtx := context.Background()
+		_, uploadErr := s.fileStorage.Upload(uploadCtx, ports.UploadRequest{
+			Key:         filename,
+			Content:     newBytesReader(pdfBytes),
+			ContentType: "application/pdf",
+		})
+		if uploadErr != nil {
+			// Log but don't fail.
+			fmt.Printf("Warning: failed to cache PDF: %v\n", uploadErr)
+		}
+	}()
+
+	return &DownloadPDFResult{
+		Content:     pdfBytes,
+		Filename:    s.generatePDFFilename(user, resume),
+		ContentType: "application/pdf",
+	}, nil
+}
+
+// generatePDFFilename generates a descriptive filename for the PDF.
+func (s *ResumeService) generatePDFFilename(user *domain.User, resume *domain.Resume) string {
+	name := user.GetDisplayName()
+	if resume.CompanyName != nil && *resume.CompanyName != "" {
+		return fmt.Sprintf("%s_Resume_%s.pdf", sanitizeFilename(name), sanitizeFilename(*resume.CompanyName))
+	}
+	if resume.JobTitle != nil && *resume.JobTitle != "" {
+		return fmt.Sprintf("%s_Resume_%s.pdf", sanitizeFilename(name), sanitizeFilename(*resume.JobTitle))
+	}
+	return fmt.Sprintf("%s_Resume.pdf", sanitizeFilename(name))
+}
+
 // buildResumeHTML builds HTML from resume content.
 func (s *ResumeService) buildResumeHTML(user *domain.User, resume *domain.Resume, languages []domain.SpokenLanguage) string {
 	// This is a simplified HTML template.
@@ -616,4 +725,63 @@ func (s *ResumeService) DeleteResume(ctx context.Context, resumeID string) error
 	}
 
 	return nil
+}
+
+// Helper functions for PDF handling.
+
+// readAll reads all bytes from a reader.
+func readAll(r interface{ Read([]byte) (int, error) }) ([]byte, error) {
+	var buf []byte
+	chunk := make([]byte, 4096)
+	for {
+		n, err := r.Read(chunk)
+		if n > 0 {
+			buf = append(buf, chunk[:n]...)
+		}
+		if err != nil {
+			if err.Error() == "EOF" {
+				break
+			}
+			return buf, err
+		}
+	}
+	return buf, nil
+}
+
+// newBytesReader creates a reader from bytes.
+func newBytesReader(b []byte) *bytesReader {
+	return &bytesReader{data: b}
+}
+
+type bytesReader struct {
+	data   []byte
+	offset int
+}
+
+func (r *bytesReader) Read(p []byte) (int, error) {
+	if r.offset >= len(r.data) {
+		return 0, fmt.Errorf("EOF")
+	}
+	n := copy(p, r.data[r.offset:])
+	r.offset += n
+	return n, nil
+}
+
+// sanitizeFilename removes or replaces characters that are invalid in filenames.
+func sanitizeFilename(name string) string {
+	var result []byte
+	for i := 0; i < len(name); i++ {
+		c := name[i]
+		switch c {
+		case '/', '\\', ':', '*', '?', '"', '<', '>', '|':
+			result = append(result, '_')
+		case ' ':
+			result = append(result, '_')
+		default:
+			if c >= 32 && c < 127 {
+				result = append(result, c)
+			}
+		}
+	}
+	return string(result)
 }

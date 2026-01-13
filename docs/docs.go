@@ -1204,9 +1204,9 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Generates a PDF file of the resume using the selected template",
+                "description": "Generates and downloads a PDF file of the resume",
                 "produces": [
-                    "application/json"
+                    "application/pdf"
                 ],
                 "tags": [
                     "resumes"
@@ -1230,9 +1230,9 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "PDF file",
                         "schema": {
-                            "$ref": "#/definitions/internal_adapters_primary_http.ResumeResponse"
+                            "type": "file"
                         }
                     },
                     "401": {
