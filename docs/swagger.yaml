@@ -75,6 +75,40 @@ definitions:
           type: string
         type: array
     type: object
+  internal_adapters_primary_http.CreateEducationRequest:
+    properties:
+      degree:
+        example: Bachelor of Science
+        type: string
+      display_order:
+        example: 0
+        type: integer
+      end_date:
+        example: "2022-05-15"
+        type: string
+      field_of_study:
+        example: Computer Science
+        type: string
+      gpa:
+        example: 3.85/4.0
+        type: string
+      honors:
+        example:
+        - Magna Cum Laude
+        - Dean's List
+        items:
+          type: string
+        type: array
+      institution:
+        example: Massachusetts Institute of Technology
+        type: string
+      location:
+        example: Cambridge, MA
+        type: string
+      start_date:
+        example: "2018-09-01"
+        type: string
+    type: object
   internal_adapters_primary_http.CreateExperienceRequest:
     properties:
       description:
@@ -108,6 +142,54 @@ definitions:
         example: https://techcompany.com
         type: string
     type: object
+  internal_adapters_primary_http.CreateProjectBulletRequest:
+    properties:
+      content:
+        example: Implemented new feature
+        type: string
+      display_order:
+        example: 0
+        type: integer
+    type: object
+  internal_adapters_primary_http.CreateProjectRequest:
+    properties:
+      bullets:
+        example:
+        - Implemented feature X
+        - Optimized performance by 50%
+        items:
+          type: string
+        type: array
+      description:
+        example: AI-powered resume engineering tool
+        type: string
+      display_order:
+        example: 0
+        type: integer
+      end_date:
+        example: "2024-06-30"
+        type: string
+      name:
+        example: Chameleon Vitae
+        type: string
+      repository_url:
+        example: https://github.com/SeltikHD/chameleon-vitae
+        type: string
+      start_date:
+        example: "2024-01-01"
+        type: string
+      tech_stack:
+        example:
+        - Go
+        - Vue.js
+        - PostgreSQL
+        items:
+          type: string
+        type: array
+      url:
+        example: https://chameleon-vitae.dev
+        type: string
+    type: object
   internal_adapters_primary_http.CreateResumeRequest:
     properties:
       company_name:
@@ -136,6 +218,49 @@ definitions:
         type: string
       proficiency:
         example: native
+        type: string
+    type: object
+  internal_adapters_primary_http.EducationResponse:
+    properties:
+      created_at:
+        example: "2026-01-09T10:00:00Z"
+        type: string
+      degree:
+        example: Bachelor of Science
+        type: string
+      display_order:
+        example: 0
+        type: integer
+      end_date:
+        example: "2022-05-15"
+        type: string
+      field_of_study:
+        example: Computer Science
+        type: string
+      gpa:
+        example: 3.85/4.0
+        type: string
+      honors:
+        example:
+        - Magna Cum Laude
+        - Dean's List
+        items:
+          type: string
+        type: array
+      id:
+        example: 550e8400-e29b-41d4-a716-446655440000
+        type: string
+      institution:
+        example: Massachusetts Institute of Technology
+        type: string
+      location:
+        example: Cambridge, MA
+        type: string
+      start_date:
+        example: "2018-09-01"
+        type: string
+      updated_at:
+        example: "2026-01-09T10:00:00Z"
         type: string
     type: object
   internal_adapters_primary_http.ErrorBody:
@@ -223,6 +348,16 @@ definitions:
         example: healthy
         type: string
     type: object
+  internal_adapters_primary_http.ListEducationResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/internal_adapters_primary_http.EducationResponse'
+        type: array
+      total:
+        example: 2
+        type: integer
+    type: object
   internal_adapters_primary_http.ListExperiencesResponse:
     properties:
       data:
@@ -237,6 +372,16 @@ definitions:
         type: integer
       total:
         example: 15
+        type: integer
+    type: object
+  internal_adapters_primary_http.ListProjectsResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/internal_adapters_primary_http.ProjectResponse'
+        type: array
+      total:
+        example: 5
         type: integer
     type: object
   internal_adapters_primary_http.ListResumesResponse:
@@ -299,6 +444,69 @@ definitions:
         type: string
       url:
         example: https://linkedin.com/jobs/view/12345
+        type: string
+    type: object
+  internal_adapters_primary_http.ProjectBulletResponse:
+    properties:
+      content:
+        example: Implemented AI-driven bullet selection algorithm
+        type: string
+      created_at:
+        example: "2026-01-09T10:00:00Z"
+        type: string
+      display_order:
+        example: 0
+        type: integer
+      id:
+        example: 550e8400-e29b-41d4-a716-446655440000
+        type: string
+      project_id:
+        example: 550e8400-e29b-41d4-a716-446655440001
+        type: string
+    type: object
+  internal_adapters_primary_http.ProjectResponse:
+    properties:
+      bullets:
+        items:
+          $ref: '#/definitions/internal_adapters_primary_http.ProjectBulletResponse'
+        type: array
+      created_at:
+        example: "2026-01-09T10:00:00Z"
+        type: string
+      description:
+        example: AI-powered resume engineering tool
+        type: string
+      display_order:
+        example: 0
+        type: integer
+      end_date:
+        example: "2024-06-30"
+        type: string
+      id:
+        example: 550e8400-e29b-41d4-a716-446655440000
+        type: string
+      name:
+        example: Chameleon Vitae
+        type: string
+      repository_url:
+        example: https://github.com/SeltikHD/chameleon-vitae
+        type: string
+      start_date:
+        example: "2024-01-01"
+        type: string
+      tech_stack:
+        example:
+        - Go
+        - Vue.js
+        - PostgreSQL
+        items:
+          type: string
+        type: array
+      updated_at:
+        example: "2026-01-09T10:00:00Z"
+        type: string
+      url:
+        example: https://chameleon-vitae.dev
         type: string
     type: object
   internal_adapters_primary_http.ResumeAnalysisDTO:
@@ -535,6 +743,39 @@ definitions:
           type: string
         type: array
     type: object
+  internal_adapters_primary_http.UpdateEducationRequest:
+    properties:
+      degree:
+        example: Master of Science
+        type: string
+      display_order:
+        example: 1
+        type: integer
+      end_date:
+        example: "2024-05-15"
+        type: string
+      field_of_study:
+        example: Artificial Intelligence
+        type: string
+      gpa:
+        example: 3.95/4.0
+        type: string
+      honors:
+        example:
+        - Summa Cum Laude
+        items:
+          type: string
+        type: array
+      institution:
+        example: MIT
+        type: string
+      location:
+        example: Cambridge, MA
+        type: string
+      start_date:
+        example: "2022-09-01"
+        type: string
+    type: object
   internal_adapters_primary_http.UpdateExperienceRequest:
     properties:
       description:
@@ -569,6 +810,39 @@ definitions:
         type: string
       url:
         example: https://techcompany.com
+        type: string
+    type: object
+  internal_adapters_primary_http.UpdateProjectRequest:
+    properties:
+      description:
+        example: Updated description
+        type: string
+      display_order:
+        example: 1
+        type: integer
+      end_date:
+        example: "2025-01-01"
+        type: string
+      name:
+        example: Chameleon Vitae v2
+        type: string
+      repository_url:
+        example: https://github.com/new/repo
+        type: string
+      start_date:
+        example: "2024-01-01"
+        type: string
+      tech_stack:
+        example:
+        - Go
+        - Vue.js
+        - PostgreSQL
+        - Redis
+        items:
+          type: string
+        type: array
+      url:
+        example: https://new-url.dev
         type: string
     type: object
   internal_adapters_primary_http.UpdateResumeContentRequest:
@@ -853,6 +1127,180 @@ paths:
       summary: Recalculate bullet score
       tags:
       - bullets
+  /v1/education:
+    get:
+      description: Returns all education entries for the authenticated user, ordered
+        by display_order
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_adapters_primary_http.ListEducationResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: List education entries
+      tags:
+      - education
+    post:
+      consumes:
+      - application/json
+      description: Creates a new education entry for the authenticated user
+      parameters:
+      - description: Education data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_adapters_primary_http.CreateEducationRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/internal_adapters_primary_http.EducationResponse'
+        "400":
+          description: Invalid request body
+          schema:
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
+        "422":
+          description: Validation failed
+          schema:
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create education entry
+      tags:
+      - education
+  /v1/education/{educationID}:
+    delete:
+      description: Deletes an education entry
+      parameters:
+      - description: Education ID
+        in: path
+        name: educationID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
+        "404":
+          description: Education not found
+          schema:
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete education entry
+      tags:
+      - education
+    get:
+      description: Retrieves a specific education entry by ID
+      parameters:
+      - description: Education ID
+        in: path
+        name: educationID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_adapters_primary_http.EducationResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
+        "404":
+          description: Education not found
+          schema:
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get education entry
+      tags:
+      - education
+    put:
+      consumes:
+      - application/json
+      description: Updates an existing education entry
+      parameters:
+      - description: Education ID
+        in: path
+        name: educationID
+        required: true
+        type: string
+      - description: Education data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_adapters_primary_http.UpdateEducationRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_adapters_primary_http.EducationResponse'
+        "400":
+          description: Invalid request body
+          schema:
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
+        "404":
+          description: Education not found
+          schema:
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
+        "422":
+          description: Validation failed
+          schema:
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update education entry
+      tags:
+      - education
   /v1/experiences:
     get:
       description: Returns a paginated list of experiences for the authenticated user
@@ -1245,6 +1693,260 @@ paths:
       summary: Update current user profile
       tags:
       - user
+  /v1/projects:
+    get:
+      description: Returns all projects for the authenticated user, ordered by display_order
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_adapters_primary_http.ListProjectsResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: List projects
+      tags:
+      - projects
+    post:
+      consumes:
+      - application/json
+      description: Creates a new project for the authenticated user
+      parameters:
+      - description: Project data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_adapters_primary_http.CreateProjectRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/internal_adapters_primary_http.ProjectResponse'
+        "400":
+          description: Invalid request body
+          schema:
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
+        "422":
+          description: Validation failed
+          schema:
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create project
+      tags:
+      - projects
+  /v1/projects/{projectID}:
+    delete:
+      description: Deletes a project and all its bullets
+      parameters:
+      - description: Project ID
+        in: path
+        name: projectID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
+        "404":
+          description: Project not found
+          schema:
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete project
+      tags:
+      - projects
+    get:
+      description: Retrieves a specific project by ID with its bullets
+      parameters:
+      - description: Project ID
+        in: path
+        name: projectID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_adapters_primary_http.ProjectResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
+        "404":
+          description: Project not found
+          schema:
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get project
+      tags:
+      - projects
+    put:
+      consumes:
+      - application/json
+      description: Updates an existing project
+      parameters:
+      - description: Project ID
+        in: path
+        name: projectID
+        required: true
+        type: string
+      - description: Project data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_adapters_primary_http.UpdateProjectRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_adapters_primary_http.ProjectResponse'
+        "400":
+          description: Invalid request body
+          schema:
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
+        "404":
+          description: Project not found
+          schema:
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
+        "422":
+          description: Validation failed
+          schema:
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update project
+      tags:
+      - projects
+  /v1/projects/{projectID}/bullets:
+    post:
+      consumes:
+      - application/json
+      description: Adds a new bullet to a project
+      parameters:
+      - description: Project ID
+        in: path
+        name: projectID
+        required: true
+        type: string
+      - description: Bullet data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_adapters_primary_http.CreateProjectBulletRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/internal_adapters_primary_http.ProjectBulletResponse'
+        "400":
+          description: Invalid request body
+          schema:
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
+        "404":
+          description: Project not found
+          schema:
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Add project bullet
+      tags:
+      - projects
+  /v1/projects/{projectID}/bullets/{bulletID}:
+    delete:
+      description: Deletes a bullet from a project
+      parameters:
+      - description: Project ID
+        in: path
+        name: projectID
+        required: true
+        type: string
+      - description: Bullet ID
+        in: path
+        name: bulletID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
+        "404":
+          description: Project or bullet not found
+          schema:
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/internal_adapters_primary_http.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete project bullet
+      tags:
+      - projects
   /v1/resumes:
     get:
       description: Returns a paginated list of resumes for the authenticated user
