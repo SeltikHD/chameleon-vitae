@@ -17,6 +17,8 @@ type ResumeService struct {
 	bulletRepo     ports.BulletRepository
 	skillRepo      ports.SkillRepository
 	languageRepo   ports.SpokenLanguageRepository
+	educationRepo  ports.EducationRepository
+	projectRepo    ports.ProjectRepository
 	aiProvider     ports.AIProvider
 	pdfEngine      ports.PDFEngine
 	jobParser      ports.JobParser
@@ -31,6 +33,8 @@ func NewResumeService(
 	bulletRepo ports.BulletRepository,
 	skillRepo ports.SkillRepository,
 	languageRepo ports.SpokenLanguageRepository,
+	educationRepo ports.EducationRepository,
+	projectRepo ports.ProjectRepository,
 	aiProvider ports.AIProvider,
 	pdfEngine ports.PDFEngine,
 	jobParser ports.JobParser,
@@ -43,6 +47,8 @@ func NewResumeService(
 		bulletRepo:     bulletRepo,
 		skillRepo:      skillRepo,
 		languageRepo:   languageRepo,
+		educationRepo:  educationRepo,
+		projectRepo:    projectRepo,
 		aiProvider:     aiProvider,
 		pdfEngine:      pdfEngine,
 		jobParser:      jobParser,
@@ -396,13 +402,40 @@ func (s *ResumeService) GeneratePDF(ctx context.Context, req GeneratePDFRequest)
 		return nil, fmt.Errorf("failed to get languages: %w", err)
 	}
 
-	// Build HTML from resume content.
-	html := s.buildResumeHTML(user, resume, languages)
+	// Get education entries.
+	education, err := s.educationRepo.ListByUserID(ctx, resume.UserID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get education: %w", err)
+	}
+
+	// Get projects with bullets.
+	projects, err := s.projectRepo.ListByUserID(ctx, resume.UserID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get projects: %w", err)
+	}
+
+	// Get user skills for categorization.
+	skills, err := s.skillRepo.ListByUserID(ctx, resume.UserID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get skills: %w", err)
+	}
+
+	// Build HTML using Jake's Resume template.
+	template := NewJakeResumeTemplate()
+	html := template.Render(ResumeTemplateData{
+		User:      user,
+		Resume:    resume,
+		Education: education,
+		Projects:  projects,
+		Languages: languages,
+		Skills:    skills,
+		FontSize:  11, // Default to 11pt
+	})
 
 	// Generate PDF.
 	templateName := req.TemplateName
 	if templateName == "" {
-		templateName = "default"
+		templateName = "jake"
 	}
 
 	pdfResult, err := s.pdfEngine.GeneratePDF(ctx, ports.GeneratePDFRequest{
@@ -492,15 +525,43 @@ func (s *ResumeService) DownloadPDF(ctx context.Context, req DownloadPDFRequest)
 		return nil, fmt.Errorf("failed to get languages: %w", err)
 	}
 
-	html := s.buildResumeHTML(user, resume, languages)
+	// Get education entries.
+	education, err := s.educationRepo.ListByUserID(ctx, resume.UserID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get education: %w", err)
+	}
+
+	// Get projects with bullets.
+	projects, err := s.projectRepo.ListByUserID(ctx, resume.UserID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get projects: %w", err)
+	}
+
+	// Get user skills for categorization.
+	skills, err := s.skillRepo.ListByUserID(ctx, resume.UserID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get skills: %w", err)
+	}
+
+	// Build HTML using Jake's Resume template.
+	template := NewJakeResumeTemplate()
+	htmlContent := template.Render(ResumeTemplateData{
+		User:      user,
+		Resume:    resume,
+		Education: education,
+		Projects:  projects,
+		Languages: languages,
+		Skills:    skills,
+		FontSize:  11,
+	})
 
 	templateName := req.TemplateName
 	if templateName == "" {
-		templateName = "default"
+		templateName = "jake"
 	}
 
 	pdfResult, err := s.pdfEngine.GeneratePDF(ctx, ports.GeneratePDFRequest{
-		HTML:         html,
+		HTML:         htmlContent,
 		TemplateName: templateName,
 		Options:      ports.DefaultPDFOptions(),
 	})
@@ -546,129 +607,6 @@ func (s *ResumeService) generatePDFFilename(user *domain.User, resume *domain.Re
 		return fmt.Sprintf("%s_Resume_%s.pdf", sanitizeFilename(name), sanitizeFilename(*resume.JobTitle))
 	}
 	return fmt.Sprintf("%s_Resume.pdf", sanitizeFilename(name))
-}
-
-// buildResumeHTML builds HTML from resume content.
-func (s *ResumeService) buildResumeHTML(user *domain.User, resume *domain.Resume, languages []domain.SpokenLanguage) string {
-	// This is a simplified HTML template.
-	// In production, use a proper templating engine.
-	content := resume.GeneratedContent
-	if content == nil {
-		return ""
-	}
-
-	html := `<!DOCTYPE html>
-<html lang="` + resume.TargetLanguage + `">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resume - ` + user.GetDisplayName() + `</title>
-    <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; margin: 0; padding: 20px; }
-        .header { text-align: center; margin-bottom: 20px; }
-        .name { font-size: 24px; font-weight: bold; margin-bottom: 5px; }
-        .headline { font-size: 14px; color: #666; }
-        .contact { font-size: 12px; color: #888; margin-top: 5px; }
-        .section { margin-bottom: 20px; }
-        .section-title { font-size: 16px; font-weight: bold; border-bottom: 2px solid #333; padding-bottom: 5px; margin-bottom: 10px; }
-        .summary { font-size: 13px; }
-        .experience { margin-bottom: 15px; }
-        .exp-header { display: flex; justify-content: space-between; }
-        .exp-title { font-weight: bold; }
-        .exp-org { font-style: italic; }
-        .exp-date { color: #666; font-size: 12px; }
-        .bullets { list-style-type: disc; margin-left: 20px; }
-        .bullet { font-size: 13px; margin-bottom: 5px; }
-        .skills { display: flex; flex-wrap: wrap; gap: 5px; }
-        .skill { background: #f0f0f0; padding: 3px 8px; border-radius: 3px; font-size: 12px; }
-    </style>
-</head>
-<body>
-    <div class="header">
-        <div class="name">` + user.GetDisplayName() + `</div>`
-
-	if user.Headline != nil {
-		html += `<div class="headline">` + *user.Headline + `</div>`
-	}
-
-	html += `<div class="contact">`
-	if user.Email != nil {
-		html += *user.Email
-	}
-	if user.Phone != nil {
-		html += ` | ` + *user.Phone
-	}
-	if user.Location != nil {
-		html += ` | ` + *user.Location
-	}
-	html += `</div>
-    </div>
-
-    <div class="section">
-        <div class="section-title">Professional Summary</div>
-        <div class="summary">` + content.Summary + `</div>
-    </div>
-
-    <div class="section">
-        <div class="section-title">Experience</div>`
-
-	for _, exp := range content.Experiences {
-		dateStr := exp.StartDate
-		if exp.IsCurrent {
-			dateStr += " - Present"
-		} else if exp.EndDate != nil {
-			dateStr += " - " + *exp.EndDate
-		}
-
-		html += `
-        <div class="experience">
-            <div class="exp-header">
-                <span class="exp-title">` + exp.Title + `</span>
-                <span class="exp-date">` + dateStr + `</span>
-            </div>
-            <div class="exp-org">` + exp.Organization + `</div>
-            <ul class="bullets">`
-
-		for _, bullet := range exp.Bullets {
-			html += `<li class="bullet">` + bullet.TailoredContent + `</li>`
-		}
-
-		html += `</ul>
-        </div>`
-	}
-
-	html += `</div>
-
-    <div class="section">
-        <div class="section-title">Skills</div>
-        <div class="skills">`
-
-	for _, skill := range content.Skills {
-		html += `<span class="skill">` + skill + `</span>`
-	}
-
-	html += `</div>
-    </div>`
-
-	if len(languages) > 0 {
-		html += `
-    <div class="section">
-        <div class="section-title">Languages</div>
-        <div class="skills">`
-
-		for _, lang := range languages {
-			html += `<span class="skill">` + lang.Language + ` (` + string(lang.Proficiency) + `)</span>`
-		}
-
-		html += `</div>
-    </div>`
-	}
-
-	html += `
-</body>
-</html>`
-
-	return html
 }
 
 // UpdateResumeStatusRequest contains parameters for updating resume status.
