@@ -157,7 +157,9 @@ const isSidebarOpen = ref(true)
 const navItems = [
   { to: '/dashboard', icon: 'i-lucide-layout-dashboard', label: 'Dashboard' },
   { to: '/dashboard/resumes', icon: 'i-lucide-file-text', label: 'Resumes' },
+  { to: '/dashboard/education', icon: 'i-lucide-book', label: 'Education' },
   { to: '/dashboard/experiences', icon: 'i-lucide-briefcase', label: 'Experiences' },
+  { to: '/dashboard/projects', icon: 'i-lucide-folder-open', label: 'Projects' },
   { to: '/dashboard/skills', icon: 'i-lucide-tags', label: 'Skills' },
   { to: '/dashboard/profile', icon: 'i-lucide-user', label: 'Profile' }
 ]
@@ -177,7 +179,9 @@ const pageTitle = computed(() => {
     '/dashboard': 'Dashboard',
     '/dashboard/resumes': 'My Resumes',
     '/dashboard/resumes/new': 'Create Resume',
+    '/dashboard/education': 'Education',
     '/dashboard/experiences': 'Experiences',
+    '/dashboard/projects': 'Projects',
     '/dashboard/skills': 'Skills',
     '/dashboard/profile': 'Profile'
   }
