@@ -195,6 +195,12 @@ func injectCSS(html, css string) string {
 func defaultTemplates() []ports.PDFTemplate {
 	return []ports.PDFTemplate{
 		{
+			Name:        "jake",
+			DisplayName: "Jake's Resume",
+			Description: "Industry gold standard for developer resumes. Single-page, dense, ATS-friendly format.",
+			PreviewURL:  "/templates/jake/preview.png",
+		},
+		{
 			Name:        "professional",
 			DisplayName: "Professional",
 			Description: "Clean, modern design suitable for most industries. Emphasizes readability and structure.",
