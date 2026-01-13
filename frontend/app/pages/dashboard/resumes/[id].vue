@@ -15,6 +15,7 @@ const resume = ref<ResumeResponse | null>(null)
 const isLoading = ref(true)
 const error = ref<string | null>(null)
 const isDownloading = ref(false)
+const isRegenerating = ref(false)
 const isRetailoring = ref(false)
 const isUpdatingStatus = ref(false)
 const showDeleteModal = ref(false)
@@ -197,6 +198,53 @@ async function downloadPDF() {
   }
 }
 
+async function regeneratePDF() {
+  if (!resume.value) return
+
+  isRegenerating.value = true
+  try {
+    // Force regenerate PDF by ignoring cache.
+    const response = await apiFetch<Blob>(`/resumes/${resumeId.value}/pdf?force_regenerate=true`, {
+      responseType: 'blob'
+    })
+
+    // Create download link.
+    const url = globalThis.URL.createObjectURL(response)
+    const link = document.createElement('a')
+    link.href = url
+
+    // Generate filename.
+    const jobTitle = resume.value.job_title || 'resume'
+    const company = resume.value.company_name || ''
+    const filename = company
+      ? `${jobTitle.replaceAll(/\s+/g, '-')}_${company.replaceAll(/\s+/g, '-')}.pdf`
+      : `${jobTitle.replaceAll(/\s+/g, '-')}.pdf`
+
+    link.download = filename
+    document.body.appendChild(link)
+    link.click()
+    link.remove()
+    globalThis.URL.revokeObjectURL(url)
+
+    toast.add({
+      title: 'PDF Regenerated',
+      description: 'A fresh PDF has been generated and downloaded.',
+      color: 'success',
+      icon: 'i-heroicons-arrow-path'
+    })
+  } catch (err) {
+    console.error('[ResumeDetail] Failed to regenerate PDF:', err)
+    toast.add({
+      title: 'Regeneration Failed',
+      description: 'Could not regenerate PDF. Please try again.',
+      color: 'error',
+      icon: 'i-heroicons-exclamation-circle'
+    })
+  } finally {
+    isRegenerating.value = false
+  }
+}
+
 async function deleteResume() {
   if (!resume.value) return
 
@@ -349,6 +397,17 @@ function formatStatus(status: string): string {
             @click="downloadPDF"
           >
             Download PDF
+          </UButton>
+          <UButton
+            variant="ghost"
+            color="neutral"
+            size="sm"
+            icon="i-heroicons-arrow-path"
+            :loading="isRegenerating"
+            title="Force regenerate PDF (ignoring cache)"
+            @click="regeneratePDF"
+          >
+            Regenerate PDF
           </UButton>
           <UButton
             v-if="resume.status !== 'reviewed'"

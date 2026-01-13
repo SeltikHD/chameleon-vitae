@@ -104,7 +104,7 @@
           <p class="mt-1 text-sm text-zinc-300">{{ parsedJobTitle }}</p>
         </div>
 
-        <div class="grid gap-4 sm:grid-cols-2">
+        <div class="grid gap-4 sm:grid-cols-3">
           <UFormField
             label="Company Name (Optional)"
             name="companyName"
@@ -125,6 +125,27 @@
               v-model="form.jobTitle"
               placeholder="e.g. Senior Software Engineer"
               icon="i-lucide-briefcase"
+              :disabled="isParsing"
+            />
+          </UFormField>
+
+          <UFormField
+            label="Target Language"
+            name="targetLanguage"
+          >
+            <USelectMenu
+              :v-model="form.targetLanguage"
+              :items="[
+                { label: 'English', value: 'en' },
+                { label: 'Portuguese', value: 'pt-br' },
+                { label: 'Spanish', value: 'es' },
+                { label: 'French', value: 'fr' },
+                { label: 'German', value: 'de' }
+              ]"
+              :default-value="{ label: 'English', value: 'en' }"
+              option-attribute="label"
+              value-attribute="value"
+              class="w-full"
               :disabled="isParsing"
             />
           </UFormField>
@@ -253,7 +274,8 @@ const form = reactive({
   jobUrl: '',
   description: '',
   companyName: '',
-  jobTitle: ''
+  jobTitle: '',
+  targetLanguage: 'en'
 })
 
 // Computed
@@ -389,7 +411,8 @@ async function generateResume() {
       job_description: form.description,
       job_title: form.jobTitle || undefined,
       company_name: form.companyName || undefined,
-      job_url: form.jobUrl || undefined
+      job_url: form.jobUrl || undefined,
+      target_language: form.targetLanguage || 'en'
     }
 
     const resume = await apiFetch<ResumeResponse>('/resumes', {
