@@ -179,3 +179,75 @@ type DisplayOrderUpdate struct {
 	ID           string
 	DisplayOrder int
 }
+
+// EducationRepository defines the interface for education persistence operations.
+type EducationRepository interface {
+	// Create creates a new education entry.
+	Create(ctx context.Context, education *domain.Education) error
+
+	// GetByID retrieves an education entry by ID.
+	GetByID(ctx context.Context, id string) (*domain.Education, error)
+
+	// ListByUserID lists all education entries for a user, ordered by display_order.
+	ListByUserID(ctx context.Context, userID string) ([]domain.Education, error)
+
+	// Update updates an existing education entry.
+	Update(ctx context.Context, education *domain.Education) error
+
+	// Delete removes an education entry.
+	Delete(ctx context.Context, id string) error
+
+	// UpdateDisplayOrder updates the display order of education entries.
+	UpdateDisplayOrder(ctx context.Context, orders []DisplayOrderUpdate) error
+}
+
+// ProjectRepository defines the interface for project persistence operations.
+type ProjectRepository interface {
+	// Create creates a new project.
+	Create(ctx context.Context, project *domain.Project) error
+
+	// GetByID retrieves a project by ID (without bullets).
+	GetByID(ctx context.Context, id string) (*domain.Project, error)
+
+	// GetByIDWithBullets retrieves a project with all its bullets.
+	GetByIDWithBullets(ctx context.Context, id string) (*domain.Project, error)
+
+	// ListByUserID lists all projects for a user, ordered by display_order.
+	ListByUserID(ctx context.Context, userID string) ([]domain.Project, error)
+
+	// ListByUserIDWithBullets lists all projects with bullets for a user.
+	ListByUserIDWithBullets(ctx context.Context, userID string) ([]domain.Project, error)
+
+	// Update updates an existing project.
+	Update(ctx context.Context, project *domain.Project) error
+
+	// Delete removes a project and all its bullets.
+	Delete(ctx context.Context, id string) error
+
+	// UpdateDisplayOrder updates the display order of projects.
+	UpdateDisplayOrder(ctx context.Context, orders []DisplayOrderUpdate) error
+
+	// SearchByTechStack searches projects containing any of the given technologies.
+	SearchByTechStack(ctx context.Context, userID string, technologies []string) ([]domain.Project, error)
+}
+
+// ProjectBulletRepository defines the interface for project bullet persistence.
+type ProjectBulletRepository interface {
+	// Create creates a new project bullet.
+	Create(ctx context.Context, bullet *domain.ProjectBullet) error
+
+	// GetByID retrieves a project bullet by ID.
+	GetByID(ctx context.Context, id string) (*domain.ProjectBullet, error)
+
+	// ListByProjectID lists all bullets for a project, ordered by display_order.
+	ListByProjectID(ctx context.Context, projectID string) ([]domain.ProjectBullet, error)
+
+	// Update updates an existing project bullet.
+	Update(ctx context.Context, bullet *domain.ProjectBullet) error
+
+	// Delete removes a project bullet.
+	Delete(ctx context.Context, id string) error
+
+	// UpdateDisplayOrder updates the display order of project bullets.
+	UpdateDisplayOrder(ctx context.Context, orders []DisplayOrderUpdate) error
+}
