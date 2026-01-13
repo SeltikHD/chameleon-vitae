@@ -249,14 +249,32 @@
             <UFormField
               label="Category"
               name="category"
+              hint="Select or type a new category"
             >
-              <USelectMenu
+              <UInputMenu
                 v-model="categoryModel"
                 :items="skillCategoryOptions"
                 value-key="value"
                 class="w-full"
-                placeholder="Select a category..."
-              />
+                placeholder="Select or type a category..."
+                creatable
+                highlight
+              >
+                <template #empty="{ searchTerm }">
+                  <div
+                    v-if="searchTerm"
+                    class="px-3 py-2 text-sm text-zinc-400"
+                  >
+                    Press Enter to create "<span class="text-emerald-400 font-medium">{{ searchTerm }}</span>"
+                  </div>
+                  <div
+                    v-else
+                    class="px-3 py-2 text-sm text-zinc-400"
+                  >
+                    Start typing to create a new category
+                  </div>
+                </template>
+              </UInputMenu>
             </UFormField>
 
             <UFormField
@@ -352,30 +370,61 @@ const skillForm = reactive<SkillInput & { is_highlighted: boolean }>({
   is_highlighted: false
 })
 
-// Computed wrapper for USelectMenu - converts null to undefined
+// Computed wrapper for UInputMenu - handles string value for creatable menu
 const categoryModel = computed({
-  get: () => skillForm.category ?? undefined,
-  set: (value: string | undefined) => {
-    skillForm.category = value ?? null
+  get: () => skillForm.category ?? '',
+  set: (value: string | { label: string, value: string } | undefined) => {
+    // Handle both string (from creatable) and object (from selection)
+    if (typeof value === 'string') {
+      skillForm.category = value || null
+    } else if (value && typeof value === 'object') {
+      skillForm.category = value.value || null
+    } else {
+      skillForm.category = null
+    }
   }
 })
 
-// Category options
-const skillCategoryOptions = [
-  { label: 'Frontend', value: 'Frontend' },
-  { label: 'Backend', value: 'Backend' },
-  { label: 'DevOps', value: 'DevOps' },
-  { label: 'Database', value: 'Database' },
-  { label: 'Mobile', value: 'Mobile' },
-  { label: 'AI/ML', value: 'AI/ML' },
-  { label: 'Soft Skills', value: 'Soft Skills' },
-  { label: 'Tools', value: 'Tools' },
-  { label: 'Other', value: 'Other' }
+// Default category options
+const defaultCategories = [
+  'Frontend',
+  'Backend',
+  'DevOps',
+  'Database',
+  'Mobile',
+  'AI/ML',
+  'Soft Skills',
+  'Tools',
+  'Other'
 ]
+
+// Dynamic category options - combines defaults with user's custom categories
+const skillCategoryOptions = computed(() => {
+  // Collect all unique categories from existing skills
+  const existingCategories = new Set(
+    skills.value
+      .map((s) => s.category)
+      .filter((c): c is string => c !== null && c !== undefined && c !== '')
+  )
+
+  // Merge with defaults, keeping unique values
+  const allCategories = new Set([...defaultCategories, ...existingCategories])
+
+  return Array.from(allCategories)
+    .sort((a, b) => {
+      // Keep defaults at top, then alphabetical
+      const aIsDefault = defaultCategories.includes(a)
+      const bIsDefault = defaultCategories.includes(b)
+      if (aIsDefault && !bIsDefault) return -1
+      if (!aIsDefault && bIsDefault) return 1
+      return a.localeCompare(b)
+    })
+    .map((cat) => ({ label: cat, value: cat }))
+})
 
 const categoryOptions = computed(() => [
   { label: 'All categories', value: '' },
-  ...skillCategoryOptions
+  ...skillCategoryOptions.value
 ])
 
 // Computed
