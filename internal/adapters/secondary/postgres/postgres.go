@@ -154,3 +154,18 @@ func (db *DB) SpokenLanguageRepository() *SpokenLanguageRepository {
 func (db *DB) ResumeRepository() *ResumeRepository {
 	return &ResumeRepository{pool: db.pool}
 }
+
+// EducationRepository returns a new EducationRepository instance.
+func (db *DB) EducationRepository() *EducationRepository {
+	return &EducationRepository{pool: db.pool}
+}
+
+// ProjectRepository returns a new ProjectRepository instance.
+func (db *DB) ProjectRepository() *ProjectRepository {
+	return &ProjectRepository{pool: db.pool}
+}
+
+// ProjectBulletRepository returns a new ProjectBulletRepository instance.
+func (db *DB) ProjectBulletRepository() *ProjectBulletRepository {
+	return &ProjectBulletRepository{pool: db.pool}
+}
