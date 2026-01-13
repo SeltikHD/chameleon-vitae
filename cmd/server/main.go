@@ -95,6 +95,8 @@ func main() {
 		BulletService:     svc.Bullet,
 		SkillService:      svc.Skill,
 		ResumeService:     svc.Resume,
+		EducationService:  svc.Education,
+		ProjectService:    svc.Project,
 	})
 
 	// Set up authentication middleware
@@ -310,6 +312,8 @@ type Services struct {
 	Bullet     *services.BulletService
 	Skill      *services.SkillService
 	Resume     *services.ResumeService
+	Education  *services.EducationService
+	Project    *services.ProjectService
 }
 
 // initializeServices initializes all application services.
@@ -337,6 +341,15 @@ func initializeServices(adapters *Adapters) *Services {
 		adapters.DB.SpokenLanguageRepository(),
 	)
 
+	educationService := services.NewEducationService(
+		adapters.DB.EducationRepository(),
+	)
+
+	projectService := services.NewProjectService(
+		adapters.DB.ProjectRepository(),
+		adapters.DB.ProjectBulletRepository(),
+	)
+
 	resumeService := services.NewResumeService(
 		adapters.DB.ResumeRepository(),
 		adapters.DB.UserRepository(),
@@ -344,6 +357,8 @@ func initializeServices(adapters *Adapters) *Services {
 		adapters.DB.BulletRepository(),
 		adapters.DB.SkillRepository(),
 		adapters.DB.SpokenLanguageRepository(),
+		adapters.DB.EducationRepository(),
+		adapters.DB.ProjectRepository(),
 		adapters.Groq,
 		adapters.Gotenberg,
 		adapters.Jina,
@@ -358,5 +373,7 @@ func initializeServices(adapters *Adapters) *Services {
 		Bullet:     bulletService,
 		Skill:      skillService,
 		Resume:     resumeService,
+		Education:  educationService,
+		Project:    projectService,
 	}
 }
