@@ -26,22 +26,13 @@ const resumeId = computed(() => route.params.id as string)
 // Computed
 const statusColor = computed(() => {
   switch (resume.value?.status) {
-    case 'tailored':
-      return 'success'
     case 'draft':
       return 'warning'
-    case 'exported':
-      return 'primary'
     case 'reviewed':
-      return 'secondary'
+      return 'success'
     default:
       return 'neutral'
   }
-})
-
-const formattedScore = computed(() => {
-  if (!resume.value?.tailoring_score) return null
-  return resume.value.tailoring_score.toFixed(2)
 })
 
 const formattedDate = computed(() => {
@@ -123,7 +114,7 @@ async function retailorResume() {
   }
 }
 
-async function updateStatus(newStatus: 'reviewed' | 'exported') {
+async function updateStatus(newStatus: 'reviewed') {
   if (!resume.value) return
 
   isUpdatingStatus.value = true
@@ -186,9 +177,6 @@ async function downloadPDF() {
     link.click()
     link.remove()
     globalThis.URL.revokeObjectURL(url)
-
-    // Update status to exported
-    await updateStatus('exported')
 
     toast.add({
       title: 'Downloaded',
@@ -383,25 +371,6 @@ function formatStatus(status: string): string {
         </div>
       </div>
 
-      <!-- Tailoring Score -->
-      <div
-        v-if="formattedScore"
-        class="mb-6 p-4 bg-zinc-900 rounded-xl border border-zinc-800"
-      >
-        <div class="flex items-center gap-3">
-          <div class="p-2 bg-emerald-500/10 rounded-lg">
-            <UIcon
-              name="i-heroicons-chart-bar"
-              class="w-5 h-5 text-emerald-400"
-            />
-          </div>
-          <div>
-            <p class="text-sm text-zinc-400">Tailoring Score</p>
-            <p class="text-lg font-semibold text-emerald-400">{{ formattedScore }}%</p>
-          </div>
-        </div>
-      </div>
-
       <!-- Main Content Grid -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- Left: Job Description -->
@@ -414,7 +383,10 @@ function formatStatus(status: string): string {
             <h2 class="text-lg font-semibold text-zinc-100">Job Description</h2>
           </div>
           <div class="prose prose-invert prose-sm max-w-none">
-            <pre class="whitespace-pre-wrap text-zinc-300 text-sm leading-relaxed font-mono bg-zinc-950 p-4 rounded-lg overflow-auto max-h-125">{{ resume.job_description || 'No job description available.' }}</pre>
+            <pre
+              class="whitespace-pre-wrap text-zinc-300 text-sm leading-relaxed font-mono bg-zinc-950 p-4 rounded-lg overflow-auto max-h-125"
+              >{{ resume.job_description || 'No job description available.' }}</pre
+            >
           </div>
           <div
             v-if="resume.job_url"
@@ -450,7 +422,10 @@ function formatStatus(status: string): string {
             v-if="resume.generated_content"
             class="prose prose-invert prose-sm max-w-none"
           >
-            <pre class="whitespace-pre-wrap text-zinc-300 text-sm leading-relaxed font-mono bg-zinc-950 p-4 rounded-lg overflow-auto max-h-125">{{ resume.generated_content }}</pre>
+            <pre
+              class="whitespace-pre-wrap text-zinc-300 text-sm leading-relaxed font-mono bg-zinc-950 p-4 rounded-lg overflow-auto max-h-125"
+              >{{ resume.generated_content }}</pre
+            >
           </div>
           <div
             v-else
@@ -491,16 +466,18 @@ function formatStatus(status: string): string {
           placeholder="Add notes about this resume..."
           class="w-full"
         />
-        <p class="mt-2 text-xs text-zinc-500">
-          Notes are saved when you update the resume status.
-        </p>
+        <p class="mt-2 text-xs text-zinc-500">Notes are saved when you update the resume status.</p>
       </div>
 
       <!-- Metadata Footer -->
-      <div class="mt-6 p-4 bg-zinc-900/50 rounded-xl border border-zinc-800/50 text-sm text-zinc-500">
+      <div
+        class="mt-6 p-4 bg-zinc-900/50 rounded-xl border border-zinc-800/50 text-sm text-zinc-500"
+      >
         <div class="flex flex-wrap gap-6">
           <span>Created: {{ formattedDate }}</span>
-          <span v-if="resume.updated_at !== resume.created_at">Updated: {{ formattedUpdatedDate }}</span>
+          <span v-if="resume.updated_at !== resume.created_at"
+            >Updated: {{ formattedUpdatedDate }}</span
+          >
           <span>ID: {{ resume.id }}</span>
         </div>
       </div>
