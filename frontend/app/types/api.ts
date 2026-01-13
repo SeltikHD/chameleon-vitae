@@ -206,6 +206,124 @@ export interface ScoreBulletResponse {
 }
 
 // ============================================================================
+// Education DTOs
+// ============================================================================
+
+/** Education entry response from API. */
+export interface EducationResponse {
+  id: string
+  institution: string
+  degree: string
+  field_of_study: string
+  location?: string | null
+  start_date?: string | null
+  end_date?: string | null
+  gpa?: string | null
+  honors?: string[]
+  display_order: number
+  created_at: string
+  updated_at: string
+}
+
+/** Request body for creating an education entry. */
+export interface CreateEducationRequest {
+  institution: string
+  degree: string
+  field_of_study: string
+  location?: string | null
+  start_date?: string | null
+  end_date?: string | null
+  gpa?: string | null
+  honors?: string[]
+  display_order?: number
+}
+
+/** Request body for updating an education entry. */
+export interface UpdateEducationRequest {
+  institution?: string | null
+  degree?: string | null
+  field_of_study?: string | null
+  location?: string | null
+  start_date?: string | null
+  end_date?: string | null
+  gpa?: string | null
+  honors?: string[]
+  display_order?: number | null
+}
+
+/** List of education entries response. */
+export interface ListEducationResponse {
+  data: EducationResponse[]
+  total: number
+}
+
+// ============================================================================
+// Project DTOs
+// ============================================================================
+
+/** Project bullet response from API. */
+export interface ProjectBulletResponse {
+  id: string
+  project_id: string
+  content: string
+  display_order: number
+  created_at: string
+}
+
+/** Project response from API. */
+export interface ProjectResponse {
+  id: string
+  name: string
+  description?: string
+  tech_stack: string[]
+  url?: string
+  repository_url?: string
+  start_date?: string | null
+  end_date?: string | null
+  display_order: number
+  bullets?: ProjectBulletResponse[]
+  created_at: string
+  updated_at: string
+}
+
+/** Request body for creating a project. */
+export interface CreateProjectRequest {
+  name: string
+  description?: string
+  tech_stack?: string[]
+  url?: string
+  repository_url?: string
+  start_date?: string | null
+  end_date?: string | null
+  display_order?: number
+  bullets?: string[]
+}
+
+/** Request body for updating a project. */
+export interface UpdateProjectRequest {
+  name?: string | null
+  description?: string | null
+  tech_stack?: string[]
+  url?: string | null
+  repository_url?: string | null
+  start_date?: string | null
+  end_date?: string | null
+  display_order?: number | null
+}
+
+/** Request body for creating a project bullet. */
+export interface CreateProjectBulletRequest {
+  content: string
+  display_order?: number
+}
+
+/** List of projects response. */
+export interface ListProjectsResponse {
+  data: ProjectResponse[]
+  total: number
+}
+
+// ============================================================================
 // Skill DTOs
 // ============================================================================
 

@@ -55,7 +55,7 @@
           label="Job URL"
           name="jobUrl"
           required
-          :error="urlError"
+          :error="urlError ?? undefined"
         >
           <div class="flex gap-2">
             <UInput
@@ -144,9 +144,7 @@
             :disabled="isParsing"
           />
           <template #hint>
-            <span class="text-xs text-zinc-500">
-              {{ form.description.length }} characters
-            </span>
+            <span class="text-xs text-zinc-500"> {{ form.description.length }} characters </span>
           </template>
         </UFormField>
 

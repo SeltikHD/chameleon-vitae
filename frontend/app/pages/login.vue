@@ -1,12 +1,12 @@
 <template>
   <div
-    class="flex min-h-screen items-center justify-center bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950 px-4"
+    class="flex min-h-screen items-center justify-center bg-linear-to-br from-zinc-950 via-zinc-900 to-zinc-950 px-4"
   >
     <div class="w-full max-w-md">
       <!-- Logo & Header -->
       <div class="mb-8 text-center">
         <div
-          class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-600 shadow-lg shadow-emerald-500/20"
+          class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-linear-to-br from-emerald-500 to-emerald-600 shadow-lg shadow-emerald-500/20"
         >
           <UIcon
             name="i-heroicons-document-duplicate"
@@ -68,7 +68,8 @@
               size="lg"
               class="w-full"
               :disabled="isLoading"
-              autocomplete="current-password"
+              :ui="{ base: 'autocomplete-current-password' }"
+              :input="{ autocomplete: 'current-password' }"
             >
               <template #trailing>
                 <UButton

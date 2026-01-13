@@ -41,7 +41,9 @@ export default defineNuxtRouteMiddleware(async (to) => {
  * Wait for auth store to be initialized.
  * Uses a polling approach with exponential backoff.
  */
-async function waitForAuthInitialization(authStore: ReturnType<typeof useAuthStore>): Promise<void> {
+async function waitForAuthInitialization(
+  authStore: ReturnType<typeof useAuthStore>
+): Promise<void> {
   const maxWait = 8000 // 8 seconds max
   const startTime = Date.now()
 
