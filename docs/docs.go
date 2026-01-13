@@ -1894,6 +1894,13 @@ const docTemplate = `{
                         "description": "Template name",
                         "name": "template",
                         "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "default": false,
+                        "description": "Force regeneration ignoring cache",
+                        "name": "force_regenerate",
+                        "in": "query"
                     }
                 ],
                 "responses": {

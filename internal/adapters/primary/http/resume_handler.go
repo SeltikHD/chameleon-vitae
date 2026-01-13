@@ -346,13 +346,14 @@ func (h *ResumeHandler) UpdateStatus(w http.ResponseWriter, r *http.Request) {
 //	@Tags			resumes
 //	@Produce		application/pdf
 //	@Security		BearerAuth
-//	@Param			resumeID	path		string	true	"Resume ID"
-//	@Param			template	query		string	false	"Template name"	default(modern)
-//	@Success		200			{file}		binary	"PDF file"
-//	@Failure		401			{object}	ErrorResponse	"Unauthorized"
-//	@Failure		404			{object}	ErrorResponse	"Resume not found"
-//	@Failure		422			{object}	ErrorResponse	"Resume not ready for PDF"
-//	@Failure		500			{object}	ErrorResponse	"Internal server error"
+//	@Param			resumeID			path		string	true	"Resume ID"
+//	@Param			template			query		string	false	"Template name"	default(modern)
+//	@Param			force_regenerate	query		bool	false	"Force regeneration ignoring cache"	default(false)
+//	@Success		200					{file}		binary	"PDF file"
+//	@Failure		401					{object}	ErrorResponse	"Unauthorized"
+//	@Failure		404					{object}	ErrorResponse	"Resume not found"
+//	@Failure		422					{object}	ErrorResponse	"Resume not ready for PDF"
+//	@Failure		500					{object}	ErrorResponse	"Internal server error"
 //	@Router			/v1/resumes/{resumeID}/pdf [get]
 func (h *ResumeHandler) GeneratePDF(w http.ResponseWriter, r *http.Request) {
 	authUser, ok := GetAuthenticatedUser(r.Context())
@@ -387,9 +388,13 @@ func (h *ResumeHandler) GeneratePDF(w http.ResponseWriter, r *http.Request) {
 		template = "modern"
 	}
 
+	// Check for force_regenerate query parameter.
+	forceRegenerate := r.URL.Query().Get("force_regenerate") == "true"
+
 	pdfReq := services.DownloadPDFRequest{
-		ResumeID:     resumeID,
-		TemplateName: template,
+		ResumeID:        resumeID,
+		TemplateName:    template,
+		ForceRegenerate: forceRegenerate,
 	}
 
 	result, err := h.resumeService.DownloadPDF(r.Context(), pdfReq)

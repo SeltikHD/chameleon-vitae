@@ -18,8 +18,9 @@ type ResumeTemplateData struct {
 	Projects    []domain.Project
 	Languages   []domain.SpokenLanguage
 	Skills      []domain.Skill
-	FontSize    int  // Base font size in pt (11, 10, or 9)
-	ShowSummary bool // Whether to show the professional summary
+	FontSize    int    // Base font size in pt (11, 10, or 9)
+	ShowSummary bool   // Whether to show the professional summary
+	Locale      Locale // Locale for internationalization (defaults to en-US)
 }
 
 // JakeResumeTemplate implements the Jake's Resume format.
@@ -40,6 +41,9 @@ func (t *JakeResumeTemplate) Render(data ResumeTemplateData) string {
 		data.FontSize = 11
 	}
 
+	// Initialize i18n with the specified locale (defaults to en-US).
+	i18n := NewI18n(data.Locale)
+
 	var sb strings.Builder
 
 	// Document head
@@ -52,29 +56,42 @@ func (t *JakeResumeTemplate) Render(data ResumeTemplateData) string {
 	// Header section
 	sb.WriteString(t.renderHeader(data.User))
 
+	// Professional Summary section (optional - after header, before education)
+	if data.ShowSummary {
+		summary := ""
+		if data.Resume.GeneratedContent != nil && data.Resume.GeneratedContent.Summary != "" {
+			summary = data.Resume.GeneratedContent.Summary
+		} else if data.User != nil && data.User.Summary != nil && *data.User.Summary != "" {
+			summary = *data.User.Summary
+		}
+		if summary != "" {
+			sb.WriteString(t.renderSummary(summary, i18n))
+		}
+	}
+
 	// Education section (always first in Jake's Resume)
 	if len(data.Education) > 0 {
-		sb.WriteString(t.renderEducation(data.Education))
-	}
-
-	// Experience section
-	if data.Resume.GeneratedContent != nil && len(data.Resume.GeneratedContent.Experiences) > 0 {
-		sb.WriteString(t.renderExperience(data.Resume.GeneratedContent.Experiences))
-	}
-
-	// Projects section (buffer section - can be dropped for one-page fit)
-	if len(data.Projects) > 0 {
-		sb.WriteString(t.renderProjects(data.Projects))
+		sb.WriteString(t.renderEducation(data.Education, i18n))
 	}
 
 	// Technical Skills section
 	if data.Resume.GeneratedContent != nil && len(data.Resume.GeneratedContent.Skills) > 0 {
-		sb.WriteString(t.renderSkills(data.Resume.GeneratedContent.Skills, data.Skills))
+		sb.WriteString(t.renderSkills(data.Resume.GeneratedContent.Skills, data.Skills, i18n))
+	}
+
+	// Experience section
+	if data.Resume.GeneratedContent != nil && len(data.Resume.GeneratedContent.Experiences) > 0 {
+		sb.WriteString(t.renderExperience(data.Resume.GeneratedContent.Experiences, i18n))
+	}
+
+	// Projects section (buffer section - can be dropped for one-page fit)
+	if len(data.Projects) > 0 {
+		sb.WriteString(t.renderProjects(data.Projects, i18n))
 	}
 
 	// Languages section (if any)
 	if len(data.Languages) > 0 {
-		sb.WriteString(t.renderLanguages(data.Languages))
+		sb.WriteString(t.renderLanguages(data.Languages, i18n))
 	}
 
 	sb.WriteString(`</div>`)
@@ -148,10 +165,14 @@ func (t *JakeResumeTemplate) renderHead(data ResumeTemplateData) string {
             margin-bottom: 4pt;
         }
 
-        .resume-contact {
-            font-size: 9pt;
-            color: #333;
-        }
+		.resume-contact {
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			width: 100%%;
+			font-size: 9pt;
+			color: #333;
+		}
 
         .resume-contact a {
             color: #000;
@@ -179,6 +200,17 @@ func (t *JakeResumeTemplate) renderHead(data ResumeTemplateData) string {
             border-bottom: 1pt solid #000;
             padding-bottom: 2pt;
             margin-bottom: 4pt;
+        }
+
+        /* Professional Summary */
+        .summary-section {
+            margin-bottom: 10pt;
+        }
+
+        .summary-text {
+            margin: 0;
+            text-align: justify;
+            line-height: 1.3;
         }
 
         /* Entry (Education, Experience, Project) */
@@ -373,15 +405,31 @@ func (t *JakeResumeTemplate) renderHeader(user *domain.User) string {
 	return sb.String()
 }
 
+// renderSummary generates the professional summary section.
+func (t *JakeResumeTemplate) renderSummary(summary string, i18n *I18n) string {
+	if summary == "" {
+		return ""
+	}
+
+	var sb strings.Builder
+	sb.WriteString(`<section class="resume-section summary-section">`)
+	sb.WriteString(fmt.Sprintf(`<h2 class="section-title">%s</h2>`, html.EscapeString(i18n.T(KeyProfessionalSummary))))
+	sb.WriteString(`<p class="summary-text">`)
+	sb.WriteString(html.EscapeString(summary))
+	sb.WriteString(`</p>`)
+	sb.WriteString(`</section>`)
+	return sb.String()
+}
+
 // renderEducation generates the education section.
-func (t *JakeResumeTemplate) renderEducation(education []domain.Education) string {
+func (t *JakeResumeTemplate) renderEducation(education []domain.Education, i18n *I18n) string {
 	if len(education) == 0 {
 		return ""
 	}
 
 	var sb strings.Builder
 	sb.WriteString(`<section class="resume-section">`)
-	sb.WriteString(`<h2 class="section-title">Education</h2>`)
+	sb.WriteString(fmt.Sprintf(`<h2 class="section-title">%s</h2>`, html.EscapeString(i18n.T(KeyEducation))))
 
 	for _, edu := range education {
 		sb.WriteString(`<div class="resume-entry">`)
@@ -401,13 +449,13 @@ func (t *JakeResumeTemplate) renderEducation(education []domain.Education) strin
 			degree += " in " + *edu.FieldOfStudy
 		}
 		fmt.Fprintf(&sb, `<span class="entry-subtitle">%s</span>`, html.EscapeString(degree))
-		fmt.Fprintf(&sb, `<span class="entry-date">%s</span>`, formatEducationDateRange(edu.StartDate, edu.EndDate))
+		fmt.Fprintf(&sb, `<span class="entry-date">%s</span>`, formatEducationDateRangeLocalized(edu.StartDate, edu.EndDate, i18n))
 		sb.WriteString(`</div>`)
 
 		// Honors/GPA if present
 		var extras []string
 		if edu.GPA != nil && *edu.GPA != "" {
-			extras = append(extras, "GPA: "+*edu.GPA)
+			extras = append(extras, i18n.T(KeyGPA)+": "+*edu.GPA)
 		}
 		if len(edu.Honors) > 0 {
 			extras = append(extras, strings.Join(edu.Honors, ", "))
@@ -424,14 +472,14 @@ func (t *JakeResumeTemplate) renderEducation(education []domain.Education) strin
 }
 
 // renderExperience generates the experience section.
-func (t *JakeResumeTemplate) renderExperience(experiences []domain.TailoredExperience) string {
+func (t *JakeResumeTemplate) renderExperience(experiences []domain.TailoredExperience, i18n *I18n) string {
 	if len(experiences) == 0 {
 		return ""
 	}
 
 	var sb strings.Builder
 	sb.WriteString(`<section class="resume-section">`)
-	sb.WriteString(`<h2 class="section-title">Experience</h2>`)
+	sb.WriteString(fmt.Sprintf(`<h2 class="section-title">%s</h2>`, html.EscapeString(i18n.T(KeyExperience))))
 
 	for _, exp := range experiences {
 		sb.WriteString(`<div class="resume-entry">`)
@@ -439,7 +487,7 @@ func (t *JakeResumeTemplate) renderExperience(experiences []domain.TailoredExper
 		// First line: Title | Dates
 		sb.WriteString(`<div class="entry-header">`)
 		fmt.Fprintf(&sb, `<span class="entry-title">%s</span>`, html.EscapeString(exp.Title))
-		dateStr := formatExperienceDateRange(exp.StartDate, exp.EndDate, exp.IsCurrent)
+		dateStr := formatExperienceDateRangeLocalized(exp.StartDate, exp.EndDate, exp.IsCurrent, i18n)
 		fmt.Fprintf(&sb, `<span class="entry-date">%s</span>`, html.EscapeString(dateStr))
 		sb.WriteString(`</div>`)
 
@@ -469,14 +517,14 @@ func (t *JakeResumeTemplate) renderExperience(experiences []domain.TailoredExper
 }
 
 // renderProjects generates the projects section.
-func (t *JakeResumeTemplate) renderProjects(projects []domain.Project) string {
+func (t *JakeResumeTemplate) renderProjects(projects []domain.Project, i18n *I18n) string {
 	if len(projects) == 0 {
 		return ""
 	}
 
 	var sb strings.Builder
 	sb.WriteString(`<section class="resume-section">`)
-	sb.WriteString(`<h2 class="section-title">Projects</h2>`)
+	sb.WriteString(fmt.Sprintf(`<h2 class="section-title">%s</h2>`, html.EscapeString(i18n.T(KeyProjects))))
 
 	for _, proj := range projects {
 		sb.WriteString(`<div class="resume-entry">`)
@@ -490,7 +538,7 @@ func (t *JakeResumeTemplate) renderProjects(projects []domain.Project) string {
 				html.EscapeString(strings.Join(proj.TechStack, ", ")))
 		}
 		sb.WriteString(`</div>`)
-		dateStr := formatProjectDateRange(proj.StartDate, proj.EndDate)
+		dateStr := formatProjectDateRangeLocalized(proj.StartDate, proj.EndDate, i18n)
 		if dateStr != "" {
 			fmt.Fprintf(&sb, `<span class="entry-date">%s</span>`, html.EscapeString(dateStr))
 		}
@@ -513,7 +561,7 @@ func (t *JakeResumeTemplate) renderProjects(projects []domain.Project) string {
 }
 
 // renderSkills generates the technical skills section in key-value format.
-func (t *JakeResumeTemplate) renderSkills(selectedSkills []string, userSkills []domain.Skill) string {
+func (t *JakeResumeTemplate) renderSkills(selectedSkills []string, userSkills []domain.Skill, i18n *I18n) string {
 	if len(selectedSkills) == 0 {
 		return ""
 	}
@@ -545,7 +593,7 @@ func (t *JakeResumeTemplate) renderSkills(selectedSkills []string, userSkills []
 
 	var sb strings.Builder
 	sb.WriteString(`<section class="resume-section">`)
-	sb.WriteString(`<h2 class="section-title">Technical Skills</h2>`)
+	sb.WriteString(fmt.Sprintf(`<h2 class="section-title">%s</h2>`, html.EscapeString(i18n.T(KeyTechnicalSkills))))
 	sb.WriteString(`<ul class="skills-list">`)
 
 	for _, category := range categoryOrder {
@@ -576,20 +624,20 @@ func (t *JakeResumeTemplate) renderSkills(selectedSkills []string, userSkills []
 }
 
 // renderLanguages generates the spoken languages section.
-func (t *JakeResumeTemplate) renderLanguages(languages []domain.SpokenLanguage) string {
+func (t *JakeResumeTemplate) renderLanguages(languages []domain.SpokenLanguage, i18n *I18n) string {
 	if len(languages) == 0 {
 		return ""
 	}
 
 	var sb strings.Builder
 	sb.WriteString(`<section class="resume-section">`)
-	sb.WriteString(`<h2 class="section-title">Languages</h2>`)
+	sb.WriteString(fmt.Sprintf(`<h2 class="section-title">%s</h2>`, html.EscapeString(i18n.T(KeyLanguages))))
 	sb.WriteString(`<div class="languages-list">`)
 
 	for _, lang := range languages {
 		sb.WriteString(`<span class="language-item">`)
 		fmt.Fprintf(&sb, `<span class="language-name">%s</span>`, html.EscapeString(lang.Language))
-		fmt.Fprintf(&sb, ` (<span class="language-level">%s</span>)`, html.EscapeString(string(lang.Proficiency)))
+		fmt.Fprintf(&sb, ` (<span class="language-level">%s</span>)`, html.EscapeString(i18n.FormatProficiencyLevel(string(lang.Proficiency))))
 		sb.WriteString(`</span>`)
 	}
 
@@ -649,6 +697,32 @@ func formatEducationDateRange(startDate, endDate *domain.Date) string {
 	return start + " – " + end
 }
 
+func formatEducationDateRangeLocalized(startDate, endDate *domain.Date, i18n *I18n) string {
+	if startDate == nil && endDate == nil {
+		return ""
+	}
+
+	format := func(d *domain.Date) string {
+		if d == nil || d.IsZero() {
+			return ""
+		}
+		return i18n.FormatDate(d.Time)
+	}
+
+	start := format(startDate)
+	end := format(endDate)
+
+	if end == "" {
+		end = i18n.T(KeyPresent)
+	}
+
+	if start == "" {
+		return end
+	}
+
+	return start + " – " + end
+}
+
 func formatExperienceDateRange(startDate string, endDate *string, isCurrent bool) string {
 	if startDate == "" {
 		return ""
@@ -662,6 +736,20 @@ func formatExperienceDateRange(startDate string, endDate *string, isCurrent bool
 	return startDate + " – " + end
 }
 
+func formatExperienceDateRangeLocalized(startDate string, endDate *string, isCurrent bool, i18n *I18n) string {
+	if startDate == "" {
+		return ""
+	}
+
+	start := i18n.FormatDateString(startDate)
+	end := i18n.T(KeyPresent)
+	if !isCurrent && endDate != nil && *endDate != "" {
+		end = i18n.FormatDateString(*endDate)
+	}
+
+	return start + " – " + end
+}
+
 func formatProjectDateRange(startDate, endDate *domain.Date) string {
 	if startDate == nil && endDate == nil {
 		return ""
@@ -672,6 +760,36 @@ func formatProjectDateRange(startDate, endDate *domain.Date) string {
 			return ""
 		}
 		return d.Time.Format("Jan 2006")
+	}
+
+	start := format(startDate)
+	end := format(endDate)
+
+	if start == "" && end == "" {
+		return ""
+	}
+
+	if end == "" {
+		return start
+	}
+
+	if start == "" {
+		return end
+	}
+
+	return start + " – " + end
+}
+
+func formatProjectDateRangeLocalized(startDate, endDate *domain.Date, i18n *I18n) string {
+	if startDate == nil && endDate == nil {
+		return ""
+	}
+
+	format := func(d *domain.Date) string {
+		if d == nil || d.IsZero() {
+			return ""
+		}
+		return i18n.FormatDate(d.Time)
 	}
 
 	start := format(startDate)

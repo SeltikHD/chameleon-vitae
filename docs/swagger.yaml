@@ -2148,6 +2148,11 @@ paths:
         in: query
         name: template
         type: string
+      - default: false
+        description: Force regeneration ignoring cache
+        in: query
+        name: force_regenerate
+        type: boolean
       produces:
       - application/pdf
       responses:

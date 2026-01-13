@@ -423,13 +423,15 @@ func (s *ResumeService) GeneratePDF(ctx context.Context, req GeneratePDFRequest)
 	// Build HTML using Jake's Resume template.
 	template := NewJakeResumeTemplate()
 	html := template.Render(ResumeTemplateData{
-		User:      user,
-		Resume:    resume,
-		Education: education,
-		Projects:  projects,
-		Languages: languages,
-		Skills:    skills,
-		FontSize:  11, // Default to 11pt
+		User:        user,
+		Resume:      resume,
+		Education:   education,
+		Projects:    projects,
+		Languages:   languages,
+		Skills:      skills,
+		FontSize:    11, // Default to 11pt
+		ShowSummary: true,
+		Locale:      ParseLocale(resume.TargetLanguage),
 	})
 
 	// Generate PDF.
@@ -474,8 +476,9 @@ func (s *ResumeService) GeneratePDF(ctx context.Context, req GeneratePDFRequest)
 
 // DownloadPDFRequest contains parameters for downloading a resume PDF.
 type DownloadPDFRequest struct {
-	ResumeID     string
-	TemplateName string
+	ResumeID        string
+	TemplateName    string
+	ForceRegenerate bool
 }
 
 // DownloadPDFResult contains the result of downloading a PDF.
@@ -502,24 +505,26 @@ func (s *ResumeService) DownloadPDF(ctx context.Context, req DownloadPDFRequest)
 		return nil, fmt.Errorf("failed to get user: %w", err)
 	}
 
-	// Check if PDF already exists.
+	// Check if PDF already exists (skip cache if force regenerate is requested).
 	filename := fmt.Sprintf("resumes/%s/%s.pdf", resume.UserID, resume.ID)
 
-	// Try to download existing PDF.
-	reader, err := s.fileStorage.Download(ctx, filename)
-	if err == nil && reader != nil {
-		defer reader.Close()
-		content, readErr := readAll(reader)
-		if readErr == nil && len(content) > 0 {
-			return &DownloadPDFResult{
-				Content:     content,
-				Filename:    s.generatePDFFilename(user, resume),
-				ContentType: "application/pdf",
-			}, nil
+	if !req.ForceRegenerate {
+		// Try to download existing PDF from cache.
+		reader, err := s.fileStorage.Download(ctx, filename)
+		if err == nil && reader != nil {
+			defer reader.Close()
+			content, readErr := readAll(reader)
+			if readErr == nil && len(content) > 0 {
+				return &DownloadPDFResult{
+					Content:     content,
+					Filename:    s.generatePDFFilename(user, resume),
+					ContentType: "application/pdf",
+				}, nil
+			}
 		}
 	}
 
-	// PDF doesn't exist, generate it.
+	// PDF doesn't exist or force regenerate requested, generate it.
 	languages, err := s.languageRepo.ListByUserID(ctx, resume.UserID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get languages: %w", err)
@@ -546,13 +551,15 @@ func (s *ResumeService) DownloadPDF(ctx context.Context, req DownloadPDFRequest)
 	// Build HTML using Jake's Resume template.
 	template := NewJakeResumeTemplate()
 	htmlContent := template.Render(ResumeTemplateData{
-		User:      user,
-		Resume:    resume,
-		Education: education,
-		Projects:  projects,
-		Languages: languages,
-		Skills:    skills,
-		FontSize:  11,
+		User:        user,
+		Resume:      resume,
+		Education:   education,
+		Projects:    projects,
+		Languages:   languages,
+		Skills:      skills,
+		FontSize:    11,
+		ShowSummary: true,
+		Locale:      ParseLocale(resume.TargetLanguage),
 	})
 
 	templateName := req.TemplateName
