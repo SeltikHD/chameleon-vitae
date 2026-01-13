@@ -55,6 +55,8 @@ type Services struct {
 	BulletService     *services.BulletService
 	SkillService      *services.SkillService
 	ResumeService     *services.ResumeService
+	EducationService  *services.EducationService
+	ProjectService    *services.ProjectService
 }
 
 // Router wraps the Chi router and handlers.
@@ -75,6 +77,8 @@ type Router struct {
 	languageHandler   *SpokenLanguageHandler
 	resumeHandler     *ResumeHandler
 	toolsHandler      *ToolsHandler
+	educationHandler  *EducationHandler
+	projectHandler    *ProjectHandler
 }
 
 // NewRouter creates a new HTTP router with the given configuration and services.
@@ -135,6 +139,8 @@ func (r *Router) setupHandlers() {
 	r.languageHandler = NewSpokenLanguageHandler(r.services.SkillService) // Spoken languages are in SkillService
 	r.resumeHandler = NewResumeHandler(r.services.ResumeService)
 	r.toolsHandler = NewToolsHandler(r.services.ResumeService) // Tools use ResumeService for job parsing
+	r.educationHandler = NewEducationHandler(r.services.EducationService)
+	r.projectHandler = NewProjectHandler(r.services.ProjectService)
 }
 
 // setupRoutes configures all API routes.
@@ -218,6 +224,34 @@ func (r *Router) setupRoutes() {
 
 				lang.Route("/{languageID}", func(langByID chi.Router) {
 					langByID.Delete("/", r.languageHandler.Delete)
+				})
+			})
+
+			// Education
+			protected.Route("/education", func(edu chi.Router) {
+				edu.Get("/", r.educationHandler.List)
+				edu.Post("/", r.educationHandler.Create)
+
+				edu.Route("/{educationID}", func(eduByID chi.Router) {
+					eduByID.Get("/", r.educationHandler.Get)
+					eduByID.Put("/", r.educationHandler.Update)
+					eduByID.Delete("/", r.educationHandler.Delete)
+				})
+			})
+
+			// Projects
+			protected.Route("/projects", func(proj chi.Router) {
+				proj.Get("/", r.projectHandler.List)
+				proj.Post("/", r.projectHandler.Create)
+
+				proj.Route("/{projectID}", func(projByID chi.Router) {
+					projByID.Get("/", r.projectHandler.Get)
+					projByID.Put("/", r.projectHandler.Update)
+					projByID.Delete("/", r.projectHandler.Delete)
+
+					// Project bullets
+					projByID.Post("/bullets", r.projectHandler.AddBullet)
+					projByID.Delete("/bullets/{bulletID}", r.projectHandler.DeleteBullet)
 				})
 			})
 

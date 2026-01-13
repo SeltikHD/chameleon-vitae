@@ -212,6 +212,124 @@ type AnalyzeBulletRequest struct {
 }
 
 // ===============================
+// Education DTOs
+// ===============================
+
+// EducationResponse represents an education entry in API responses.
+type EducationResponse struct {
+	ID           string    `json:"id" example:"550e8400-e29b-41d4-a716-446655440000"`
+	Institution  string    `json:"institution" example:"Massachusetts Institute of Technology"`
+	Degree       string    `json:"degree" example:"Bachelor of Science"`
+	FieldOfStudy string    `json:"field_of_study" example:"Computer Science"`
+	Location     *string   `json:"location,omitempty" example:"Cambridge, MA"`
+	StartDate    *string   `json:"start_date,omitempty" example:"2018-09-01"`
+	EndDate      *string   `json:"end_date,omitempty" example:"2022-05-15"`
+	GPA          *string   `json:"gpa,omitempty" example:"3.85/4.0"`
+	Honors       []string  `json:"honors,omitempty" example:"Magna Cum Laude,Dean's List"`
+	DisplayOrder int       `json:"display_order" example:"0"`
+	CreatedAt    time.Time `json:"created_at" example:"2026-01-09T10:00:00Z"`
+	UpdatedAt    time.Time `json:"updated_at" example:"2026-01-09T10:00:00Z"`
+}
+
+// CreateEducationRequest represents the request body for creating an education entry.
+type CreateEducationRequest struct {
+	Institution  string   `json:"institution" example:"Massachusetts Institute of Technology"`
+	Degree       string   `json:"degree" example:"Bachelor of Science"`
+	FieldOfStudy string   `json:"field_of_study" example:"Computer Science"`
+	Location     *string  `json:"location,omitempty" example:"Cambridge, MA"`
+	StartDate    *string  `json:"start_date,omitempty" example:"2018-09-01"`
+	EndDate      *string  `json:"end_date,omitempty" example:"2022-05-15"`
+	GPA          *string  `json:"gpa,omitempty" example:"3.85/4.0"`
+	Honors       []string `json:"honors,omitempty" example:"Magna Cum Laude,Dean's List"`
+	DisplayOrder int      `json:"display_order,omitempty" example:"0"`
+}
+
+// UpdateEducationRequest represents the request body for updating an education entry.
+type UpdateEducationRequest struct {
+	Institution  *string  `json:"institution,omitempty" example:"MIT"`
+	Degree       *string  `json:"degree,omitempty" example:"Master of Science"`
+	FieldOfStudy *string  `json:"field_of_study,omitempty" example:"Artificial Intelligence"`
+	Location     *string  `json:"location,omitempty" example:"Cambridge, MA"`
+	StartDate    *string  `json:"start_date,omitempty" example:"2022-09-01"`
+	EndDate      *string  `json:"end_date,omitempty" example:"2024-05-15"`
+	GPA          *string  `json:"gpa,omitempty" example:"3.95/4.0"`
+	Honors       []string `json:"honors,omitempty" example:"Summa Cum Laude"`
+	DisplayOrder *int     `json:"display_order,omitempty" example:"1"`
+}
+
+// ListEducationResponse represents the list of education entries.
+type ListEducationResponse struct {
+	Data  []EducationResponse `json:"data"`
+	Total int                 `json:"total" example:"2"`
+}
+
+// ===============================
+// Project DTOs
+// ===============================
+
+// ProjectResponse represents a project in API responses.
+type ProjectResponse struct {
+	ID            string                  `json:"id" example:"550e8400-e29b-41d4-a716-446655440000"`
+	Name          string                  `json:"name" example:"Chameleon Vitae"`
+	Description   string                  `json:"description,omitempty" example:"AI-powered resume engineering tool"`
+	TechStack     []string                `json:"tech_stack" example:"Go,Vue.js,PostgreSQL"`
+	URL           string                  `json:"url,omitempty" example:"https://chameleon-vitae.dev"`
+	RepositoryURL string                  `json:"repository_url,omitempty" example:"https://github.com/SeltikHD/chameleon-vitae"`
+	StartDate     *string                 `json:"start_date,omitempty" example:"2024-01-01"`
+	EndDate       *string                 `json:"end_date,omitempty" example:"2024-06-30"`
+	DisplayOrder  int                     `json:"display_order" example:"0"`
+	Bullets       []ProjectBulletResponse `json:"bullets,omitempty"`
+	CreatedAt     time.Time               `json:"created_at" example:"2026-01-09T10:00:00Z"`
+	UpdatedAt     time.Time               `json:"updated_at" example:"2026-01-09T10:00:00Z"`
+}
+
+// ProjectBulletResponse represents a project bullet in API responses.
+type ProjectBulletResponse struct {
+	ID           string    `json:"id" example:"550e8400-e29b-41d4-a716-446655440000"`
+	ProjectID    string    `json:"project_id" example:"550e8400-e29b-41d4-a716-446655440001"`
+	Content      string    `json:"content" example:"Implemented AI-driven bullet selection algorithm"`
+	DisplayOrder int       `json:"display_order" example:"0"`
+	CreatedAt    time.Time `json:"created_at" example:"2026-01-09T10:00:00Z"`
+}
+
+// CreateProjectRequest represents the request body for creating a project.
+type CreateProjectRequest struct {
+	Name          string   `json:"name" example:"Chameleon Vitae"`
+	Description   string   `json:"description,omitempty" example:"AI-powered resume engineering tool"`
+	TechStack     []string `json:"tech_stack,omitempty" example:"Go,Vue.js,PostgreSQL"`
+	URL           string   `json:"url,omitempty" example:"https://chameleon-vitae.dev"`
+	RepositoryURL string   `json:"repository_url,omitempty" example:"https://github.com/SeltikHD/chameleon-vitae"`
+	StartDate     *string  `json:"start_date,omitempty" example:"2024-01-01"`
+	EndDate       *string  `json:"end_date,omitempty" example:"2024-06-30"`
+	DisplayOrder  int      `json:"display_order,omitempty" example:"0"`
+	Bullets       []string `json:"bullets,omitempty" example:"Implemented feature X,Optimized performance by 50%"`
+}
+
+// UpdateProjectRequest represents the request body for updating a project.
+type UpdateProjectRequest struct {
+	Name          *string  `json:"name,omitempty" example:"Chameleon Vitae v2"`
+	Description   *string  `json:"description,omitempty" example:"Updated description"`
+	TechStack     []string `json:"tech_stack,omitempty" example:"Go,Vue.js,PostgreSQL,Redis"`
+	URL           *string  `json:"url,omitempty" example:"https://new-url.dev"`
+	RepositoryURL *string  `json:"repository_url,omitempty" example:"https://github.com/new/repo"`
+	StartDate     *string  `json:"start_date,omitempty" example:"2024-01-01"`
+	EndDate       *string  `json:"end_date,omitempty" example:"2025-01-01"`
+	DisplayOrder  *int     `json:"display_order,omitempty" example:"1"`
+}
+
+// CreateProjectBulletRequest represents the request body for creating a project bullet.
+type CreateProjectBulletRequest struct {
+	Content      string `json:"content" example:"Implemented new feature"`
+	DisplayOrder int    `json:"display_order,omitempty" example:"0"`
+}
+
+// ListProjectsResponse represents the list of projects.
+type ListProjectsResponse struct {
+	Data  []ProjectResponse `json:"data"`
+	Total int               `json:"total" example:"5"`
+}
+
+// ===============================
 // Skill DTOs
 // ===============================
 
