@@ -139,7 +139,7 @@ func (c *Client) SelectBullets(ctx context.Context, req ports.SelectBulletsReque
 	// Build bullets list for prompt.
 	var bulletsText strings.Builder
 	for i, bullet := range req.AvailableBullets {
-		bulletsText.WriteString(fmt.Sprintf("%d. [ID: %s] %s\n", i+1, bullet.ID, bullet.Content))
+		fmt.Fprintf(&bulletsText, "%d. [ID: %s] %s\n", i+1, bullet.ID, bullet.Content)
 	}
 
 	prompt := fmt.Sprintf(`You are an expert resume consultant. Select the most relevant experience bullets for this job.
@@ -200,38 +200,36 @@ Respond ONLY with valid JSON.`,
 
 // TailorBullet rewrites a bullet to better match job requirements.
 func (c *Client) TailorBullet(ctx context.Context, req ports.TailorBulletRequest) (*ports.TailoredBulletResult, error) {
-	prompt := fmt.Sprintf(`You are an expert resume writer. Rewrite this experience bullet to better match the job requirements.
+	prompt := fmt.Sprintf(`You are an expert Resume Writer and STAR Method Specialist. Your task is to optimize a specific experience bullet point.
 
 ORIGINAL BULLET:
 %s
 
-JOB CONTEXT:
-- Title: %s
+TARGET CONTEXT:
+- Job Title: %s
 - Required Skills: %s
 - Keywords: %s
 
-GUIDELINES:
-1. Keep the core achievement/responsibility intact
-2. Use action verbs that align with the job
-3. Incorporate relevant keywords naturally
-4. Maintain or improve quantifiable metrics
-5. Keep it concise (1-2 lines max)
-6. Write in %s style
+TASK INSTRUCTIONS:
+1. **Analyze & Polish:** First, check the original bullet for grammar and clarity. Fix any errors.
+2. **STAR Method Check:** Does the bullet follow the STAR method (Situation, Task, **Action**, **Result**)?
+   - *If YES (it has a clear action and quantifiable result):* Keep the structure close to the original. Do not rewrite unnecessary parts.
+   - *If NO (it is vague, e.g., "Worked on API"):* Rewrite it to include a specific **Action** and a measurable **Result** (e.g., "Architected a REST API handling **10k requests/sec**").
+3. **Keyword Integration:** Naturally weave in the provided keywords if they fit the context.
+4. **Style:** Write strictly in %s.
 
-SMART BOLDING (REQUIRED):
-Apply **bold** markdown syntax to highlight:
-- Technical skills and technologies (e.g., **Python**, **AWS**, **React**)
-- Quantifiable metrics and numbers (e.g., **40%%**, **3x faster**, **$2M**)
-- Key achievements and impact words (e.g., **led**, **architected**, **reduced**)
-Use sparingly - maximum 3-4 bold terms per bullet to maintain readability.
+SMART BOLDING (CRITICAL):
+Apply **bold** markdown syntax to specific high-value terms. Use bolding for:
+- **Hard Skills/Tech Stack:** (e.g., **Go**, **PostgreSQL**, **Docker**)
+- **Quantifiable Metrics:** (e.g., **30%% reduction**, **500ms**, **$1M revenue**)
+- **Strong Action Verbs:** (e.g., **Orchestrated**, **Deployed**, **Optimized**)
+*Constraint:* Limit to 3-5 bolded terms per bullet to ensure readability.
 
-Respond with JSON:
+Response format (JSON ONLY):
 {
-  "tailored_content": "the rewritten bullet with **bold** keywords",
-  "keywords": ["matched", "keywords", "used"]
-}
-
-Respond ONLY with valid JSON.`,
+  "tailored_content": "The optimized bullet string with **markdown** formatting",
+  "keywords": ["list", "of", "keywords", "used"]
+}`,
 		req.Bullet.Content,
 		req.JobAnalysis.Title,
 		strings.Join(req.JobAnalysis.RequiredSkills, ", "),
