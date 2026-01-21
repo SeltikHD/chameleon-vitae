@@ -253,19 +253,23 @@
             >
               <UInputMenu
                 v-model="categoryModel"
+                v-model:query="categoryQuery"
                 :items="skillCategoryOptions"
-                value-key="value"
                 class="w-full"
                 placeholder="Select or type a category..."
                 creatable
-                highlight
+                searchable
+                @keydown.enter.prevent.stop="handleManualCreate"
               >
                 <template #empty="{ searchTerm }">
                   <div
                     v-if="searchTerm"
                     class="px-3 py-2 text-sm text-zinc-400"
                   >
-                    Press Enter to create "<span class="text-emerald-400 font-medium">{{ searchTerm }}</span>"
+                    Press Enter to create "<span class="text-emerald-400 font-medium">{{
+                      searchTerm
+                    }}</span
+                    >"
                   </div>
                   <div
                     v-else
@@ -370,10 +374,16 @@ const skillForm = reactive<SkillInput & { is_highlighted: boolean }>({
   is_highlighted: false
 })
 
-// Computed wrapper for UInputMenu - handles string value for creatable menu
+// Query for UInputMenu creatable functionality
+const categoryQuery = ref('')
+
+// Computed wrapper for UInputMenu - handles object value for creatable menu
 const categoryModel = computed({
-  get: () => skillForm.category ?? '',
-  set: (value: string | { label: string, value: string } | undefined) => {
+  get: (): { label: string; value: string } | undefined => {
+    if (!skillForm.category) return undefined
+    return { label: skillForm.category, value: skillForm.category }
+  },
+  set: (value: string | { label: string; value: string } | undefined) => {
     // Handle both string (from creatable) and object (from selection)
     if (typeof value === 'string') {
       skillForm.category = value || null
@@ -397,6 +407,25 @@ const defaultCategories = [
   'Tools',
   'Other'
 ]
+
+// Function to handle manual creation of category on Enter key
+const handleManualCreate = (e: KeyboardEvent) => {
+  // Cast target to HTMLInputElement to access value
+  const target = e.target as HTMLInputElement
+
+  // Get the value directly from the DOM, ignoring Vue's reactivity which might be reset
+  const newCategory = target.value
+
+  if (newCategory && newCategory.trim() !== '') {
+    // Set the category in the form
+    skillForm.category = newCategory.trim()
+
+    // Update the query to visually reflect (even though the modal might close or the input might clear)
+    categoryQuery.value = newCategory.trim()
+  }
+}
+
+// Mantenha seu categoryModel computed como estava, ele já trata string corretamente.
 
 // Dynamic category options - combines defaults with user's custom categories
 const skillCategoryOptions = computed(() => {
