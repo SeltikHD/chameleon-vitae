@@ -10,7 +10,6 @@ permissions:
   contents: read
 
 env:
-  # Firebase configuration for tests (use dummy values for CI)
   FIREBASE_PROJECT_ID: test-project-id
 
 jobs:
@@ -23,12 +22,12 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set up Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
-          go-version: '1.25.5'
+          go-version: "1.25.5"
           cache: true
 
       - name: Download dependencies
@@ -41,7 +40,7 @@ jobs:
         run: go vet ./...
 
       - name: Install golangci-lint
-        uses: golangci/golangci-lint-action@v4
+        uses: golangci/golangci-lint-action@v9
         with:
           version: latest
           args: --timeout=5m
@@ -50,13 +49,6 @@ jobs:
         run: go test -v -race -coverprofile=coverage.out -covermode=atomic ./...
         env:
           FIREBASE_PROJECT_ID: ${{ env.FIREBASE_PROJECT_ID }}
-
-      - name: Upload coverage
-        uses: codecov/codecov-action@v4
-        with:
-          files: ./coverage.out
-          flags: backend
-          fail_ci_if_error: false
 
   # ===========================================================================
   # Frontend (Nuxt)
@@ -70,34 +62,27 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v3
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
         with:
-          version: 9
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'pnpm'
-          cache-dependency-path: frontend/pnpm-lock.yaml
+          bun-version: latest
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: bun install --frozen-lockfile
 
       - name: Run linter
-        run: pnpm lint
+        run: bun run lint
 
       - name: Type check
-        run: pnpm typecheck || true
+        run: bun run typecheck || true
 
       - name: Build
-        run: pnpm build
+        run: bun run build
 
   # ===========================================================================
-  # Build Check
+  # Build Check (Go Binary)
   # ===========================================================================
   build:
     name: Build Check
@@ -106,16 +91,13 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set up Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
           go-version: '1.25.5'
           cache: true
 
       - name: Build binary
         run: go build -v -o bin/chameleon-vitae ./cmd/server/main.go
-
-      - name: Verify binary
-        run: ./bin/chameleon-vitae --version 2>/dev/null || echo "Binary built successfully"
