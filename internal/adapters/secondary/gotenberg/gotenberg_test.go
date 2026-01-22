@@ -79,7 +79,7 @@ func TestGetTemplateByName(t *testing.T) {
 	require.NotEmpty(t, templates)
 
 	t.Run("finds existing template", func(t *testing.T) {
-		assert.Equal(t, "professional", templates[0].Name)
+		assert.Equal(t, "jake", templates[0].Name)
 	})
 
 	t.Run("has expected templates", func(t *testing.T) {
@@ -87,6 +87,7 @@ func TestGetTemplateByName(t *testing.T) {
 		for i, tmpl := range templates {
 			names[i] = tmpl.Name
 		}
+		assert.Contains(t, names, "jake")
 		assert.Contains(t, names, "professional")
 		assert.Contains(t, names, "minimal")
 		assert.Contains(t, names, "technical")

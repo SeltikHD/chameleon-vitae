@@ -51,7 +51,7 @@ func TestDefaultConfig(t *testing.T) {
 	cfg := groq.DefaultConfig()
 
 	assert.Equal(t, "llama-3.3-70b-versatile", cfg.ModelGeneration)
-	assert.Equal(t, "llama-4-scout-17b-16e-instruct", cfg.ModelAnalysis)
+	assert.Equal(t, "meta-llama/llama-4-scout-17b-16e-instruct", cfg.ModelAnalysis)
 	assert.Equal(t, 3, cfg.MaxRetries)
 	assert.NotZero(t, cfg.Timeout)
 }
