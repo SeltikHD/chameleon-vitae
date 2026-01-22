@@ -65,12 +65,6 @@ func (r *Router) SetAuthMiddleware(authProvider ports.AuthProvider, userRepo por
 	}
 }
 
-// authMiddleware instance stored in router.
-type _authMiddlewareInstance struct {
-	authProvider ports.AuthProvider
-	userRepo     ports.UserRepository
-}
-
 // AuthMiddleware is the authentication middleware that validates Firebase tokens.
 func (r *Router) AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {

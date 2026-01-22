@@ -103,7 +103,7 @@ func (a *Adapter) VerifyToken(ctx context.Context, idToken string) (*ports.AuthC
 		if auth.IsIDTokenExpired(err) {
 			return nil, ErrTokenExpired
 		}
-		return nil, fmt.Errorf("%w: %v", ErrInvalidToken, err)
+		return nil, fmt.Errorf("%w: %w", ErrInvalidToken, err)
 	}
 
 	// Extract claims.

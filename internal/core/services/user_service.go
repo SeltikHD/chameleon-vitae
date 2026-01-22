@@ -4,6 +4,7 @@ package services
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -47,7 +48,7 @@ func (s *UserService) SyncUser(ctx context.Context, req SyncUserRequest) (*SyncU
 
 	// Try to find existing user.
 	existingUser, err := s.userRepo.GetByFirebaseUID(ctx, claims.UserID)
-	if err != nil && err != domain.ErrUserNotFound {
+	if err != nil && !errors.Is(err, domain.ErrUserNotFound) {
 		return nil, fmt.Errorf("failed to check existing user: %w", err)
 	}
 

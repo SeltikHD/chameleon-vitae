@@ -722,32 +722,6 @@ func extractDomain(url string) string {
 	return url
 }
 
-func formatEducationDateRange(startDate, endDate *domain.Date) string {
-	if startDate == nil && endDate == nil {
-		return ""
-	}
-
-	format := func(d *domain.Date) string {
-		if d == nil || d.IsZero() {
-			return ""
-		}
-		return d.Time.Format("Jan 2006")
-	}
-
-	start := format(startDate)
-	end := format(endDate)
-
-	if end == "" {
-		end = "Present"
-	}
-
-	if start == "" {
-		return end
-	}
-
-	return start + " – " + end
-}
-
 func formatEducationDateRangeLocalized(startDate, endDate *domain.Date, i18n *I18n) string {
 	if startDate == nil && endDate == nil {
 		return ""
@@ -774,19 +748,6 @@ func formatEducationDateRangeLocalized(startDate, endDate *domain.Date, i18n *I1
 	return start + " – " + end
 }
 
-func formatExperienceDateRange(startDate string, endDate *string, isCurrent bool) string {
-	if startDate == "" {
-		return ""
-	}
-
-	end := "Present"
-	if !isCurrent && endDate != nil && *endDate != "" {
-		end = *endDate
-	}
-
-	return startDate + " – " + end
-}
-
 func formatExperienceDateRangeLocalized(startDate string, endDate *string, isCurrent bool, i18n *I18n) string {
 	if startDate == "" {
 		return ""
@@ -796,36 +757,6 @@ func formatExperienceDateRangeLocalized(startDate string, endDate *string, isCur
 	end := i18n.T(KeyPresent)
 	if !isCurrent && endDate != nil && *endDate != "" {
 		end = i18n.FormatDateString(*endDate)
-	}
-
-	return start + " – " + end
-}
-
-func formatProjectDateRange(startDate, endDate *domain.Date) string {
-	if startDate == nil && endDate == nil {
-		return ""
-	}
-
-	format := func(d *domain.Date) string {
-		if d == nil || d.IsZero() {
-			return ""
-		}
-		return d.Time.Format("Jan 2006")
-	}
-
-	start := format(startDate)
-	end := format(endDate)
-
-	if start == "" && end == "" {
-		return ""
-	}
-
-	if end == "" {
-		return start
-	}
-
-	if start == "" {
-		return end
 	}
 
 	return start + " – " + end
