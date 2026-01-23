@@ -35,9 +35,6 @@ COPY --from=builder /app/main .
 # Create the secrets directory
 RUN mkdir -p /etc/secrets
 
-# Copy the configuration file from the builder stage
-COPY --from=builder /app/etc/secrets/config.yaml /etc/secrets/config.yaml
-
 # Expose the port
 EXPOSE 8080
 
