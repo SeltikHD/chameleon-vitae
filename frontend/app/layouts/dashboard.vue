@@ -14,7 +14,7 @@
           class="flex items-center gap-2 overflow-hidden"
         >
           <img
-            src="~/assets/icons/logo.svg"
+            src="~../public/logo.svg"
             alt="Chameleon Vitae Logo"
             class="h-8 w-8 shrink-0 -scale-x-100"
           />

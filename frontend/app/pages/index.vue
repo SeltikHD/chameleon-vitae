@@ -1,3 +1,130 @@
+<script setup lang="ts">
+const config = useRuntimeConfig()
+const siteUrl = config.public.siteUrl
+
+definePageMeta({
+  layout: 'default'
+})
+
+// Enhanced SEO for Homepage
+useHead({
+  title: 'Chameleon Vitae — AI-Powered Resume Builder That Beats ATS',
+  link: [{ rel: 'canonical', href: siteUrl }]
+})
+
+useSeoMeta({
+  title: 'Chameleon Vitae — AI-Powered Resume Builder That Beats ATS',
+  description:
+    'Create ATS-friendly resumes with AI. Chameleon Vitae maintains atomic experience bullets and intelligently rewrites them for each job application. Get past automated screening systems.',
+  ogTitle: 'Chameleon Vitae — AI Resume Builder That Beats ATS',
+  ogDescription:
+    'AI-powered resume engineering system that beats ATS. Maintain atomic experience bullets, let AI select and rewrite them for each job application.',
+  ogType: 'website',
+  ogUrl: siteUrl,
+  ogImage: `${siteUrl}/og-image.png`,
+  twitterCard: 'summary_large_image'
+})
+
+// JSON-LD Structured Data for Homepage
+useJsonld({
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'Chameleon Vitae',
+  url: siteUrl,
+  potentialAction: {
+    '@type': 'SearchAction',
+    target: {
+      '@type': 'EntryPoint',
+      urlTemplate: `${siteUrl}/search?q={search_term_string}`
+    }
+  }
+})
+
+// FAQ JSON-LD
+useJsonld({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: 'What is Chameleon Vitae?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Chameleon Vitae is an AI-powered resume engineering system that helps you create ATS-friendly resumes by maintaining atomic experience bullets and intelligently rewriting them for each job application.'
+      }
+    },
+    {
+      '@type': 'Question',
+      name: 'How does Chameleon Vitae beat ATS systems?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Chameleon Vitae uses AI to analyze job descriptions and automatically select and rewrite your experience bullets to match the specific requirements, ensuring maximum ATS match scores.'
+      }
+    },
+    {
+      '@type': 'Question',
+      name: 'Is Chameleon Vitae free to use?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Yes, Chameleon Vitae is an open-source project available for free. You can self-host it or use our hosted version.'
+      }
+    }
+  ]
+})
+
+const features = [
+  {
+    icon: 'i-lucide-brain',
+    title: 'AI-Powered Tailoring',
+    description:
+      'Our AI analyzes job descriptions and rewrites your experience bullets to match exactly what recruiters are looking for.',
+    color: 'secondary' as const
+  },
+  {
+    icon: 'i-lucide-file-check',
+    title: 'ATS-Optimized PDFs',
+    description:
+      'Generated with Headless Chrome for pixel-perfect, machine-readable documents that pass through any Applicant Tracking System.',
+    color: 'primary' as const
+  },
+  {
+    icon: 'i-lucide-layers',
+    title: 'Atomic Experience Bullets',
+    description:
+      'Your experiences are stored as modular bullets, allowing the AI to select and combine them uniquely for each application.',
+    color: 'primary' as const
+  }
+]
+
+const steps = [
+  {
+    icon: 'i-lucide-upload',
+    title: 'Import Your Experiences',
+    description:
+      'Add your work history, education, and projects. Break them down into achievement-focused bullets.'
+  },
+  {
+    icon: 'i-lucide-clipboard-paste',
+    title: 'Paste the Job Description',
+    description:
+      'Just paste the URL or text of any job posting. Our AI extracts key requirements automatically.'
+  },
+  {
+    icon: 'i-lucide-download',
+    title: 'Download Tailored Resume',
+    description:
+      'Get a professionally formatted PDF with bullets selected and rewritten to maximize your match score.'
+  }
+]
+
+const stats = [
+  { value: '95%', label: 'ATS Pass Rate' },
+  { value: '3x', label: 'More Interviews' },
+  { value: '<30s', label: 'Generation Time' },
+  { value: '100%', label: 'Open Source' }
+]
+</script>
+
 <template>
   <div>
     <!-- Hero Section -->
@@ -41,8 +168,8 @@
 
         <!-- Subheadline -->
         <p class="mx-auto mt-6 max-w-2xl text-lg text-zinc-400 md:text-xl">
-          Stop sending the same resume everywhere. Chameleon Vitae uses AI to tailor your experience
-          bullets to each job description, maximizing your ATS match score.
+          Stop sending the same resume everywhere. <strong>Chameleon Vitae</strong> uses AI to
+          tailor your experience bullets to each job description, maximizing your ATS match score.
         </p>
 
         <!-- CTA Buttons -->
@@ -59,19 +186,31 @@
             />
           </UButton>
           <UButton
-            to="#how-it-works"
+            to="https://github.com/SeltikHD/chameleon-vitae"
+            target="_blank"
             color="neutral"
             variant="outline"
             size="xl"
+            icon="i-simple-icons-github"
           >
-            See How It Works
+            View on GitHub
           </UButton>
         </div>
 
-        <!-- Social Proof -->
-        <p class="mt-8 text-sm text-zinc-500">
-          Trusted by <span class="text-zinc-300">2,500+</span> job seekers worldwide
-        </p>
+        <!-- Social Proof + Stats -->
+        <div class="mt-16 grid grid-cols-2 gap-8 md:grid-cols-4">
+          <div
+            v-for="stat in stats"
+            :key="stat.label"
+          >
+            <div class="text-3xl font-bold text-emerald-400 md:text-4xl">
+              {{ stat.value }}
+            </div>
+            <div class="mt-2 text-sm text-zinc-400">
+              {{ stat.label }}
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -152,56 +291,3 @@
     </section>
   </div>
 </template>
-
-<script setup lang="ts">
-definePageMeta({
-  layout: 'default'
-})
-
-// Feature cards data.
-const features = [
-  {
-    icon: 'i-lucide-brain',
-    title: 'AI-Powered Tailoring',
-    description:
-      'Our AI analyzes job descriptions and rewrites your experience bullets to match exactly what recruiters are looking for.',
-    color: 'secondary' as const
-  },
-  {
-    icon: 'i-lucide-file-check',
-    title: 'ATS-Optimized PDFs',
-    description:
-      'Generated with Headless Chrome for pixel-perfect, machine-readable documents that pass through any Applicant Tracking System.',
-    color: 'primary' as const
-  },
-  {
-    icon: 'i-lucide-layers',
-    title: 'Atomic Experience Bullets',
-    description:
-      'Your experiences are stored as modular bullets, allowing the AI to select and combine them uniquely for each application.',
-    color: 'primary' as const
-  }
-]
-
-// How it works steps.
-const steps = [
-  {
-    icon: 'i-lucide-upload',
-    title: 'Import Your Experiences',
-    description:
-      'Add your work history, education, and projects. Break them down into achievement-focused bullets.'
-  },
-  {
-    icon: 'i-lucide-clipboard-paste',
-    title: 'Paste the Job Description',
-    description:
-      'Just paste the URL or text of any job posting. Our AI extracts key requirements automatically.'
-  },
-  {
-    icon: 'i-lucide-download',
-    title: 'Download Tailored Resume',
-    description:
-      'Get a professionally formatted PDF with bullets selected and rewritten to maximize your match score.'
-  }
-]
-</script>

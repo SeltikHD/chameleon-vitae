@@ -185,6 +185,28 @@
 <script setup lang="ts">
 import { useAuthStore } from '~/stores/auth'
 
+const config = useRuntimeConfig()
+
+// SEO: Login pages should not be indexed by search engines
+useHead({
+  link: [
+    {
+      rel: 'canonical',
+      href: `${config.public.siteUrl}/login`
+    }
+  ]
+})
+
+useSeoMeta({
+  title: 'Login - Chameleon Vitae',
+  description: 'Sign in to your Chameleon Vitae account to create AI-powered resumes.',
+  robots: 'noindex, nofollow', // Prevent search engines from indexing this page
+  ogTitle: 'Login - Chameleon Vitae',
+  ogDescription: 'Sign in to your account',
+  twitterTitle: 'Login - Chameleon Vitae',
+  twitterDescription: 'Sign in to your account'
+})
+
 definePageMeta({
   layout: false
 })

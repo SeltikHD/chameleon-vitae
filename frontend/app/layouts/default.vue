@@ -1,5 +1,6 @@
 <template>
   <div class="min-h-screen bg-zinc-950">
+    <SpeedInsights />
     <!-- Public Header -->
     <header
       class="fixed left-0 right-0 top-0 z-50 border-b border-zinc-800 bg-zinc-950/80 backdrop-blur-sm"
@@ -83,5 +84,5 @@
 </template>
 
 <script setup lang="ts">
-// Default layout for public pages.
+import { SpeedInsights } from '@vercel/speed-insights/vue'
 </script>

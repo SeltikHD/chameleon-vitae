@@ -4,7 +4,7 @@
     class="flex items-center gap-2"
   >
     <img
-      src="~/assets/icons/logo.svg"
+      src="~../public/logo.svg"
       alt="Chameleon Vitae Logo"
       class="-scale-x-100"
       :class="logoSizeClass"
