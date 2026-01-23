@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"strings"
 	"time"
@@ -119,6 +120,7 @@ Respond ONLY with valid JSON, no additional text.`, req.JobDescription)
 	}
 
 	if err := json.Unmarshal([]byte(cleanJSON(response)), &result); err != nil {
+		log.Printf("json to parse: %s", cleanJSON(response))
 		return nil, fmt.Errorf("groq: failed to parse job analysis: %w", err)
 	}
 
@@ -189,6 +191,7 @@ Respond ONLY with valid JSON.`,
 	}
 
 	if err := json.Unmarshal([]byte(cleanJSON(response)), &result); err != nil {
+		log.Printf("json to parse: %s", cleanJSON(response))
 		return nil, fmt.Errorf("groq: failed to parse bullet selection: %w", err)
 	}
 
@@ -248,6 +251,7 @@ Response format (JSON ONLY):
 	}
 
 	if err := json.Unmarshal([]byte(cleanJSON(response)), &result); err != nil {
+		log.Printf("json to parse: %s", cleanJSON(response))
 		return nil, fmt.Errorf("groq: failed to parse tailored bullet: %w", err)
 	}
 
@@ -329,6 +333,7 @@ Respond ONLY with valid JSON.`,
 	}
 
 	if err := json.Unmarshal([]byte(cleanJSON(response)), &result); err != nil {
+		log.Printf("json to parse: %s", cleanJSON(response))
 		return nil, fmt.Errorf("groq: failed to parse summary: %w", err)
 	}
 
@@ -410,6 +415,7 @@ Respond ONLY with valid JSON.`,
 	}
 
 	if err := json.Unmarshal([]byte(cleanJSON(response)), &result); err != nil {
+		log.Printf("json to parse: %s", cleanJSON(response))
 		return nil, fmt.Errorf("groq: failed to parse match score: %w", err)
 	}
 
@@ -494,6 +500,7 @@ func (c *Client) chatCompletion(ctx context.Context, model, prompt string, tempe
 		}
 
 		if err := json.Unmarshal([]byte(cleanJSON(string(respBody))), &response); err != nil {
+			log.Printf("json to parse: %s", cleanJSON(string(respBody)))
 			return "", fmt.Errorf("failed to parse response: %w", err)
 		}
 
