@@ -105,6 +105,7 @@ func Load() (*Config, error) {
 	v.AddConfigPath(".")
 	v.AddConfigPath("./config")
 	v.AddConfigPath("/etc/chameleon-vitae")
+	v.AddConfigPath("/etc/secrets")
 
 	// Enable environment variable reading
 	v.SetEnvPrefix("CHAMELEON")
