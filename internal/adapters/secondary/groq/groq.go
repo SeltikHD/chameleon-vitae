@@ -118,7 +118,7 @@ Respond ONLY with valid JSON, no additional text.`, req.JobDescription)
 		Summary         string   `json:"summary"`
 	}
 
-	if err := json.Unmarshal([]byte(response), &result); err != nil {
+	if err := json.Unmarshal([]byte(cleanJSON(response)), &result); err != nil {
 		return nil, fmt.Errorf("groq: failed to parse job analysis: %w", err)
 	}
 
@@ -188,7 +188,7 @@ Respond ONLY with valid JSON.`,
 		Reasoning         string   `json:"reasoning"`
 	}
 
-	if err := json.Unmarshal([]byte(response), &result); err != nil {
+	if err := json.Unmarshal([]byte(cleanJSON(response)), &result); err != nil {
 		return nil, fmt.Errorf("groq: failed to parse bullet selection: %w", err)
 	}
 
@@ -247,7 +247,7 @@ Response format (JSON ONLY):
 		Keywords        []string `json:"keywords"`
 	}
 
-	if err := json.Unmarshal([]byte(response), &result); err != nil {
+	if err := json.Unmarshal([]byte(cleanJSON(response)), &result); err != nil {
 		return nil, fmt.Errorf("groq: failed to parse tailored bullet: %w", err)
 	}
 
@@ -328,7 +328,7 @@ Respond ONLY with valid JSON.`,
 		Summary string `json:"summary"`
 	}
 
-	if err := json.Unmarshal([]byte(response), &result); err != nil {
+	if err := json.Unmarshal([]byte(cleanJSON(response)), &result); err != nil {
 		return nil, fmt.Errorf("groq: failed to parse summary: %w", err)
 	}
 
@@ -409,7 +409,7 @@ Respond ONLY with valid JSON.`,
 		Score int `json:"score"`
 	}
 
-	if err := json.Unmarshal([]byte(response), &result); err != nil {
+	if err := json.Unmarshal([]byte(cleanJSON(response)), &result); err != nil {
 		return nil, fmt.Errorf("groq: failed to parse match score: %w", err)
 	}
 
@@ -493,7 +493,7 @@ func (c *Client) chatCompletion(ctx context.Context, model, prompt string, tempe
 			} `json:"choices"`
 		}
 
-		if err := json.Unmarshal(respBody, &response); err != nil {
+		if err := json.Unmarshal([]byte(cleanJSON(string(respBody))), &response); err != nil {
 			return "", fmt.Errorf("failed to parse response: %w", err)
 		}
 
@@ -522,4 +522,20 @@ func stringPtr(s *string) string {
 		return ""
 	}
 	return *s
+}
+
+// cleanJSON extracts JSON content from a string that may contain markdown formatting.
+func cleanJSON(input string) string {
+	// Starts the JSON object
+	start := strings.Index(input, "{")
+	// Finds the end of the JSON object
+	end := strings.LastIndex(input, "}")
+
+	// If both start and end are found, extract the JSON substring
+	if start != -1 && end != -1 && start < end {
+		return input[start : end+1]
+	}
+
+	// If not found, return the original input
+	return input
 }
