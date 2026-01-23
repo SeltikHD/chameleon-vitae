@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { Analytics } from '@vercel/analytics/nuxt'
+
 const config = useRuntimeConfig()
 const siteUrl = config.public.siteUrl
 
@@ -85,6 +87,7 @@ useJsonld({
 <template>
   <UApp>
     <NuxtLayout>
+      <Analytics />
       <NuxtPage />
     </NuxtLayout>
   </UApp>
