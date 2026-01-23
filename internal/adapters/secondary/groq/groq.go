@@ -9,6 +9,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"regexp" // <--- ADDED: Required for the new cleanJSON function
 	"strings"
 	"time"
 
@@ -101,7 +102,7 @@ Provide a JSON response with the following structure:
   "summary": "brief 2-3 sentence summary of the role"
 }
 
-Respond ONLY with valid JSON, no additional text.`, req.JobDescription)
+IMPORTANT: Respond ONLY with valid JSON. Do not include markdown formatting or additional text.`, req.JobDescription)
 
 	response, err := c.chatCompletion(ctx, c.config.ModelAnalysis, prompt, 0.3)
 	if err != nil {
@@ -119,6 +120,7 @@ Respond ONLY with valid JSON, no additional text.`, req.JobDescription)
 		Summary         string   `json:"summary"`
 	}
 
+	// Uses cleanJSON to ensure we get the valid block
 	if err := json.Unmarshal([]byte(cleanJSON(response)), &result); err != nil {
 		log.Printf("json to parse: %s", cleanJSON(response))
 		return nil, fmt.Errorf("groq: failed to parse job analysis: %w", err)
@@ -138,12 +140,12 @@ Respond ONLY with valid JSON, no additional text.`, req.JobDescription)
 
 // SelectBullets selects the most relevant bullets for a job description.
 func (c *Client) SelectBullets(ctx context.Context, req ports.SelectBulletsRequest) (*ports.BulletSelection, error) {
-	// Build bullets list for prompt.
 	var bulletsText strings.Builder
 	for i, bullet := range req.AvailableBullets {
 		fmt.Fprintf(&bulletsText, "%d. [ID: %s] %s\n", i+1, bullet.ID, bullet.Content)
 	}
 
+	// Updated Prompt to discourage "Chain of Thought" output
 	prompt := fmt.Sprintf(`You are an expert resume consultant. Select the most relevant experience bullets for this job.
 
 JOB REQUIREMENTS:
@@ -163,13 +165,16 @@ Select up to %d bullets that best match this job. Prioritize:
 3. Relevant industry experience
 4. Leadership/impact indicators
 
+IMPORTANT RULES:
+1. Return ONLY the final JSON object.
+2. Do not output draft JSONs or reasoning text outside the JSON.
+3. If no bullets match perfectly, select the closest ones and explain in "reasoning".
+
 Respond with JSON:
 {
   "selected_bullet_ids": ["id1", "id2", ...],
   "reasoning": "Brief explanation of selection strategy"
-}
-
-Respond ONLY with valid JSON.`,
+}`,
 		req.JobAnalysis.Title,
 		req.JobAnalysis.Company,
 		strings.Join(req.JobAnalysis.RequiredSkills, ", "),
@@ -190,8 +195,11 @@ Respond ONLY with valid JSON.`,
 		Reasoning         string   `json:"reasoning"`
 	}
 
-	if err := json.Unmarshal([]byte(cleanJSON(response)), &result); err != nil {
-		log.Printf("json to parse: %s", cleanJSON(response))
+	// cleanedResponse handles cases where the model "thinks" before outputting JSON
+	cleanedResponse := cleanJSON(response)
+
+	if err := json.Unmarshal([]byte(cleanedResponse), &result); err != nil {
+		log.Printf("json to parse: %s", cleanedResponse)
 		return nil, fmt.Errorf("groq: failed to parse bullet selection: %w", err)
 	}
 
@@ -227,6 +235,8 @@ Apply **bold** markdown syntax to specific high-value terms. Use bolding for:
 - **Quantifiable Metrics:** (e.g., **30%% reduction**, **500ms**, **$1M revenue**)
 - **Strong Action Verbs:** (e.g., **Orchestrated**, **Deployed**, **Optimized**)
 *Constraint:* Limit to 3-5 bolded terms per bullet to ensure readability.
+
+IMPORTANT: Return ONLY the final JSON. No markdown blocks, no intro text.
 
 Response format (JSON ONLY):
 {
@@ -264,7 +274,6 @@ Response format (JSON ONLY):
 
 // GenerateSummary generates a professional summary tailored to the job.
 func (c *Client) GenerateSummary(ctx context.Context, req ports.GenerateSummaryRequest) (*ports.SummaryResult, error) {
-	// Build context from user and bullets.
 	userName := "Professional"
 	if req.User.Name != nil {
 		userName = *req.User.Name
@@ -306,12 +315,12 @@ Apply **bold** markdown syntax to highlight:
 - Notable achievements or metrics (e.g., **Fortune 500**, **$10M revenue**)
 Use sparingly - maximum 4-6 bold terms in the summary to maintain readability.
 
+IMPORTANT: Respond ONLY with valid JSON.
+
 Respond with JSON:
 {
   "summary": "the generated professional summary with **bold** highlights"
-}
-
-Respond ONLY with valid JSON.`,
+}`,
 		userName,
 		stringPtr(req.User.Headline),
 		stringPtr(req.User.Summary),
@@ -344,13 +353,11 @@ Respond ONLY with valid JSON.`,
 
 // ScoreMatch calculates a match score between resume and job.
 func (c *Client) ScoreMatch(ctx context.Context, req ports.ScoreMatchRequest) (*domain.MatchScore, error) {
-	// Build skills list.
 	var skillsList strings.Builder
 	for _, skill := range req.UserSkills {
 		fmt.Fprintf(&skillsList, "- %s (proficiency: %d%%)\n", skill.Name, skill.ProficiencyLevel.Int())
 	}
 
-	// Build experiences from resume content.
 	var experiencesText strings.Builder
 	if req.Resume != nil {
 		fmt.Fprintf(&experiencesText, "Summary: %s\n\n", req.Resume.Summary)
@@ -383,6 +390,8 @@ Analyze the match and provide a score from 0-100 based on:
 3. Seniority fit (15%%)
 4. Keyword coverage (15%%)
 
+IMPORTANT: Respond ONLY with valid JSON.
+
 Respond with JSON:
 {
   "score": 85,
@@ -393,9 +402,7 @@ Respond with JSON:
     "keywords": 75
   },
   "explanation": "Brief explanation of the score"
-}
-
-Respond ONLY with valid JSON.`,
+}`,
 		req.JobAnalysis.Title,
 		strings.Join(req.JobAnalysis.RequiredSkills, ", "),
 		strings.Join(req.JobAnalysis.PreferredSkills, ", "),
@@ -499,8 +506,9 @@ func (c *Client) chatCompletion(ctx context.Context, model, prompt string, tempe
 			} `json:"choices"`
 		}
 
-		if err := json.Unmarshal([]byte(cleanJSON(string(respBody))), &response); err != nil {
-			log.Printf("json to parse: %s", cleanJSON(string(respBody)))
+		// Warning: This unmarshal handles the GROQ API response (which is always standard JSON),
+		// so using cleanJSON here is usually not necessary for the API envelope itself, but harmless.
+		if err := json.Unmarshal(respBody, &response); err != nil {
 			return "", fmt.Errorf("failed to parse response: %w", err)
 		}
 
@@ -510,13 +518,8 @@ func (c *Client) chatCompletion(ctx context.Context, model, prompt string, tempe
 
 		content := response.Choices[0].Message.Content
 
-		// Clean JSON from markdown code blocks if present.
-		content = strings.TrimSpace(content)
-		content = strings.TrimPrefix(content, "```json")
-		content = strings.TrimPrefix(content, "```")
-		content = strings.TrimSuffix(content, "```")
-		content = strings.TrimSpace(content)
-
+		// Removed manual trim logic here.
+		// We rely on the caller using cleanJSON() which is more robust.
 		return content, nil
 	}
 
@@ -531,18 +534,32 @@ func stringPtr(s *string) string {
 	return *s
 }
 
-// cleanJSON extracts JSON content from a string that may contain markdown formatting.
+// cleanJSON extracts the *last* valid JSON content from a string.
+// This handles cases where the LLM "thinks" before answering or uses markdown blocks.
 func cleanJSON(input string) string {
-	// Starts the JSON object
+	input = strings.TrimSpace(input)
+
+	// Regex to find markdown code blocks: ```json ... ``` or just ``` ... ```
+	// (?s) allows . to match newlines
+	re := regexp.MustCompile(`(?s)\x60\x60\x60(?:json)?(.*?)\x60\x60\x60`)
+	matches := re.FindAllStringSubmatch(input, -1)
+
+	// Scenario 1: LLM used markdown blocks
+	if len(matches) > 0 {
+		// Always take the LAST match, as it represents the final answer
+		// (ignoring drafts or chain-of-thought in previous blocks)
+		lastMatch := matches[len(matches)-1]
+		return strings.TrimSpace(lastMatch[1])
+	}
+
+	// Scenario 2: LLM returned raw JSON without markdown
+	// We assume the standard structure: find the outer braces.
 	start := strings.Index(input, "{")
-	// Finds the end of the JSON object
 	end := strings.LastIndex(input, "}")
 
-	// If both start and end are found, extract the JSON substring
 	if start != -1 && end != -1 && start < end {
 		return input[start : end+1]
 	}
 
-	// If not found, return the original input
 	return input
 }
