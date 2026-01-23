@@ -1,0 +1,27 @@
+# Ignore unnecessary files and directories
+node_modules/
+frontend/
+.git/
+bin/
+deploy/
+tmp/
+coverage.out
+
+# Ignore Dockerfile and Docker Compose files
+Dockerfile
+docker-compose.yml
+
+# Ignore log files
+*.log
+logs/
+
+# Ignore all GitHub files
+.github/
+CODEOWNERS
+DECISIONS.md
+LICENSE
+CONTRIBUTING.md
+
+# Ignore Git files
+.gitignore
+.gitattributes
