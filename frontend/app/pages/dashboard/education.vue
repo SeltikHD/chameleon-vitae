@@ -115,14 +115,36 @@
               >
                 {{ formatDateRange(edu) }}
               </UBadge>
-              <UDropdown :items="getDropdownItems(edu)">
+              <UPopover :popper="{ placement: 'bottom-end' }">
                 <UButton
                   color="neutral"
                   variant="ghost"
                   icon="i-lucide-more-vertical"
                   size="sm"
                 />
-              </UDropdown>
+
+                <template #content="{ close }">
+                  <div class="p-1 min-w-35 flex flex-col gap-0.5">
+                    <UButton
+                      color="neutral"
+                      variant="ghost"
+                      icon="i-lucide-pencil"
+                      label="Edit"
+                      class="justify-start w-full"
+                      @click="openEditModal(edu, close)"
+                    />
+
+                    <UButton
+                      color="error"
+                      variant="ghost"
+                      icon="i-lucide-trash-2"
+                      label="Delete"
+                      class="justify-start w-full text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30"
+                      @click="openDeleteModal(edu, close)"
+                    />
+                  </div>
+                </template>
+              </UPopover>
             </div>
           </div>
         </template>
@@ -457,7 +479,7 @@ function openAddModal() {
   isModalOpen.value = true
 }
 
-function openEditModal(edu: EducationResponse) {
+function openEditModal(edu: EducationResponse, closePopover: () => void) {
   isEditing.value = true
   editingId.value = edu.id
   form.value = {
@@ -472,6 +494,7 @@ function openEditModal(edu: EducationResponse) {
   }
   formErrors.value = {}
   isModalOpen.value = true
+  closePopover()
 }
 
 function closeModal() {
@@ -586,9 +609,10 @@ async function saveEducation() {
   }
 }
 
-function openDeleteModal(edu: EducationResponse) {
+function openDeleteModal(edu: EducationResponse, closePopover: () => void) {
   deleteTarget.value = edu
   isDeleteModalOpen.value = true
+  closePopover()
 }
 
 async function confirmDelete() {
@@ -619,26 +643,6 @@ async function confirmDelete() {
   } finally {
     deleting.value = false
   }
-}
-
-function getDropdownItems(edu: EducationResponse) {
-  return [
-    [
-      {
-        label: 'Edit',
-        icon: 'i-lucide-pencil',
-        click: () => openEditModal(edu)
-      }
-    ],
-    [
-      {
-        label: 'Delete',
-        icon: 'i-lucide-trash-2',
-        color: 'error' as const,
-        click: () => openDeleteModal(edu)
-      }
-    ]
-  ]
 }
 
 // Lifecycle

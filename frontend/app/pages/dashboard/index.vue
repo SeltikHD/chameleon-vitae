@@ -83,37 +83,45 @@
             </template>
 
             <template #actions-cell="{ row }">
-              <UDropdownMenu
-                :items="[
-                  [
-                    {
-                      label: 'View',
-                      icon: 'i-lucide-eye',
-                      click: () => navigateTo(`/dashboard/resumes/${row.original.id}`)
-                    },
-                    {
-                      label: 'Download',
-                      icon: 'i-lucide-download',
-                      click: () => downloadResume(row.original.id)
-                    }
-                  ],
-                  [
-                    {
-                      label: 'Delete',
-                      icon: 'i-lucide-trash-2',
-                      color: 'error',
-                      click: () => deleteResume(row.original.id)
-                    }
-                  ]
-                ]"
-              >
+              <UPopover :popper="{ placement: 'bottom-end' }">
                 <UButton
                   color="neutral"
                   variant="ghost"
                   icon="i-lucide-more-horizontal"
                   size="xs"
                 />
-              </UDropdownMenu>
+
+                <template #content="{ close }">
+                  <div class="p-1 min-w-35 flex flex-col gap-0.5">
+                    <UButton
+                      color="neutral"
+                      variant="ghost"
+                      icon="i-lucide-eye"
+                      label="View"
+                      class="justify-start w-full"
+                      @click="navigateTo(`/dashboard/resumes/${row.original.id}`)"
+                    />
+
+                    <UButton
+                      color="neutral"
+                      variant="ghost"
+                      icon="i-lucide-download"
+                      label="Download"
+                      class="justify-start w-full"
+                      @click="downloadResume(row.original.id, close)"
+                    />
+
+                    <UButton
+                      color="error"
+                      variant="ghost"
+                      icon="i-lucide-trash-2"
+                      label="Delete"
+                      class="justify-start w-full"
+                      @click="deleteResume(row.original.id, close)"
+                    />
+                  </div>
+                </template>
+              </UPopover>
             </template>
           </UTable>
         </UCard>
@@ -365,7 +373,8 @@ function getStatusColor(status: string) {
   return colors[status] || 'neutral'
 }
 
-async function downloadResume(id: string) {
+async function downloadResume(id: string, closePopover?: () => void) {
+  closePopover?.()
   try {
     toast.add({
       title: 'Downloading...',
@@ -417,9 +426,10 @@ async function downloadResume(id: string) {
   }
 }
 
-async function deleteResume(id: string) {
+async function deleteResume(id: string, closePopover?: () => void) {
   if (!confirm('Are you sure you want to delete this resume?')) return
 
+  closePopover?.()
   try {
     await apiFetch(`/resumes/${id}`, { method: 'DELETE' })
 

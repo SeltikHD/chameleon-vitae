@@ -116,14 +116,36 @@
                 </p>
               </div>
             </div>
-            <UDropdown :items="getDropdownItems(project)">
+            <UPopover :popper="{ placement: 'bottom-end' }">
               <UButton
                 color="neutral"
                 variant="ghost"
                 icon="i-lucide-more-vertical"
                 size="sm"
               />
-            </UDropdown>
+
+              <template #content="{ close }">
+                <div class="p-1 min-w-35 flex flex-col gap-0.5">
+                  <UButton
+                    color="neutral"
+                    variant="ghost"
+                    icon="i-lucide-pencil"
+                    label="Edit"
+                    class="justify-start w-full"
+                    @click="handleEdit(project, close)"
+                  />
+
+                  <UButton
+                    color="error"
+                    variant="ghost"
+                    icon="i-lucide-trash-2"
+                    label="Delete"
+                    class="justify-start w-full text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30"
+                    @click="handleDelete(project, close)"
+                  />
+                </div>
+              </template>
+            </UPopover>
           </div>
         </template>
 
@@ -825,24 +847,14 @@ async function confirmDelete() {
   }
 }
 
-function getDropdownItems(project: ProjectResponse) {
-  return [
-    [
-      {
-        label: 'Edit',
-        icon: 'i-lucide-pencil',
-        click: () => openEditModal(project)
-      }
-    ],
-    [
-      {
-        label: 'Delete',
-        icon: 'i-lucide-trash-2',
-        color: 'error' as const,
-        click: () => openDeleteModal(project)
-      }
-    ]
-  ]
+const handleEdit = (project: ProjectResponse, close: () => void) => {
+  close() // Fecha o menu
+  openEditModal(project)
+}
+
+const handleDelete = (project: ProjectResponse, close: () => void) => {
+  close() // Fecha o menu
+  openDeleteModal(project)
 }
 
 // Lifecycle

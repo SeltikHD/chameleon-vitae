@@ -31,7 +31,7 @@
         <USelectMenu
           v-model="statusFilter"
           :items="statusOptions"
-          value-key="value"
+          option-attribute="label"
           placeholder="All statuses"
           class="w-full sm:w-40"
         />
@@ -143,37 +143,45 @@
                 size="xs"
                 @click="downloadResume(row.original.id)"
               />
-              <UDropdownMenu
-                :items="[
-                  [
-                    {
-                      label: 'Duplicate',
-                      icon: 'i-lucide-copy',
-                      click: () => duplicateResume(row.original.id)
-                    },
-                    {
-                      label: 'Edit',
-                      icon: 'i-lucide-pencil',
-                      click: () => navigateTo(`/dashboard/resumes/${row.original.id}`)
-                    }
-                  ],
-                  [
-                    {
-                      label: 'Delete',
-                      icon: 'i-lucide-trash-2',
-                      color: 'error',
-                      click: () => deleteResume(row.original.id)
-                    }
-                  ]
-                ]"
-              >
+              <UPopover :popper="{ placement: 'bottom-end' }">
                 <UButton
                   color="neutral"
                   variant="ghost"
                   icon="i-lucide-more-horizontal"
                   size="xs"
                 />
-              </UDropdownMenu>
+
+                <template #content="{ close }">
+                  <div class="p-1 min-w-35 flex flex-col gap-0.5">
+                    <UButton
+                      color="primary"
+                      variant="ghost"
+                      icon="i-lucide-pencil"
+                      label="Edit"
+                      class="justify-start w-full"
+                      @click="navigateTo(`/dashboard/resumes/${row.original.id}`)"
+                    />
+
+                    <UButton
+                      color="neutral"
+                      variant="ghost"
+                      icon="i-lucide-copy"
+                      label="Duplicate"
+                      class="justify-start w-full"
+                      @click="duplicateResume(row.original.id, close)"
+                    />
+
+                    <UButton
+                      color="error"
+                      variant="ghost"
+                      icon="i-lucide-trash-2"
+                      label="Delete"
+                      class="justify-start w-full text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30"
+                      @click="deleteResume(row.original.id, close)"
+                    />
+                  </div>
+                </template>
+              </UPopover>
             </div>
           </template>
         </UTable>
@@ -270,7 +278,7 @@ definePageMeta({
 const toast = useToast()
 
 const searchQuery = ref('')
-const statusFilter = ref('')
+const statusFilter = ref<{ label: string; value: string }>({ label: 'All statuses', value: '' })
 const viewMode = ref<'table' | 'grid'>('table')
 const isLoading = ref(true)
 const resumes = ref<ResumeResponse[]>([])
@@ -302,7 +310,8 @@ const filteredResumes = computed(() => {
       (resume.company_name?.toLowerCase().includes(searchQuery.value.toLowerCase()) ?? false) ||
       (resume.job_title?.toLowerCase().includes(searchQuery.value.toLowerCase()) ?? false)
 
-    const matchesStatus = statusFilter.value === '' || resume.status === statusFilter.value
+    const matchesStatus =
+      statusFilter.value.value === '' || resume.status === statusFilter.value.value
 
     return matchesSearch && matchesStatus
   })
@@ -424,7 +433,9 @@ async function downloadResume(id: string) {
   }
 }
 
-async function duplicateResume(id: string) {
+async function duplicateResume(id: string, close?: () => void) {
+  close?.()
+
   try {
     // Find the resume to duplicate
     const original = resumes.value.find((r) => r.id === id)
@@ -461,7 +472,7 @@ async function duplicateResume(id: string) {
   }
 }
 
-async function deleteResume(id: string) {
+async function deleteResume(id: string, close?: () => void) {
   if (!confirm('Are you sure you want to delete this resume?')) return
 
   try {
@@ -484,5 +495,7 @@ async function deleteResume(id: string) {
       icon: 'i-heroicons-exclamation-circle'
     })
   }
+
+  close?.()
 }
 </script>
